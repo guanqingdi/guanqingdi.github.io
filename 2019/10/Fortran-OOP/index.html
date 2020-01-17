@@ -1,0 +1,752 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="alternate" href="/atom.xml" title="过河卒" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://guanqingdi.github.io').hostname,
+    root: '/',
+    scheme: 'Muse',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言记录Fortran面向对象的学习过程, 归纳总结相关的重要知识点. 核心内容是 Chapman 的 Fortran程序设计(第四版),结合了部分学习python面向对象时的内容.">
+<meta name="keywords" content="fortran,OOP">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Fortran 面向对象程序设计">
+<meta property="og:url" content="https:&#x2F;&#x2F;guanqingdi.github.io&#x2F;2019&#x2F;10&#x2F;Fortran-OOP&#x2F;index.html">
+<meta property="og:site_name" content="过河卒">
+<meta property="og:description" content="前言记录Fortran面向对象的学习过程, 归纳总结相关的重要知识点. 核心内容是 Chapman 的 Fortran程序设计(第四版),结合了部分学习python面向对象时的内容.">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;guanqingdi.github.io&#x2F;2019&#x2F;10&#x2F;Fortran-OOP&#x2F;Fortran-OOP&#x2F;Fortran_Programming.jpg">
+<meta property="og:updated_time" content="2019-11-20T14:46:45.666Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;guanqingdi.github.io&#x2F;2019&#x2F;10&#x2F;Fortran-OOP&#x2F;Fortran-OOP&#x2F;Fortran_Programming.jpg">
+
+<link rel="canonical" href="https://guanqingdi.github.io/2019/10/Fortran-OOP/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>Fortran 面向对象程序设计 | 过河卒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">过河卒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">朝廷鹰犬，反贼先锋</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://guanqingdi.github.io/2019/10/Fortran-OOP/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Guan Qingdi">
+      <meta itemprop="description" content="日常 | 湍流 | PDF | 燃烧 | 码渣">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="过河卒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          Fortran 面向对象程序设计
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-10-28 22:26:49" itemprop="dateCreated datePublished" datetime="2019-10-28T22:26:49+08:00">2019-10-28</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-11-20 22:46:45" itemprop="dateModified" datetime="2019-11-20T22:46:45+08:00">2019-11-20</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Programming/" itemprop="url" rel="index">
+                    <span itemprop="name">Programming</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>9.4k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>16 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <p><img src="Fortran-OOP/Fortran_Programming.jpg" alt=""></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>记录Fortran面向对象的学习过程, 归纳总结相关的重要知识点. 核心内容是 <strong>Chapman</strong> 的 <em>Fortran程序设计(第四版)</em>,结合了部分学习python面向对象时的内容.</p>
+<a id="more"></a>
+
+<h1 id="类和对象"><a href="#类和对象" class="headerlink" title="类和对象"></a>类和对象</h1><p>对象是具体的,程序中的对象与现实世界中的对象十分类似,都具备某些属性和一定的行为.例如<code>宠物狗</code>,<code>宠物猫</code>等都是一定的对象,狗和猫可以拥有<code>名字年龄</code>等属性,也可以进行<code>吃饭睡觉</code>等一定的行为.</p>
+<p>类是抽象的,是对一类对象逻辑上的抽象,例如可以将前述的<code>宠物猫</code>和<code>宠物狗</code>抽象归纳为<code>宠物</code>这一类.类中自然也抽象了对象的各种属性和行为.在类中,<strong>数据成员</strong>用来定义数据类型,如<code>名字年龄</code>等属性定义的数据类型声明等,<strong>成员函数</strong>则定义了对数据域的操作,或者说定义了具体的行为.</p>
+<p>从这个例子也可以直观的看到,抽象的过程本身是不唯一的,甚至是具有一定的随意性的,可以将<code>宠物狗</code>和<code>宠物猫</code>抽象为<code>动物</code>,甚至也可以是<code>生物</code>,这个抽象的程度根据程序员对要解决问题的分析理解和选择来确定的,没有唯一性,但也要尽可能选择比较恰当的抽象范围,不要过小导致没有概括性,也不要过大导致没有什么代表性,过度或者不足的抽象都可能使得问题更加复杂化.</p>
+<p>面向对象编程过程中,对象就是对类的实例化,或者说创建对象的过程就是对类的实例化过程.</p>
+<h1 id="Fortran-类的结构"><a href="#Fortran-类的结构" class="headerlink" title="Fortran 类的结构"></a>Fortran 类的结构</h1><p>一个 fortran 类的主要组件包含以下几部分:</p>
+<ol>
+<li>数据域(Field)</li>
+</ol>
+<p>简单的理解,就是变量.当然类中的变量本身没有具体的意义,类是抽象的,其变量也是抽象的,没有具体意义的,只是一个变量名称,类中的变量在实例化为对象的过程(创建对象的过程)中,会给这个对象创建具体的变量,对象的变量是具有实际意义的,或者不严格的讲是在内存中进行了定义存储的.</p>
+<ol start="2">
+<li>方法(Method)</li>
+</ol>
+<p>方法定义了类的对象实现行为的过程.有的方法可能在类中进行明确的定义,有的则可能直接从父类中继承而来.</p>
+<ol start="3">
+<li>构造函数(Constructor)</li>
+</ol>
+<p>当对象被创建(类的实例化)后,构造函数用来初始化对象中的变量.</p>
+<ol start="4">
+<li>析构函数(Finalizer)</li>
+</ol>
+<p>在一个对象被销毁前,它将调用该函数,用以完成对象销毁前的所有必须的清楚工作,主要是为了释放资源,例如在对象中创建的动态数组,指针等.类中最多有一个析构函数,很多类也可能根本不需要析构函数.</p>
+<h1 id="CLASS保留字"><a href="#CLASS保留字" class="headerlink" title="CLASS保留字"></a>CLASS保留字</h1><p>所谓的保留字就是被语言本身定义过的,使用者不能再重新定义的变量名或者过程名.</p>
+<p>在 fortran 语言中, <code>CLASS</code> 保留字是对 <code>TYPE</code> 保留字的一种变形.常规 fortran 程序中,<strong>形参</strong>的类型和调用时相应<strong>实参</strong>的类型要完全匹配,而 <code>CLASS</code> 保留字则以一种特殊的方法放松了这种要求.即若形参用 <code>CLASS</code> 声明,<font color=red>那么该形参将与该数据类型及其所有扩展类型相匹配</font></p>
+<p>例如,假设声明了以下两个数据类型:</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> :: point</span><br><span class="line">    <span class="keyword">real</span> :: x</span><br><span class="line">    <span class="keyword">real</span> :: y</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span>, <span class="keyword">extends</span>(point) :: point_3d</span><br><span class="line">    <span class="keyword">real</span> :: z</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span></span><br></pre></td></tr></table></figure>
+
+<p>如果又声明一个指针:</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span>(point), <span class="keyword">pointer</span> :: p</span><br></pre></td></tr></table></figure>
+
+<p>那么它只能接受 <code>point</code> 类型的数据,而如果该指针声明为:</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">calss(point), <span class="keyword">pointer</span> :: p</span><br></pre></td></tr></table></figure>
+
+<p>这种方式声明的指针,则可以 <code>point</code> 类型,也可以接受其的拓展 <code>point_3d</code>类型.</p>
+<p>以 <code>CLASS</code> 保留字声明的形参,称为形参的 <strong>声明类型</strong>; 而任何时候分配给形参的实际对象的类型被称为形参的动态类型.</p>
+<p>因为 <code>CLASS</code> 声明的形参可以与一种以上的数据类型相匹配,所以被认为是 <strong>多态的</strong>.</p>
+<p>这种多态指针存在限制: 仅能用它访问声明类型的数据项,而扩展中定义的数据项不能用多态形参访问.</p>
+<p>例如,如下的类型:</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">class</span>(point), <span class="keyword">pointer</span> :: p1</span><br><span class="line"><span class="keyword">type</span>(point_3d),<span class="keyword">target</span> :: p2</span><br></pre></td></tr></table></figure>
+
+<p><code>CLASS</code> 定义的 <strong>p1</strong> 只能访问 <strong>point</strong> 类型的数据项, 即 <strong>p1</strong> 可以访问 p1%x 和 p1%y, <font color=red> 但是不能访问 p1%z</font>, 因为 <strong>point</strong>类型没有定义z. </p>
+<h1 id="Fortran-中实现类和对象"><a href="#Fortran-中实现类和对象" class="headerlink" title="Fortran 中实现类和对象"></a>Fortran 中实现类和对象</h1><p>简单的来说,实现类就是<strong>声明变量</strong>和<strong>创建方法</strong>, 而创建对象就是<strong>类的实例化</strong>.</p>
+<ul>
+<li>声明变量</li>
+</ul>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> complex_class        <span class="comment">! 模块名称</span></span><br><span class="line"><span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line"></span><br><span class="line"><span class="comment">! 类型定义</span></span><br><span class="line"><span class="keyword">type</span>,<span class="keyword">public</span> :: complex_ob   <span class="comment">! 类的名称</span></span><br><span class="line">    <span class="comment">! 类的数据成员</span></span><br><span class="line">    <span class="keyword">real</span> :: re</span><br><span class="line">    <span class="keyword">real</span> :: im</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span> complex_ob</span><br><span class="line"></span><br><span class="line"><span class="comment">! 添加方法的具体实现</span></span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span> <span class="keyword">module</span> complex_class</span><br></pre></td></tr></table></figure>
+
+<p>这里注意,比较特别的是,<font color=red>如果类的数据成员是<code>public</code> 属性,那么这个类的构造函数就可以用来初始化实例变量,该构造函数由数据类型名组成</font>.另外Chapman书中的原来的代码在 <strong>intel19</strong> 编译器下编译出错,可能更 <code>CLASS</code> 保留字还有什么多态指针这些相关吧,具体没有深究. 采用 <code>type</code> 进行声明则没有问题,可以正常运行.</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">! class(complex_ob), pointer :: p</span></span><br><span class="line"><span class="keyword">type</span>(complex_ob) :: p</span><br><span class="line"></span><br><span class="line">p = complex_ob(re=<span class="number">1.0</span>, im=<span class="number">2.0</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>创建方法</li>
+</ul>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> complex_class        <span class="comment">! 模块名称</span></span><br><span class="line"><span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line"></span><br><span class="line"><span class="comment">! 类型定义</span></span><br><span class="line"><span class="keyword">type</span>,<span class="keyword">public</span> :: complex_ob   <span class="comment">! 类的名称</span></span><br><span class="line">    <span class="comment">! 类的数据成员</span></span><br><span class="line">    <span class="keyword">real</span> :: re</span><br><span class="line">    <span class="keyword">real</span> :: im</span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line">    <span class="comment">! 类的方法成员</span></span><br><span class="line">    <span class="keyword">procedure</span> :: add =&gt; add_complex_to_complex</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span> complex_ob</span><br><span class="line"></span><br><span class="line"><span class="comment">! 声明对模块的访问</span></span><br><span class="line"><span class="keyword">private</span> :: add_complex_to_complex</span><br><span class="line"></span><br><span class="line"><span class="comment">! 添加方法的具体实现</span></span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line">    <span class="function"><span class="keyword">subroutine</span></span> add_complex_to_complex( this, ... )</span><br><span class="line">        <span class="keyword">class</span>(complex_ob) :: this</span><br><span class="line">        ...</span><br><span class="line">    <span class="keyword">end</span> <span class="function"><span class="keyword">subroutine</span></span> add_complex_to_complex</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">module</span> complex_class</span><br></pre></td></tr></table></figure>
+
+<p>创建方法的基本结构就是如上所示,其中 <code>add</code> 过程只是对 <code>add_complex_to_complex</code> 更简短的表示而已,方便对象对该过程的调用. 方法子过程中的第一个变量必须是有类型定义的变量(this). </p>
+<ul>
+<li>类的实例化</li>
+</ul>
+<p>一般是采用 <code>type</code> 保留字直接实例化创建对象, 注意 <code>class</code> 保留字一般在类的定义过程中,常用于实现 <strong>多态</strong>,在实例化过程中不采用.<br>如果类的数据域不是 <code>private</code> 属性, 则可以直接用类的名称创建并初始化.</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">program</span></span> test</span><br><span class="line">    <span class="keyword">use</span> complex_class</span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line">    <span class="keyword">real</span> a, b, c</span><br><span class="line">    <span class="keyword">type</span>(complex_ob) :: p</span><br><span class="line">    <span class="keyword">type</span>(complex_ob) :: p1 = complex_ob(<span class="number">1.</span>, <span class="number">2.</span>)</span><br><span class="line"></span><br><span class="line">    <span class="built_in">write</span>(*,*) p1%re, p1%im</span><br><span class="line"></span><br><span class="line">    p = complex_ob( re=<span class="number">1.0</span>, im=<span class="number">2.0</span>)</span><br><span class="line">    <span class="built_in">write</span>(*,*) p%re, p%im</span><br><span class="line"></span><br><span class="line">    p = complex_ob( im=<span class="number">1.0</span>, re=<span class="number">2.0</span>)</span><br><span class="line">    <span class="built_in">write</span>(*,*) p%re, p%im</span><br><span class="line"></span><br><span class="line">    p = complex_ob( <span class="number">3.0</span>, <span class="number">4.0</span>)</span><br><span class="line">    <span class="built_in">write</span>(*,*) p%re, p%im</span><br><span class="line"><span class="keyword">end</span> <span class="function"><span class="keyword">program</span></span></span><br></pre></td></tr></table></figure>
+
+<h1 id="timer-类"><a href="#timer-类" class="headerlink" title="timer 类"></a>timer 类</h1><p>主要实现对程序各部分的简单耗时分析,数据就包含时长,方法主要就是 <strong>开始计时</strong>, <strong>结束计时</strong>, <strong>打印时长</strong>.</p>
+<p>主要过程包括:</p>
+<ul>
+<li><p>定义变量</p>
+</li>
+<li><p>创建方法</p>
+</li>
+</ul>
+<p>因为比较简单,这里直接给出Chapman书中最后的实现结果.</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> timer_class</span><br><span class="line"></span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">! 声明常量(real类型的精度)</span></span><br><span class="line">    <span class="keyword">integer</span>,<span class="keyword">parameter</span>       :: DBL = <span class="built_in">selected_real_kind</span>(p=<span class="number">14</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">!类型定义</span></span><br><span class="line">    <span class="keyword">type</span>, <span class="keyword">public</span> :: timer</span><br><span class="line">        <span class="keyword">private</span></span><br><span class="line">        <span class="keyword">real</span>(DBL)           :: saved_time</span><br><span class="line">    <span class="keyword">contains</span></span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: start_timer  =&gt; start_timer_sub</span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: elapsed_time =&gt; elapsed_time_fn</span><br><span class="line">    <span class="keyword">end</span> <span class="keyword">type</span> timer</span><br><span class="line"></span><br><span class="line">    <span class="comment">! 子过程访问限制</span></span><br><span class="line">    <span class="keyword">private</span> :: start_timer_sub</span><br><span class="line">    <span class="keyword">private</span> :: elapsed_time_fn</span><br><span class="line"></span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line"><span class="comment">!-------------------------------------------------------------------------------</span></span><br><span class="line"><span class="function"><span class="keyword">subroutine</span></span> start_timer_sub( this )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line"><span class="comment">! - inout variables(声明调用参数)</span></span><br><span class="line">    <span class="keyword">class</span>(timer),<span class="keyword">intent</span>(inout)  :: this</span><br><span class="line"><span class="comment">! - local variables(声明局部变量)</span></span><br><span class="line">    <span class="keyword">integer</span>,<span class="keyword">dimension</span>(<span class="number">8</span>)        :: <span class="keyword">value</span></span><br><span class="line"></span><br><span class="line"><span class="comment">! - 获取时间</span></span><br><span class="line">    <span class="keyword">call</span> <span class="built_in">date_and_time</span> ( values=<span class="keyword">value</span> )</span><br><span class="line"></span><br><span class="line">    this%saved_time = <span class="number">86400.d0</span> * <span class="keyword">value</span>(<span class="number">3</span>) + <span class="number">3600.d0</span> * <span class="keyword">value</span>(<span class="number">5</span>) &amp;</span><br><span class="line">            + <span class="number">60.d0</span> * <span class="keyword">value</span>(<span class="number">6</span>) + <span class="keyword">value</span>(<span class="number">7</span>) + <span class="number">0.001d0</span> * <span class="keyword">value</span>(<span class="number">8</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span> <span class="function"><span class="keyword">subroutine</span></span> start_timer_sub</span><br><span class="line"><span class="comment">!-------------------------------------------------------------------------------</span></span><br><span class="line"><span class="keyword">real</span> <span class="function"><span class="keyword">function</span></span> elapsed_time_fn( this )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line"><span class="comment">! - inout variables(声明调用参数)</span></span><br><span class="line">    <span class="keyword">class</span>(timer),<span class="keyword">intent</span>(inout)  :: this</span><br><span class="line"><span class="comment">! - local variables(声明局部变量)</span></span><br><span class="line">    <span class="keyword">integer</span>,<span class="keyword">dimension</span>(<span class="number">8</span>)        :: <span class="keyword">value</span></span><br><span class="line">    <span class="keyword">real</span>(DBL)                   :: current_time</span><br><span class="line"></span><br><span class="line">    <span class="keyword">call</span> <span class="built_in">date_and_time</span> ( values=<span class="keyword">value</span> )</span><br><span class="line"></span><br><span class="line">    current_time = <span class="number">86400.d0</span> * <span class="keyword">value</span>(<span class="number">3</span>) + <span class="number">3600.d0</span> * <span class="keyword">value</span>(<span class="number">5</span>) &amp;</span><br><span class="line">    + <span class="number">60.d0</span> * <span class="keyword">value</span>(<span class="number">6</span>) + <span class="keyword">value</span>(<span class="number">7</span>) + <span class="number">0.001d0</span> * <span class="keyword">value</span>(<span class="number">8</span>)</span><br><span class="line"></span><br><span class="line">    elapsed_time_fn = current_time - this%saved_time</span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span> <span class="function"><span class="keyword">function</span></span> elapsed_time_fn</span><br><span class="line"><span class="comment">!-------------------------------------------------------------------------------</span></span><br><span class="line"><span class="keyword">end</span> <span class="keyword">module</span> timer_class</span><br></pre></td></tr></table></figure>
+
+<h1 id="方法分类"><a href="#方法分类" class="headerlink" title="方法分类"></a>方法分类</h1><ul>
+<li>设置方法(set)</li>
+</ul>
+<p>向类中存储数据的方法,以 <code>set</code> 开头.</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">call</span> d1%set_date(<span class="number">1</span>,<span class="number">3</span>,<span class="number">2018</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>读取方法(get)</li>
+</ul>
+<p>从类中获取数据的方法, 以 <code>get</code> 开头.</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">date = d1%get_date()</span><br><span class="line">year = d1%get_year()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>判断方法(is)</li>
+</ul>
+<p>在类中检验方法的真假, 以 <code>is</code> 开头</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span>( d1%is_leap_year ) <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">write</span>(*,*) d1%get_year(), <span class="string">' is a leap year. '</span></span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="析构函数"><a href="#析构函数" class="headerlink" title="析构函数"></a>析构函数</h1><p>析构函数完成对象销毁前全部必要的清理工作(释放资源,关闭文件)等. <font color=red> 类中可以有一个以上的析构函数</font>,但大多数类也根本不需要析构函数.</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span>,<span class="keyword">public</span> :: vector</span><br><span class="line">    <span class="keyword">private</span></span><br><span class="line">    <span class="keyword">real</span>,<span class="keyword">pointer</span>    :: v(:)</span><br><span class="line">    <span class="keyword">logical</span>         :: <span class="built_in">allocated</span> = .false.</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span></span><br></pre></td></tr></table></figure>
+
+<p>如果该数据类型的对象被删除,指针也将释放,但是已分配的空间却被保留下来了,这样程序中就出现了<strong>内存泄露</strong>.</p>
+<p>而如果在类中声明一个 <code>clean_vector</code> 的析构子过程</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span>,<span class="keyword">public</span> :: vector</span><br><span class="line">    <span class="keyword">private</span></span><br><span class="line">    <span class="keyword">real</span>,<span class="keyword">pointer</span>    :: v(:)</span><br><span class="line">    <span class="keyword">logical</span>         :: <span class="built_in">allocated</span> = .false.</span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line">    <span class="keyword">final</span>           :: clean_vector</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span></span><br></pre></td></tr></table></figure>
+
+<p>这样在销毁这个数据类型的数据项时,它销毁前将自动调用析构子过程clean_vector.</p>
+<h1 id="继承性和多态性"><a href="#继承性和多态性" class="headerlink" title="继承性和多态性"></a>继承性和多态性</h1><h2 id="超类和子类"><a href="#超类和子类" class="headerlink" title="超类和子类"></a>超类和子类</h2><p>继承在面向对象里是很重要也是比较清晰的概念,低层级的类可以继承上层类的变量和方法.继承的概念Fortran与其他语言没有什么区别,下面直接给出 <strong>Fortran</strong> 中子类的定义以及使用方法.</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">! 类型定义</span></span><br><span class="line"><span class="keyword">type</span>,<span class="keyword">public</span> :: employee</span><br><span class="line">    <span class="comment">! 变量</span></span><br><span class="line">    <span class="keyword">character</span>(len=<span class="number">30</span>)   :: first_name</span><br><span class="line">    <span class="keyword">character</span>(len=<span class="number">30</span>)   :: last_name</span><br><span class="line">    <span class="keyword">character</span>(len=<span class="number">11</span>)   :: ssn</span><br><span class="line">    <span class="keyword">real</span>(<span class="keyword">kind</span>=<span class="number">8</span>)        :: pay = <span class="number">0</span></span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line">    <span class="comment">! 方法</span></span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_employee =&gt; set_emplyee_sub</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_name =&gt; set_name_sub</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_ssn =&gt; set_ssn_sub</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: get_first_name =&gt; get_first_name_fn</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: get_last_name =&gt; get_last_name_fn</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: get_ssn =&gt; get_ssn_fn</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: calc_pay =&gt; calc_pay_fn</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span> employee</span><br></pre></td></tr></table></figure>
+
+<p>上面该过程定义了 <strong>employee</strong> 这样一个类型,包含了一定的变量和相应的方法. <strong>fortran</strong>语法中这些变量和方法都要有比较严格的定义过程,可能不像其他语言一样比较灵活.</p>
+<p>基于<strong>employee</strong>这个类,可以进一步定义<strong>salaried_employee</strong>等子类</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">! 类型定义</span></span><br><span class="line"><span class="keyword">type</span>,<span class="keyword">public</span>,<span class="keyword">extends</span>(employee)   :: salaried_employee</span><br><span class="line">    <span class="comment">! 定义其他变量</span></span><br><span class="line">    <span class="keyword">private</span></span><br><span class="line">    <span class="keyword">real</span>    :: salary = <span class="number">0</span></span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line">    <span class="comment">! 绑定的其他方法</span></span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_salary =&gt; set_salary_sub</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: calc_pay =&gt; calc_pay_fn</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span> salaried_employee</span><br></pre></td></tr></table></figure>
+
+<p>通过<code>extends</code>,新的子类<strong>salaried_employee</strong>继承了<strong>employee</strong>的所有变量和方法,还添加了新的方法.另外这里有一个<code>calc_pay</code>方法,还是对超类<strong>employee</strong>中方法的<strong>重载</strong>,实际上就是对超类中定义方法的代替.</p>
+<h2 id="超类对象和子类对象"><a href="#超类对象和子类对象" class="headerlink" title="超类对象和子类对象"></a>超类对象和子类对象</h2><p>对象是类的实例化,子类对象继承超类对象的所有变量和方法.任何子类对象都可以看成是它的超类的对象.这里最主要的就是通过指向子类的指针也可以通过指向超类的指针来操作该对象.</p>
+<p>也就是说,一个对象可以通过不同’路径’的指针来操作它.</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">calss(employee)         :: <span class="keyword">pointer</span>  :: emp1, emp2</span><br><span class="line"><span class="keyword">type</span>(salaried_employee) :: <span class="keyword">pointer</span>  :: sal_emp</span><br><span class="line"><span class="keyword">type</span>(hourly_employee)   :: <span class="keyword">pointer</span>  :: hourly_emp</span><br><span class="line"></span><br><span class="line">emp1 =&gt; sal_emp</span><br><span class="line">emp2 =&gt; hourly_mep</span><br></pre></td></tr></table></figure>
+
+<h2 id="多态性"><a href="#多态性" class="headerlink" title="多态性"></a>多态性</h2><p>多态性可以简单的理解为,不同子类的多个对象,可以被当成一个超类的对象来处理.如前面举例的<code>宠物猫</code>和<code>宠物狗</code>,<code>宠物猫</code>定义了方法:<strong>发出’喵喵喵’的叫声</strong>,<code>宠物狗</code>定义方法:<strong>发出’汪汪汪’的叫声</strong>,这个都可以被<code>宠物</code>这个超类的<strong>发出叫声</strong>来处理.</p>
+<p><font color=red >为了能够使得多态性发挥作用,<strong>必须在超类中定义该方法</strong>,并且在各个子类中重载该方法.</font></p>
+<h2 id="SELECT-TYPE-结构"><a href="#SELECT-TYPE-结构" class="headerlink" title="SELECT TYPE 结构"></a>SELECT TYPE 结构</h2><p>在使用超类指针引用对象时,可以用<code>SELECT TYPE</code> 来分辨出该对象是属于哪一个子类的.</p>
+<p>基本结构如下:</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[<span class="keyword">name</span>:] <span class="keyword">select</span> <span class="keyword">type</span> (obj)</span><br><span class="line"><span class="keyword">type</span> is (type_1) </span><br><span class="line">    Block1</span><br><span class="line"><span class="keyword">type</span> is (type2) </span><br><span class="line">    Block2</span><br><span class="line"><span class="keyword">class</span> is (type_3) </span><br><span class="line">    Block3</span><br><span class="line"><span class="keyword">class</span> <span class="keyword">default</span></span><br><span class="line">    Block4</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">select</span> [<span class="keyword">name</span>]</span><br></pre></td></tr></table></figure>
+
+<p>根据 <strong>obj</strong> 对象的不同,执行不同的块,这些块中执行该子类型的实现方法.</p>
+<h1 id="禁止在子类中重载方法"><a href="#禁止在子类中重载方法" class="headerlink" title="禁止在子类中重载方法"></a>禁止在子类中重载方法</h1><p>当需要一个或者多个方法在某个特定超类的子类中不被修改,这可以在绑定时用<code>non_overridable</code>属性标识声明该方法.</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">type</span> :: point</span><br><span class="line">    <span class="keyword">real</span> :: x</span><br><span class="line">    <span class="keyword">real</span> :: y</span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line">    <span class="keyword">procedure</span>, <span class="keyword">non_overridable</span> :: my_proc</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span> point</span><br></pre></td></tr></table></figure>
+
+<p>在上述类型的定义中,被<code>non_overridable</code>标识的<code>my_proc</code>方法不能被<code>point</code>的任何子类所改写.</p>
+<h1 id="抽象类"><a href="#抽象类" class="headerlink" title="抽象类"></a>抽象类</h1><h2 id="抽象方法和抽象类"><a href="#抽象方法和抽象类" class="headerlink" title="抽象方法和抽象类"></a>抽象方法和抽象类</h2><p>为了实现<strong>多态性</strong>,多态方法必须与父类绑定,这样才能被其子类所继承和重载.</p>
+<p>但是如前<code>employee</code>类,该类的方法<code>calc_pay</code>总是被其子类的方法所重载,如果没有对象从父类中进行实例化,那么这个父类中的方法本身是永远不会被使用.</p>
+<p>因此在Fortran中就允许只声明<strong>方法的绑定</strong>和<strong>方法的接口</strong>,而不具体编写方法. 这种方法被称为<code>抽象方法</code>或者<code>不能引用的方法</code>.而包含抽象方法的类型则称为<code>抽象类型</code>,以区别于一般的<code>具体类型</code>.</p>
+<h2 id="抽象方法的定义"><a href="#抽象方法的定义" class="headerlink" title="抽象方法的定义"></a>抽象方法的定义</h2><p>类型定义中,用<code>deferred</code>属性来声明抽象方法,以及用<code>abstract interface</code>(抽象接口)来定义方法的调用参数的顺序(方法形参的顺序).</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">! 抽象方法的定义</span></span><br><span class="line"><span class="keyword">procedure</span>(calc_payx),<span class="keyword">public</span>,<span class="keyword">deferred</span> :: calc_pay</span><br><span class="line"><span class="comment">! 抽象接口的定义</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="keyword">interface</span></span><br><span class="line">    <span class="keyword">pure</span> <span class="function"><span class="keyword">subroutine</span></span> calc_payx( this )</span><br><span class="line">        <span class="keyword">import</span> :: employee</span><br><span class="line">        <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line">        <span class="keyword">class</span>(employee),<span class="keyword">intent</span>(inout) :: this</span><br><span class="line">    <span class="keyword">end</span> <span class="function"><span class="keyword">subroutine</span></span> destroy_func</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">interface</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>calc_pay</strong>则是方法实际的名字,也就是要被重载的方法的实际名称.</p>
+</li>
+<li><p><strong>calc_payx</strong>为该方法<code>抽象接口</code>的名字,抽象接口定义了抽象方法形参的顺序</p>
+</li>
+</ul>
+<h2 id="抽象类的定义"><a href="#抽象类的定义" class="headerlink" title="抽象类的定义"></a>抽象类的定义</h2><p>任何包含了抽象方法的类型都必须用<code>abstract</code>属性声明.此外,既然抽象类型的方法中包含了抽象方法,那么从抽象类型实例化对象就是非法的.</p>
+<p>更进一步,只要是被<code>abstract</code>定义的抽象类型,都不能直接实例化对象.抽象类型没有直接的对象,但是继承抽象类型的子类,通过对抽象方法的重载,可以创建对象</p>
+<p>因此创建指向该抽象类型的指针是合法的,可以通过指针来操作抽象类型的不同子类对象.</p>
+<figure class="highlight fortran"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">module</span> employee_class</span><br><span class="line"></span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line">    <span class="comment">! 抽象类型的定义</span></span><br><span class="line">    <span class="keyword">type</span>,<span class="keyword">abstract</span>,<span class="keyword">public</span> :: employee</span><br><span class="line">        <span class="keyword">character</span>(len=<span class="number">30</span>)   :: <span class="keyword">name</span></span><br><span class="line">        <span class="keyword">character</span>(len=<span class="number">11</span>)   :: ssn</span><br><span class="line">        <span class="keyword">real</span>(<span class="keyword">kind</span>=<span class="number">8</span>)        :: pay</span><br><span class="line">    <span class="keyword">contains</span></span><br><span class="line">        <span class="comment">! 抽象类型绑定的具体过程</span></span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_employee =&gt; set_employee_sub</span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_name =&gt; set_name_sub</span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_ssn =&gt; set_ssn_sub</span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: get_name =&gt; get_name_fn</span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: get_ssn =&gt; get_ssn_fn</span><br><span class="line">        <span class="comment">! 抽象类型绑定的抽象过程</span></span><br><span class="line">        <span class="keyword">procedure</span>(calc_payx),<span class="keyword">public</span>,<span class="keyword">deferred</span> :: calc_pay</span><br><span class="line">    <span class="keyword">end</span> <span class="keyword">type</span> employee</span><br><span class="line"></span><br><span class="line">    <span class="comment">! 抽象接口的定义</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">interface</span></span><br><span class="line">        <span class="keyword">real</span> <span class="function"><span class="keyword">function</span></span> calc_payx( this, hours )</span><br><span class="line">            <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line">            <span class="keyword">class</span>(employee) :: this</span><br><span class="line">            <span class="keyword">real</span>(<span class="keyword">kind</span>=<span class="number">8</span>),<span class="keyword">intent</span>(<span class="keyword">in</span>) :: hours</span><br><span class="line">        <span class="keyword">end</span> <span class="function"><span class="keyword">function</span></span> calc_payx</span><br><span class="line">    <span class="keyword">end</span> <span class="keyword">interface</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">! 限制对实际过程名的访问</span></span><br><span class="line">    <span class="keyword">private</span> :: set_employee_sub, set_name_sub, set_ssn_sub</span><br><span class="line">    <span class="keyword">private</span> :: get_name_fn, get_ssn_fn</span><br><span class="line"></span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line"><span class="comment">! 具体方法的实现</span></span><br><span class="line"><span class="comment">!-------------------------------------------------------------</span></span><br><span class="line"><span class="function"><span class="keyword">subroutine</span></span> set_employee_sub( this, <span class="keyword">name</span>, ssn )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line"><span class="comment">! - inout variables</span></span><br><span class="line">    <span class="keyword">class</span>(employee)     :: this</span><br><span class="line">    <span class="keyword">character</span>(len=<span class="number">30</span>)   :: <span class="keyword">name</span></span><br><span class="line">    <span class="keyword">character</span>(len=<span class="number">11</span>)   :: ssn</span><br><span class="line"><span class="comment">! - local variables</span></span><br><span class="line"></span><br><span class="line">    this%<span class="keyword">name</span> = <span class="keyword">name</span></span><br><span class="line">    this%ssn = ssn</span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span> <span class="function"><span class="keyword">subroutine</span></span> set_employee_sub</span><br><span class="line"><span class="comment">!-------------------------------------------------------------</span></span><br><span class="line"><span class="function"><span class="keyword">subroutine</span></span> set_name_sub( this, <span class="keyword">name</span> )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line">    </span><br><span class="line"><span class="keyword">end</span> <span class="function"><span class="keyword">subroutine</span></span> set_name_sub</span><br><span class="line"><span class="comment">!-------------------------------------------------------------</span></span><br><span class="line"><span class="keyword">end</span> <span class="keyword">module</span> employee_class</span><br></pre></td></tr></table></figure>
+<h2 id="抽象类和抽象方法的简单总结"><a href="#抽象类和抽象方法的简单总结" class="headerlink" title="抽象类和抽象方法的简单总结"></a>抽象类和抽象方法的简单总结</h2><ol>
+<li><p>抽象类的所有子类都必须重载超类中所有的抽象方法,否则该子类自己也将是抽象类型.</p>
+</li>
+<li><p>不能从抽象类实例化对象. 抽象类就是为具体子类服务的模板,可以从其具体的子类实例化对象.</p>
+</li>
+<li><p>抽象类定义了可以被其子类使用的<strong>多态行为</strong>的类型,但没有这些行为的具体细节.</p>
+</li>
+<li><p>使用抽象类型来定义顶层的主要类型,使用具体类型来完成抽象类的子类的实现细节.</p>
+</li>
+</ol>
+<h2 id="程序实现多态性的简单总结"><a href="#程序实现多态性的简单总结" class="headerlink" title="程序实现多态性的简单总结"></a>程序实现多态性的简单总结</h2><ol>
+<li><strong>定义一个父类,其中需要包含解决问题的所有方法.</strong></li>
+</ol>
+<p>为了实现多态性,超类需要绑定所有方法,超类中可以定义具体方法,也可以定义抽象方法而在子类中实现具体方法.</p>
+<ol start="2">
+<li><strong>为每一类具体问题定义子类,子类包含了解决某一类问题的方法.</strong></li>
+</ol>
+<p>子类可以定义自己的方法,即在超类中没有定义的,这种方法是对该子类自己的过程的实现.另外子类可以重载超类中的方法,这种方法可以通过超类的指针来引用该方法,实现程序的多态性.</p>
+<ol start="3">
+<li><strong>创建不同子类的对象,并用超类的指针引用它们.</strong></li>
+</ol>
+<p>多态性的实现主要就是从这些重载的具体或者抽象方法上体现出来.超类中被重载的方法可以是抽象的,也可以是具体的.</p>
+
+    </div>
+
+    
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------------</div>
+    
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Guan Qingdi
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://guanqingdi.github.io/2019/10/Fortran-OOP/" title="Fortran 面向对象程序设计">https://guanqingdi.github.io/2019/10/Fortran-OOP/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/fortran/" rel="tag"><i class="fa fa-tag"></i> fortran</a>
+              <a href="/tags/OOP/" rel="tag"><i class="fa fa-tag"></i> OOP</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/10/Markdown-Code/" rel="prev" title="Markdown代码块支持的语言">
+      <i class="fa fa-chevron-left"></i> Markdown代码块支持的语言
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/Multi-Blocks-Communication/" rel="next" title="多块并行计算中的通信问题">
+      多块并行计算中的通信问题 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#类和对象"><span class="nav-number">2.</span> <span class="nav-text">类和对象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Fortran-类的结构"><span class="nav-number">3.</span> <span class="nav-text">Fortran 类的结构</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#CLASS保留字"><span class="nav-number">4.</span> <span class="nav-text">CLASS保留字</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Fortran-中实现类和对象"><span class="nav-number">5.</span> <span class="nav-text">Fortran 中实现类和对象</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#timer-类"><span class="nav-number">6.</span> <span class="nav-text">timer 类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#方法分类"><span class="nav-number">7.</span> <span class="nav-text">方法分类</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#析构函数"><span class="nav-number">8.</span> <span class="nav-text">析构函数</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#继承性和多态性"><span class="nav-number">9.</span> <span class="nav-text">继承性和多态性</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#超类和子类"><span class="nav-number">9.1.</span> <span class="nav-text">超类和子类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#超类对象和子类对象"><span class="nav-number">9.2.</span> <span class="nav-text">超类对象和子类对象</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#多态性"><span class="nav-number">9.3.</span> <span class="nav-text">多态性</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#SELECT-TYPE-结构"><span class="nav-number">9.4.</span> <span class="nav-text">SELECT TYPE 结构</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#禁止在子类中重载方法"><span class="nav-number">10.</span> <span class="nav-text">禁止在子类中重载方法</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#抽象类"><span class="nav-number">11.</span> <span class="nav-text">抽象类</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#抽象方法和抽象类"><span class="nav-number">11.1.</span> <span class="nav-text">抽象方法和抽象类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抽象方法的定义"><span class="nav-number">11.2.</span> <span class="nav-text">抽象方法的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抽象类的定义"><span class="nav-number">11.3.</span> <span class="nav-text">抽象类的定义</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#抽象类和抽象方法的简单总结"><span class="nav-number">11.4.</span> <span class="nav-text">抽象类和抽象方法的简单总结</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#程序实现多态性的简单总结"><span class="nav-number">11.5.</span> <span class="nav-text">程序实现多态性的简单总结</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Guan Qingdi"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Guan Qingdi</p>
+  <div class="site-description" itemprop="description">日常 | 湍流 | PDF | 燃烧 | 码渣</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/guanqingdi" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;guanqingdi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5770863755/home?wvr=5" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5770863755&#x2F;home?wvr=5" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guan Qingdi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">65k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">1:48</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='255,0,200' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+</body>
+</html>

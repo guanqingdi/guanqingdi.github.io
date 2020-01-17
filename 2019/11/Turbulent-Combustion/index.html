@@ -1,0 +1,657 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="alternate" href="/atom.xml" title="过河卒" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://guanqingdi.github.io').hostname,
+    root: '/',
+    scheme: 'Muse',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言记录对湍流燃烧的理解,内容来自书籍,文献以及互联网等多种渠道.">
+<meta name="keywords" content="combustion,writing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="湍流燃烧">
+<meta property="og:url" content="https:&#x2F;&#x2F;guanqingdi.github.io&#x2F;2019&#x2F;11&#x2F;Turbulent-Combustion&#x2F;index.html">
+<meta property="og:site_name" content="过河卒">
+<meta property="og:description" content="前言记录对湍流燃烧的理解,内容来自书籍,文献以及互联网等多种渠道.">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2019-12-02T07:34:25.514Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://guanqingdi.github.io/2019/11/Turbulent-Combustion/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>湍流燃烧 | 过河卒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">过河卒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">朝廷鹰犬，反贼先锋</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://guanqingdi.github.io/2019/11/Turbulent-Combustion/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Guan Qingdi">
+      <meta itemprop="description" content="日常 | 湍流 | PDF | 燃烧 | 码渣">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="过河卒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          湍流燃烧
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-23 10:15:05" itemprop="dateCreated datePublished" datetime="2019-11-23T10:15:05+08:00">2019-11-23</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-12-02 15:34:25" itemprop="dateModified" datetime="2019-12-02T15:34:25+08:00">2019-12-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Turbulence/" itemprop="url" rel="index">
+                    <span itemprop="name">Turbulence</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>4.2k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>7 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>记录对湍流燃烧的理解,内容来自书籍,文献以及互联网等多种渠道.</p>
+<a id="more"></a>
+
+<h1 id="Heinz-Pitsch-2006-Annu-Rev-Fluid-Mech-Large-eddy-simulation-LES-of-turbulent-combustion"><a href="#Heinz-Pitsch-2006-Annu-Rev-Fluid-Mech-Large-eddy-simulation-LES-of-turbulent-combustion" class="headerlink" title="Heinz Pitsch-2006-Annu. Rev. Fluid Mech-Large-eddy simulation (LES) of turbulent combustion"></a>Heinz Pitsch-2006-Annu. Rev. Fluid Mech-Large-eddy simulation (LES) of turbulent combustion</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>燃烧装置通常需要更快速的混合和更短的燃烧时间,同时还必须确保能稳定燃烧.为了实现上述要求,燃烧室中通常具有非常复杂的流动模式,如旋涡流、大尺度涡结构的破碎以及回流区等.用雷诺-平均纳维-斯托克斯(RANS)模拟来预测这种复杂流动燃烧过程，通常无法达到预测所需的精度.</p>
+<p>LES已经用于污染物生成预测,发动机燃烧,火焰回传,燃气轮机和燃烧不稳定</p>
+<p>在非预混燃烧中，只有当燃料和氧化剂在分子水平上充分混合时才能发生反应。湍流混合增加了标量扩散，但只有分子扩散才能形成使化学反应发生的混合物</p>
+<p>湍流将未燃烧的混合物和高温的燃烧产物搅拌在一起,然后只能通过分子扩散提升反应物的温度,并在该温度下发生自持的化学反应.</p>
+<p>标量的分子混合以及在此基础上的化学反应基本上发生在最小的湍流尺度(耗散尺度)上，并由标量方差的耗散率表征和量化，标量方差的耗散率在燃烧建模中起着重要作用.</p>
+<p>湍流燃烧对小尺度混合存在很强的依赖性.对于无限快化学反应条件下的非预混燃烧,湍流反应速率直接正比于标量耗散率.因此对于快速反应,平均的反应源项服从耗散谱.</p>
+<blockquote>
+<p>思考:但是对于化学非平衡下的燃烧,较大的标量耗散率反而可能导致局部熄火</p>
+</blockquote>
+<p>对于高雷诺数下的LES模拟,滤波后的反应源项实质上不存在可解部分,也就表明,同RANS一样,滤波的反应源项也需要建模.</p>
+<p><strong>LES通常无法解析滤波的反应源项,其与RANS一样,燃烧需要全部被模化.</strong></p>
+<p>LES在燃烧建模中的优势在于,无论是在无反应还是反应模拟中,其预测标量混合过程和标量耗散率的准确度要远高于RANS,这在复杂流动中尤为明显.而标量混合过程的准确预测对化学反应至关重要.</p>
+<p>湍流标量耗散率的脉动对燃烧过程具有重要的意义,与其在对中间组分的预测上.</p>
+<h2 id="非预混燃烧"><a href="#非预混燃烧" class="headerlink" title="非预混燃烧"></a>非预混燃烧</h2><p>非预混燃烧中,燃料和氧化剂初始是分开的.化学反应仅由组分的分子混合引起.如果化学反应足够快,在恰当当量比的位置会形成一个反应层,在反应层中,燃料和氧气被消耗并生成产物.</p>
+<p>对于工程应用中的氢和碳氢燃料，燃烧通常由分子混合的速率控制，尽管如果反应的时间尺度与湍流的时间尺度相接近，化学反应就变得重要.</p>
+<p>如果反应时间尺度和湍流时间尺度接近,湍流化学反应相互作用强烈,可能会发生局部熄火.</p>
+<p>此外，污染物形成的化学过程常常是由缓慢的化学反应控制的.</p>
+<p>燃料与氧化剂的混合速率可以用混合分数(非反应标量)来描述.混合分数的定义各有不同,但本质上混合分数是局部当量比的度量.因此混合分数是独立于化学反应的一个守恒标量.</p>
+<h3 id="守恒标量方法-大多数非预混燃烧模型的基础"><a href="#守恒标量方法-大多数非预混燃烧模型的基础" class="headerlink" title="守恒标量方法(大多数非预混燃烧模型的基础)"></a>守恒标量方法(大多数非预混燃烧模型的基础)</h3><p>在扩散燃烧中,考虑最简单的无限快化学反应,组分和温度都只是混合分数的函数,如果混合分数的亚格子概率密度函数已知,那么可以由此得到滤波的组分质量分数.</p>
+<p>$$ \widetilde{Y}_i = \int_0^1 Y_i(Z) f(Z) dZ $$</p>
+<p>其中$Z$即为混合分数,$f(Z)$为混合分数的边缘密度加权的滤波概率密度函数.</p>
+<p>简单的守恒标量模型一般假设无限快不可逆反应或者达到化学平衡态.</p>
+<p><strong>火焰面模型和条件矩封闭模型是描述有限速率反应的守恒标量模型。</strong></p>
+<p>这些模型本质上是为反应标量建立了以混合分数和其他可能参数(标量耗散率)为函数的状态关系.这样滤波量就可以以类似公式1的形式得到,其中使用了混合分数和标量耗散率的设定型联合概率密度函数.</p>
+<h3 id="FPDF-和-FDF"><a href="#FPDF-和-FDF" class="headerlink" title="FPDF 和 FDF"></a>FPDF 和 FDF</h3><p>概率密度函数在大多数非预混燃烧模型中起着核心作用,因此有必要强调FPDF的特殊意义.</p>
+<p>在RANS方法中，通过多次重复实验并记录给定时间和空间位置下的混合分数，可以确定一点的PDF.如果产生足够多的样本，那么就可以很好地确定系综的PDF值.</p>
+<p>在LES中，假设有一个简单的盒式滤波器，感兴趣的数据在一个微团中是单时刻,单点的概率分布，该微团与感兴趣点周围的滤波器大小相对应.如果在某一给定时间通过实验观测得到混合分数的空间分布，那么不能简单地从这些数据来评估FPDF，因为通过前述方法观测到的分布是这种特定实现下的特征(带有条件性)，而不是统计特性。</p>
+<p>基于其统计性质,FPDF必须由含有大量随机样本的系综来确定.</p>
+<p>在输运型PDF方法中,Pope引入了滤波密度函数FDF的概念,它描述了上述实验的局部滤波状态.也就是说上面LES的假想实验得到的分布实际上是滤波密度函数,而非滤波的概率密度函数.</p>
+<p>滤波密度函数FDF和滤波的概率密度函数FPDF是有区别的.FDF实际上只描述了单个实现.<strong>FPDF只能定义为在相同滤波场下(以滤波场为条件)的多次实现的FDF的平均(Fox 2003).</strong></p>
+<p>也就是说,一个FDF对应微团中的一次实现,然后在滤波场不变,或者说以滤波场为条件的情况下,在微团中进行多次实现,这样就可以得到多个以滤波场为条件的FDF,对这些FDF进行平均就可以得到所谓的滤波的概率密度函数FPDF.</p>
+<p>区分FDF和FPDF非常重要，特别是在使用直接数值模拟(DNS)数据来评估模型时，以及在输运型FDF模型中。</p>
+<blockquote>
+<p><strong>Only the FDF can be evaluated from typical DNS data, whereas the FPDF is required for subfilter modeling.</strong></p>
+</blockquote>
+<p>翻译1:只有FDF可以从典型的DNS数据进行评估，而FPDF无法从DNS数据中直接得到,其仍旧需要进行亚格子部分的建模.</p>
+<p>翻译2:FDF可以从典型的DNS数据进行评估，而亚格子建模需要的是FPDF.</p>
+<p>上述的翻译仍旧没有很好的理解!!!</p>
+<p>对于守恒标量模型，需要预设FPDF的形状.与RANS模型相似，通常假定混合分数的边缘FPDF为Beta分布，并由混合分数的一阶矩和二阶矩参数化.滤波的混合分数(一阶矩)由输运方程确定,而亚格子标量方差(这里说的是混合分数的方差吗?)通常用代数模型模化.</p>
+<p>RANS中使用beta函数时,湍流间歇性是误差的主要来源,可以预见,其在LES的可解尺度上同样存在影响.</p>
+<p>Cook &amp; Riley 1994, Jimenez et al. 1997,Wall et al. 2000利用常/变密度的非预混反应流DNS数据,研究了假定为beta分布的混合分数的FPDF的有效性。这些研究的主要结论是,beta分布为混合分数的FPDF提供了一个很好的估计，且其在LES中的效果比在RANS中要更好.</p>
+<p>此外，使用DNS数据中的混合分数方差对模型进行模化时，计算结果比使用通常的混合分数方差亚格子模型时表现得更好.</p>
+<p>然而，Tong(2001)和Tong et al.(2005)最近的研究表明，FPDF往往严重偏离Beta分布.</p>
+<p>一般而言,概率密度分布函数的形式与流动条件及化学反应速率有关,通过测量流动中惰性组分或微小颗粒浓度的概率分布可以确定混合分数的概率密度分布函数.</p>
+<h2 id="标量耗散率的模化"><a href="#标量耗散率的模化" class="headerlink" title="标量耗散率的模化"></a>标量耗散率的模化</h2><p>虽然这里讨论的燃烧模型使用了不同的概念和假设,但大都需要对标量耗散率进行模化.</p>
+<p>非预混燃烧中混合分数的耗散率是一个重要的基础参数,如果燃烧是由混合控制的,那么其就决定了滤波反应速率.</p>
+<p>高标量耗散率也会导致局部或全场火焰的熄火.</p>
+<p>设定型PDF模型同样需要对亚格子标量方差进行模化.</p>
+<p>下面的例子说明了非预混燃烧模型中标量方差和耗散率的重要性.</p>
+<h3 id="RANS中的标量耗散率模型"><a href="#RANS中的标量耗散率模型" class="headerlink" title="RANS中的标量耗散率模型"></a>RANS中的标量耗散率模型</h3><p>RANS中通常需要求解标量方差的输运方程,其中雷诺平均的标量耗散率是一个未封闭的汇项(sink term).再假设标量耗散的时间尺度和速度场的积分时间尺度成正比,由此得到</p>
+<p>$$ \langle \chi \rangle = C_\phi \frac{1}{\tau_t} \langle Z’^2 \rangle $$</p>
+<h3 id="LES中的标量耗散率模型"><a href="#LES中的标量耗散率模型" class="headerlink" title="LES中的标量耗散率模型"></a>LES中的标量耗散率模型</h3><p>LES中并不求解亚格子方差的输运方差,而是基于标量方差的生成率等于耗散率的假设,建立了如下的标量耗散率代数模型.</p>
+<p>$$ \widetilde \chi = 2D_t(\nabla \widetilde Z)2 $$</p>
+<p>其中生成项中的亚格子标量通量由涡扩散模型进行模化.</p>
+<p>虽然生成/耗散平衡假设似乎在所有耗散率模型中都被使用，但有强有力的证据表明它并不总是适用，这可能会对湍流燃烧模型产生严重的后果.</p>
+<p>Tong(2001)从无反应射流的滤波实验数据中发现，所谓的斜坡-悬崖结构的出现导致了局部的高标量耗散率和守恒标量的双模态滤波分布，而这不能用Beta分布来描述.</p>
+<p>由于斜坡-悬崖结构是大尺度湍流运动的直接结果，而不是能量级联的结果，因此不能用生成/耗散平衡假设来描述.</p>
+<p>最近，通过分析射流扩散火焰的实验数据也发现了同样的结论(Tong et al. 2005)。虽然双模态FDFs被观察到的概率很低(在x/D = 15的扩散火焰实验中大约为15%)，但是由于局部的高耗散率，这些可能对火焰结构的动力学非常重要。这也表明，在LES中输运型FDF模型中混合模型的准确性是非常重要的.</p>
+<p>在LES中使用标量方差和耗散率模型的另一个复杂性是数值上的。LES通常使用隐式滤波，隐式滤波是指通过数值网格的间距来实现滤波。因此，最小的分辨率实际上是under-resolved.</p>
+<p>由于数值扩散，这些尺度的能量含量被低估了。对于无反应的LES，这通常不那么重要，因为流动力学主要由大尺度的湍流控制。对于反应流，这是不同的:由式(3)和式(4)可以看出，标量耗散率和方差的模型依赖于滤波标量梯度的平方.</p>
+<p>然而，滤波标量梯度的平方在最小的可解尺度上才达到最大。同样，标量方差方程的生成项也依赖于这个量，因此，标量方差方程的解也低估了标量方差。</p>
+<p>因此，方程3或4的形式的模型，或包含亚格子方差输运方程的模型，只能用显式滤波或高阶精度的数值格式.</p>
+<p>显然，对于标量场的小尺度结构，需要新的标量方差和耗散率的建模方法。</p>
+<h2 id="LES非预混燃烧模型"><a href="#LES非预混燃烧模型" class="headerlink" title="LES非预混燃烧模型"></a>LES非预混燃烧模型</h2><h3 id="定常-非定常火焰面模型"><a href="#定常-非定常火焰面模型" class="headerlink" title="定常/非定常火焰面模型"></a>定常/非定常火焰面模型</h3><p>火焰面模型的基本假设:化学时间尺度足够短，反应发生在化学恰当比混合物周围的薄层中，其尺度小于最小的湍流尺度.</p>
+<p>这就产生了两个结果:反应区的结构仍然是层流的，而扩散输运基本上沿着与化学恰当比混合物表面垂直的方向发生。然后，可以将标量输运方程转化为一个以混合分数为独立坐标的系统.</p>
+<p>基于上述这些假设,可以得到火焰面方程,</p>
+<p>$$   $$</p>
+<h3 id="火焰面-进度变量模型-FPV"><a href="#火焰面-进度变量模型-FPV" class="headerlink" title="火焰面/进度变量模型(FPV)"></a>火焰面/进度变量模型(FPV)</h3><h3 id="条件矩封闭模型"><a href="#条件矩封闭模型" class="headerlink" title="条件矩封闭模型"></a>条件矩封闭模型</h3><h3 id="输运型FDF模型"><a href="#输运型FDF模型" class="headerlink" title="输运型FDF模型"></a>输运型FDF模型</h3>
+    </div>
+
+    
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------------</div>
+    
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Guan Qingdi
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://guanqingdi.github.io/2019/11/Turbulent-Combustion/" title="湍流燃烧">https://guanqingdi.github.io/2019/11/Turbulent-Combustion/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/combustion/" rel="tag"><i class="fa fa-tag"></i> combustion</a>
+              <a href="/tags/writing/" rel="tag"><i class="fa fa-tag"></i> writing</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/Markdown-Pictures/" rel="prev" title="Markdown-Pictures">
+      <i class="fa fa-chevron-left"></i> Markdown-Pictures
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/Turbulent-Inlet/" rel="next" title="湍流入口生成方法">
+      湍流入口生成方法 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Heinz-Pitsch-2006-Annu-Rev-Fluid-Mech-Large-eddy-simulation-LES-of-turbulent-combustion"><span class="nav-number">2.</span> <span class="nav-text">Heinz Pitsch-2006-Annu. Rev. Fluid Mech-Large-eddy simulation (LES) of turbulent combustion</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">2.1.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#非预混燃烧"><span class="nav-number">2.2.</span> <span class="nav-text">非预混燃烧</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#守恒标量方法-大多数非预混燃烧模型的基础"><span class="nav-number">2.2.1.</span> <span class="nav-text">守恒标量方法(大多数非预混燃烧模型的基础)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#FPDF-和-FDF"><span class="nav-number">2.2.2.</span> <span class="nav-text">FPDF 和 FDF</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#标量耗散率的模化"><span class="nav-number">2.3.</span> <span class="nav-text">标量耗散率的模化</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RANS中的标量耗散率模型"><span class="nav-number">2.3.1.</span> <span class="nav-text">RANS中的标量耗散率模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#LES中的标量耗散率模型"><span class="nav-number">2.3.2.</span> <span class="nav-text">LES中的标量耗散率模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#LES非预混燃烧模型"><span class="nav-number">2.4.</span> <span class="nav-text">LES非预混燃烧模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定常-非定常火焰面模型"><span class="nav-number">2.4.1.</span> <span class="nav-text">定常/非定常火焰面模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#火焰面-进度变量模型-FPV"><span class="nav-number">2.4.2.</span> <span class="nav-text">火焰面/进度变量模型(FPV)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#条件矩封闭模型"><span class="nav-number">2.4.3.</span> <span class="nav-text">条件矩封闭模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#输运型FDF模型"><span class="nav-number">2.4.4.</span> <span class="nav-text">输运型FDF模型</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Guan Qingdi"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Guan Qingdi</p>
+  <div class="site-description" itemprop="description">日常 | 湍流 | PDF | 燃烧 | 码渣</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/guanqingdi" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;guanqingdi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5770863755/home?wvr=5" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5770863755&#x2F;home?wvr=5" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guan Qingdi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">65k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">1:48</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='255,0,200' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="alternate" href="/atom.xml" title="过河卒" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://guanqingdi.github.io').hostname,
+    root: '/',
+    scheme: 'Muse',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言湍流燃烧相关文献的阅读临时记录.">
+<meta name="keywords" content="writing">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文献阅读笔记">
+<meta property="og:url" content="https:&#x2F;&#x2F;guanqingdi.github.io&#x2F;2019&#x2F;11&#x2F;Literature-Reading&#x2F;index.html">
+<meta property="og:site_name" content="过河卒">
+<meta property="og:description" content="前言湍流燃烧相关文献的阅读临时记录.">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:image" content="https:&#x2F;&#x2F;guanqingdi.github.io&#x2F;2019&#x2F;11&#x2F;Literature-Reading&#x2F;Literature-Reading&#x2F;1D_mixing_layer.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;guanqingdi.github.io&#x2F;2019&#x2F;11&#x2F;Literature-Reading&#x2F;Literature-Reading&#x2F;HO2_mass_fraction.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;guanqingdi.github.io&#x2F;2019&#x2F;11&#x2F;Literature-Reading&#x2F;Literature-Reading&#x2F;Spark_schlieren.png">
+<meta property="og:image" content="https:&#x2F;&#x2F;guanqingdi.github.io&#x2F;2019&#x2F;11&#x2F;Literature-Reading&#x2F;Literature-Reading&#x2F;Long_exposure_visual_photograph.png">
+<meta property="og:updated_time" content="2019-12-02T07:34:08.712Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https:&#x2F;&#x2F;guanqingdi.github.io&#x2F;2019&#x2F;11&#x2F;Literature-Reading&#x2F;Literature-Reading&#x2F;1D_mixing_layer.png">
+
+<link rel="canonical" href="https://guanqingdi.github.io/2019/11/Literature-Reading/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>文献阅读笔记 | 过河卒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">过河卒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">朝廷鹰犬，反贼先锋</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://guanqingdi.github.io/2019/11/Literature-Reading/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Guan Qingdi">
+      <meta itemprop="description" content="日常 | 湍流 | PDF | 燃烧 | 码渣">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="过河卒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          文献阅读笔记
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-21 10:21:22" itemprop="dateCreated datePublished" datetime="2019-11-21T10:21:22+08:00">2019-11-21</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2019-12-02 15:34:08" itemprop="dateModified" datetime="2019-12-02T15:34:08+08:00">2019-12-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Literature-Reading/" itemprop="url" rel="index">
+                    <span itemprop="name">Literature Reading</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>24k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>41 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>湍流燃烧相关文献的阅读临时记录.</p>
+<a id="more"></a>
+
+<h1 id="Boivin-2012-采用简化反应机理的超声速氢空气自点火稳定火焰模拟"><a href="#Boivin-2012-采用简化反应机理的超声速氢空气自点火稳定火焰模拟" class="headerlink" title="Boivin-2012-采用简化反应机理的超声速氢空气自点火稳定火焰模拟"></a>Boivin-2012-采用简化反应机理的超声速氢空气自点火稳定火焰模拟</h1><blockquote>
+<p>Boivin(博伊文),马德里卡洛斯三世大学，勒加内斯，西班牙</p>
+</blockquote>
+<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>Boivin等人发展了一种氢空气的三步简化反应机理,以更好的处理高温自点火/扩散燃烧和火焰传播过程,并在超声速抬举射流火焰的模拟中研究了简化反应机理在湍流燃烧模拟中的影响.</p>
+<p>通过与实验和详细机理的对比,验证了该简化反应机理的准确性.</p>
+<p>基于简化机理发展过程中引入的变量，提出了一种新的显式诊断方法，可以在氢空气燃烧模拟中方便地识别自点火区域.</p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>为了涵盖自点火，在反应物和主自由基之间的支链反应的特征分析基础上，对反应机理进行了相应的修正.</p>
+<p>它已在预混和非预混层流火焰以及层流自点火中得到验证，适用于各种压力，温度和当量比.</p>
+<p>该射流抬举火焰的后处理分析同样是很有挑战性的工作,因为其瞬时稳定位置(火焰基底)波动很快,预混燃烧,非预混燃烧以及自点火过程在整个火焰稳定过程中都起到了重要作用.</p>
+<p>系统的识别火区域同样是一个关键问题.文章第4节提出了一种新的显式判断方法，通过联合使用多个物理量,快速识别自点火区域.</p>
+<h2 id="超声速火焰描述-实验结果"><a href="#超声速火焰描述-实验结果" class="headerlink" title="超声速火焰描述(实验结果)"></a>超声速火焰描述(实验结果)</h2><p>图中所示的是 NASA 兰利研究中心的超声速燃烧器基本构型,其基本工况如表所示.</p>
+<p>低温的氢气射流从内部中心体以声速喷出,氢气射流外围是高温的污染空气伴流,速度约为2马赫.</p>
+<p>射流和伴流的速度快,对流效应强,在火焰稳定区之前形成了较大的诱导区.火焰大致稳定在喷嘴出口约6厘米(25D)位置处.</p>
+<p>Cheng等人的实验提供了详细的动力学、混合和燃烧条件下的实验数据,通过拉曼散射和激光诱导荧光技术,获得了温度和组分(主要组分以及OH自由基)的同步瞬时测量。</p>
+<p>实验给出了距离燃烧器出口的x/D = 0.85、10.8、21.5、32.3、43.1、64.7和86.1位置处的径向分布,还给出了几个特定位置处温度和组分的散点分布图.</p>
+<p>射流出口平均速度$\bar u = 1200m/s$,是氢/空气层流火焰速度的数百倍.即使考虑射流的湍流度(20%)，流动速度也至少是爆燃速度的10倍,显然火焰不可能通过火焰传播来稳定.<strong>该算例中的超声速抬举射流火焰是通过冷氢和热污染空气之间混合层的自点火来稳定的</strong></p>
+<h2 id="数值设置"><a href="#数值设置" class="headerlink" title="数值设置"></a>数值设置</h2><blockquote>
+<p><strong>CERFACS</strong>开发的Navier-Stokes方程求解器 <strong>AVBP</strong></p>
+</blockquote>
+<ul>
+<li><p>AVBP是一种非结构化并行可压缩求解器，设计用于燃烧系统的大涡模拟(LES)或直接数值模拟(DNS).</p>
+</li>
+<li><p>亚格子湍流模型:Smagorinsky model</p>
+</li>
+<li><p>激波捕捉方法:中心格式+高黏性</p>
+</li>
+<li><p>亚格子扩散模型:梯度输运模型,湍流施密特数Sc=0.6</p>
+</li>
+<li><p>分子扩散:差异扩散,不同组分的扩散系数不同</p>
+</li>
+<li><p>亚格子燃烧模型:无模型,准层流假设(QL),所谓的可解尺度完全控制了火焰稳定区域的燃烧过程.(有问题)</p>
+</li>
+<li><p>入口条件:在污染空气伴流中叠加均匀各向同性湍流,均方根速度为300m/s,与实验测量的射流出口20%的速度脉动相一致.</p>
+</li>
+<li><p>计算区域与网格:660万非结构网格,边界足够远以保证计算中没有扰动能到达.</p>
+</li>
+</ul>
+<p>采用层流条件初步计算了与自点火过程相关的物理尺度,以估算湍流条件下的网格分辨率要求.采用DNS程序模拟了H2和污染空气一维混合层的演化过程.</p>
+<p><img src="Literature-Reading/1D_mixing_layer.png" alt="1D-mixing-layer"></p>
+<p>一维混合层算例的设计:左面是污染空气伴流,右面是氢气射流,随时间演化.在一维混合层算例中,<strong>自点火发生在反应最剧烈的混合分数$f_{mr}$处</strong>,导致产生了两个预混前沿,并形成一个尾随的扩散火焰.</p>
+<p>在火焰稳定区域($0&lt;x/D&lt;50$)，混合是一个关键的现象，必须从最大的尺度到最小的尺度进行捕获.</p>
+<p>在$x/D&lt;40$ 区域, $0.1&lt;\Delta x&lt;0.4 mm$以保证对混合和自点火过程的分辨率.根据Cheng等人的实验,最小网格间距与实验积分尺度以及柯尔莫戈罗夫尺度之比分别为0.02和10的数量级.</p>
+<p>为了说明其火焰稳定区的网格解析度问题,其进行了后验的测试,对比了该区域亚格子湍流黏性$\mu_t$和层流黏性$\mu$的大小,从结果来看,湍流黏性约是层流黏性的10倍左右,然后其得出了诱导区的湍流结构是被很好的解析了的.</p>
+<p>文中说因此这一部分不需要燃烧模型,但实际上这样的网格解析度还是远远不够的,所以燃烧模型仍旧是十分重要的.</p>
+<p>进一步对下游而言，亚格子湍流燃烧模型的缺失将导致扩散火焰的低分辨率.但这并不意味着数值上的不稳定性，因为组分和温度梯度是由可解量控制的。</p>
+<p>由于火焰稳定是自点火过程控制的，而不是火焰向上游的传播，因此扩散火焰中缺少亚格子模型并不影响火焰稳定的位置.</p>
+<p>最终的时间步长为$2×10^{-8}s$,低于任何化学动力学时间尺度的时间.</p>
+<h2 id="反应机理"><a href="#反应机理" class="headerlink" title="反应机理"></a>反应机理</h2><p>验证3步简化机理(从12步骨架机理简化而来),并与详细机理(21步)进行对比</p>
+<p>$$ 3H2 + O2 =&gt; 2H2O + 2H $$<br>$$ H + H + M =&gt; H2 + M $$<br>$$ H2 + O2 =&gt; HO2 + H $$</p>
+<p>该三步反应机理包含了对O和OH在超过第二爆炸极限的自点火过程中稳态假设失效的修正，其有效性和数值稳定性还有待于在湍流火焰中进行验证.</p>
+<p>在导致自点火的支链反应阶段对反应速率进行修正,修正系数取决于反应物的浓度和温度.</p>
+<p>HO2对自点火具有很好的标记作用,为了确定何时何地针对自点火进行反应速率的修正,定义了变量$\alpha$</p>
+<p>$$<br>\alpha = (production rate(HO2) - destruction rate(HO2)) / production rate(HO2)<br>$$</p>
+<p>在H原子具有正生成率的区域,如果 $\alpha$ 大于某个阈值,则判定为自点火.若条件不满足,那么反应速率的修正便是不需要的.在计算过程中阈值为$\alpha&gt;0.05$</p>
+<p>在对湍流中自点火过程的模拟中,由于反应速率可能具有很强的梯度，这种开关在原则上会引起数值问题.</p>
+<h2 id="结果讨论"><a href="#结果讨论" class="headerlink" title="结果讨论"></a>结果讨论</h2><p>主要对比了三种机理的区别,第一种是详细机理,第二种是没有包含修正的简化机理,第三种是包含修正的简化机理.</p>
+<h3 id="定性结果对比-云图"><a href="#定性结果对比-云图" class="headerlink" title="定性结果对比(云图)"></a>定性结果对比(云图)</h3><p><img src="Literature-Reading/HO2_mass_fraction.png" alt="HO2瞬时和时均质量分数云图"></p>
+<p>详细机理预测的火焰稳定位置约在距射流出口25D位置处,与实验结果吻合的很好.</p>
+<p>包含了修正的反应机理预测的结果,不论是火焰稳定位置还是温度和HO2径向的分布,都与详细机理十分接近.</p>
+<p>而没有包含修正的简化机理对抬举高度预测严重不足，大约缩短了40%. 此外从平均的火焰基底形状可以看出该简化机理预测的自点火更窄.</p>
+<p>而没有包含修正的机理预测的火焰稳定位置和火焰形状均发生了很大的变化.这再次表明自点火是这种抬举射流火焰稳定的关键机制.</p>
+<h3 id="定量结果对比-实验"><a href="#定量结果对比-实验" class="headerlink" title="定量结果对比(实验)"></a>定量结果对比(实验)</h3><p>主要对比了 <code>温度</code>,<code>H2</code>,<code>O2</code>,<code>H2O</code>和自由基<code>HO2</code>的平均和均方根结果</p>
+<p>诱导区$x/D=10.8$和21.5位置处,详细机理和简化机理预测的主要组分和温度的均值和均方根分布基本一致,HO2摩尔分数的预测也很相似</p>
+<p>数值模拟的均值与实验吻合的较好,脉动值是比较难准确模拟的量,即使中心区域的峰值没有很好地再现，但模拟中的均方根波动在大小上与实验结果相当.</p>
+<p>除了均值和均方根的线图,还给出了几个特定位置瞬时的散点图,同时画出了混合线(无反应)和平衡线(化学平衡假设下的燃烧)</p>
+<ul>
+<li>x/D=10.8</li>
+</ul>
+<p>在出口附近的测点,温度和主要组分的分布都十分接近混合线,表明该位置附近几乎没有反应发生.这也表明对大尺度混合的准确预测(分辨率)是准确预测抬举高度的必要条件.</p>
+<p>一些微量的OH在实验中以非常低的混合分数出现，这与实验中报道的贫预燃产物相对应，而与点火开始无关.</p>
+<ul>
+<li>x/D=32.3和x/D=43.1</li>
+</ul>
+<p>在稳定燃烧的区域,组分和温度逐渐接近绝热平衡水平,预测的结果与实验比较相近,但仍有一定的差距,主要是在稳定燃烧区域模拟的结果散点分布比较集中,比较解决绝热平衡状态,但实际上实验的结果显示,火焰仍旧处在非平衡的状态,组分和温度的散布仍旧是比较明显的.</p>
+<p>实验和模拟散点图的条件平均可以得到很好的一致性，但是这些散点在垂直方向上的散步有明显的不同,它与在对称轴附近温度和组分的较低均方根波动有关.也可以理解成其对湍流脉动的估计不足,导致反应更加倾向与绝热平衡状态.</p>
+<p>Boivin分析这是因为入口湍流脉动的原因,因为其给的是各向同性湍流,没有描述唇口造成的不均匀性,导致对该位置处湍流脉动的估计不足.</p>
+<p>实际上很可能不单单是这个原因,一般的湍流燃烧模型,尤其是他还没有采用湍流燃烧模型,预测的结果都比较偏向绝热平衡态,由于没有很好的估计小尺度上分子扩散,湍流混合和化学反应的相互作用,很难准确给出温度和组分的散点分布.</p>
+<p>Boivin最后结合模拟结果(入口附近的散点分布)指出,入口湍流脉动对整体的混合可能影响不是很大,模拟的流动质量足以研究有限速率反应对火焰稳定的影响.</p>
+<ul>
+<li>x/D=20和x/D=25</li>
+</ul>
+<p>瞬时自点火开始的位置.散点图的分布比较广.在x/D=25的区域,出现了自点火,所有的组分强烈脉动,大部分的氢过氧化氢被消耗了，在这些条件下触发了H2氧化特有的链分支反应.</p>
+<h3 id="结果讨论-1"><a href="#结果讨论-1" class="headerlink" title="结果讨论"></a>结果讨论</h3><ol>
+<li><p>入口湍流脉动的影响值得研究,但是其并不影响整体的火焰稳定,这似乎是纯化学反应相关的.</p>
+</li>
+<li><p>另一个问题是实验的火焰似乎比模拟的火焰要更宽.这个问题在近期的所有模拟中都存在.可能受真实的燃烧器几何构型的影响</p>
+</li>
+<li><p>火焰的最高温度被高估了约150k,这是使用简化机理的众所周知的缺陷:自由基的选择对比热Cp的计算有很大的影响，因此对热力学也有很大的影响。</p>
+</li>
+</ol>
+<h2 id="一种显示的自点火识别方法"><a href="#一种显示的自点火识别方法" class="headerlink" title="一种显示的自点火识别方法"></a>一种显示的自点火识别方法</h2><p>氢过氧化氢自由基HO2通常在点火混合物中达到典型的峰值，因此它被广泛应用于自点火的检测和显示</p>
+<p>然而，HO2的浓度在靠近火焰富燃料反应区的混合物中也会达到峰值.同时自点火过程中HO2浓度随局部条件的变化极大,当同时存在多个局部极大值时，会阻碍对某些自燃点的检测.</p>
+<h2 id="评述"><a href="#评述" class="headerlink" title="评述"></a>评述</h2><p>该篇文章的主要方面还是在验证其提出的简化<strong>反应机理</strong>.</p>
+<p>Cheng的这个算例,是一个由高温自点火稳定的超声速抬举射流火焰算例,流动具有很强的脉动,整个过程中涉及自点火,扩散和预混等多种形式的湍流燃烧过程,对简化反应机理来说,是很有挑战性的.</p>
+<p>简化机理可以节省计算时间,但同时也无法全面准确的描述燃烧的所有过程.为了达到简化计算的目的,简化机理一般会去除一些不太重要的组分和基元反应.但这些不太重要的部分大都基于特定的反应条件,所以简化的反应机理可能存在随反应条件变化,结果不稳定的问题.详细化学反应机理通常具有更加广的适用范围.</p>
+<p>为了提高简化反应机理的预测能力,一般会对反应速率常数进行优化.</p>
+<p>超声速抬举射流火焰中,自点火是其实现火焰稳定的主要原因,所以对自点火过程的准确模拟是该算例的重要基础.而对自点火,熄火以及火焰抬举等特征,一般很难用简化反应机理进行精确的描述.</p>
+<blockquote>
+<p>说明:关于简化机理部分的认识来自<a href="http://www.cnki.com.cn/Article/CJFDTotal-MTZH200404000.htm" target="_blank" rel="noopener">反应动力学机理简化的研究现状及进展</a></p>
+</blockquote>
+<p>点火延迟时间和火焰传播速度是考察机理的两个比较常用的指标,对于不同的模拟问题,关注的重点有所不同.对于这种自点火主导的燃烧算例,显然点火延迟时间是更加重要的一个指标.</p>
+<p>Boivin的工作更偏向化学部分,内容的重点是对比了不同反应机理下的模拟结果,验证了其三步简化机理的准确性.其对具体问题的分析上就比较简单,或者比较偏向用化学反应来解释.</p>
+<p>在模拟方法上,其网格只有660万,在流动模拟上其用了Smagorinsky模型,但是对燃烧模型的影响明显估计不足,其认为在该网格下可以准确解析大尺度混合和反应,认为反应主要受可解尺度量的控制,严重低估了小尺度层面上分子混合,湍流脉动和化学反应之间的复杂相互作用.</p>
+<hr>
+<h1 id="Cheng-1994-超声速同轴射流火焰实验"><a href="#Cheng-1994-超声速同轴射流火焰实验" class="headerlink" title="Cheng-1994-超声速同轴射流火焰实验"></a>Cheng-1994-超声速同轴射流火焰实验</h1><h2 id="Abstract-1"><a href="#Abstract-1" class="headerlink" title="Abstract"></a>Abstract</h2><p>将拉曼散射和激光诱导荧光(LIPF)结合起来,可以同时测量温度、主要组分(h2,02, N2, H20)和OH自由基的浓度.</p>
+<p>声速的氢气射流与2马赫的污染空气环形射流混合形成了轴对称火焰。实验获得了温度,组分浓度和混合分数的时均和均方根脉动值.</p>
+<p>将组分和温度的同步测量结果与冻结化学(混合线)和平衡化学极限(平衡线)进行比较，以评估混合和化学的局部状态。</p>
+<p>在抬举的火焰基底上游，氢气射流与高温的污染空气混合,产生了少量的反应.在火焰基底下游，强烈的湍流混合导致温度和OH浓度的亚平衡值.</p>
+<p>在超声速火焰中，由于速度和温度的相互作用，温度和物质浓度的脉动要高于亚声速火焰.</p>
+<p>在火焰的远下游位置，缓慢的三体聚合反应会导致超平衡的OH浓度，使得温度低于平衡值.</p>
+<h2 id="Introduction-1"><a href="#Introduction-1" class="headerlink" title="Introduction"></a>Introduction</h2><p>氢气点火延迟时间短,氢空气的混合时间短</p>
+<p>缓慢的化学动力学导致的不完全燃烧会极大地影响燃烧效率。</p>
+<p>由于重量限制，超燃冲压发动机燃烧室的长度是有限的.如果燃烧室不够长，由于三体缓慢聚合而产生的超平衡自由基会导致推力减小。</p>
+<p>为了设计更轻的重量和更短的超声速燃烧室，必须了解有限速率的化学效应。然而，由于高速、高焓反应流测量的困难，对超声速反应流中有限速率化学效应的实验研究还很缺乏</p>
+<p>在超声速反应流中，温度和组分等反应标量的时间和空间尺度通常达到耗散尺度(分别小于1ms和1mm),因此对反应标量的测量是十分困难的.</p>
+<p>物理探针缺少足够的时空分辨率,且在超声速流中会产生激波,从而加速探针附近的化学反应.因此需要更先进的非接触测量手段.</p>
+<p>用自发振动拉曼散射法测定了主要组分的浓度和温度,用激光诱导荧光测定OH浓度.通过这些浓度测量,可以计算出当地的燃料-空气比(混合分数)</p>
+<p>利用拉曼散射和PLIF方法，可以得到超声速反应流中混合(混合物分数)和化学反应的瞬时局部状态.组分和温度的同步测量结果可以与冻结化学和平衡化学极限进行对比,以了解有限反应速率在整个超声速火焰中的重要性程度.</p>
+<p>温度和多组分的测量也为CFD计算的燃烧模型提供了验证信息.人们提出了许多复杂的超声速反应流湍流燃烧模型，但这些模型缺乏准确的非侵入性实验数据的支持.</p>
+<ul>
+<li><p><strong>实验测得的污染空气射流出口速度脉动为20%</strong>.这种明显的脉动可能是由于在2马赫喷管中对LDV不同粒子的阻力效应引起的.污染空气中$Al_2O_3$粒子($<del>1\mu m$)的慢时间响应($</del>5\mu s$)使喷管出口处的测量速度比计算值低10-20%.</p>
+</li>
+<li><p><strong>实验测得的污染空气射流出口的标量脉动是平缓的(5%)</strong></p>
+</li>
+<li><p>中心氢气射流的雷诺数为15600.(基于射流内径D=2.36mm)</p>
+</li>
+<li><p>拉曼散射测量在以下位置沿径向进行的:x/D = 0.85、10.8、21.5、32.3、43.1、64.7、86.1.对于每个位置，径向扫描大约需要30-40分钟.每个测量位置的数据包括500张照片.在一些地点记录了2000张激光照片，以便对散点图作出更准确的统计.</p>
+</li>
+<li><p>火焰稳定位置(火焰基底)位于x/D=25位置处.火焰的亮度呈周期性地变化，表明存在弱激波结构.在x/d=25附近处，火焰在这些弱激波的影响下趋于稳定.</p>
+</li>
+</ul>
+<p><img src="Literature-Reading/Spark_schlieren.png" alt="火焰激光纹影图像"></p>
+<p><img src="Literature-Reading/Long_exposure_visual_photograph.png" alt="火焰长曝光图像"></p>
+<ul>
+<li><p>文中提到的最靠近出口的截面(x/D=0.85),污染空气的柯尔莫戈罗夫时间尺度约为$0.6\mu s$. 不知道这个是怎么得到的?</p>
+</li>
+<li><p>用不受碰撞猝灭影响的激光诱导荧光方法(LIPF)测定了氢氧自由基的浓度</p>
+</li>
+<li><p><strong>混合分数$f$是描述燃料与氧化剂混合状态的守恒标量</strong>.混合物的分数是根据拉曼散射测量的组分结果计算出来的，即由燃料流产生的质量除以总质量</p>
+</li>
+</ul>
+<p>$$ x = {(2[H_2]+2[H_2O]) / (32[O_2] + 28[N_2] + 18[H_2O] + 2[H_2])} $$<br>$$ f = {(x - Z_{H,a})} / {(1 - Z_{H,a})} $$</p>
+<p>其中 $Z_{H,a}$ 是污染空气中氢原子的质量分数.混合分数$f$在纯氢气中为1,纯空气中为0,在恰当计量数下为0.0299.</p>
+<ul>
+<li>实验误差</li>
+</ul>
+<p>室温下N2浓度测量的相对标准偏差在2.7%，在2300K的化学恰当比的火焰中为6.3%.在化学恰当比火焰中，温度和OH测量值的相对标准偏差分别为11.7%和13.2%.</p>
+<h2 id="Results-and-Discussion"><a href="#Results-and-Discussion" class="headerlink" title="Results and Discussion"></a>Results and Discussion</h2><blockquote>
+<p><strong>射流中心位置的选择也是十分重要的点</strong></p>
+</blockquote>
+<p>对这种轴对称射流火焰，由于安装困难和主喷管在高温污染空气中的热膨胀，无法获得精确的轴对称射流火焰.因此，射流的中心(y=0)被选择在混合分数最大和N2摩尔分数最小的位置.</p>
+<ul>
+<li>x/D=0.85</li>
+</ul>
+<p>该位置由于燃烧器的遮挡,镜头能够收集的光约减少了20%.数据的处理中也考虑了燃烧器的阴影.</p>
+<p>平均混合分数在燃料(1)和空气(0)中的值之间变化.在混合分数计算(式1)中，由于污染空气中水蒸气浓度较高(26%摩尔分数)，所以污染空气中氢原子的质量分数必须包括在内.</p>
+<p>污染空气的平均温度约为1250k.污浊空气中，OH基的含量约为0.1%摩尔分数,大约是用LIPF方法检测结果的三倍.OH自由基在污染空气的滞止腔内形成，由于自由基聚合缓慢而出现在环形喷嘴出口.对于正的y值，OH浓度在喷嘴出口更高.</p>
+<p>氢燃料以295k的温度供给燃烧器，并在射流出口加热至545k.温度的升高是由从污染空气向氢气燃料管的热传递引起的.</p>
+<p>在该位置处，氢气射流和污染空气之间几乎没有反应.环形剪切层中的混合情况如温度脉动图所示。两个内峰是燃料射流与污染空气混合产生的，两个外峰是污染空气与环境空气混合产生的.</p>
+<p>为了验证数据一致性，将喷嘴出口处(x/D=0.85)污染空气中的拉曼散射测量的组分浓度值与流量计测量值进行比较.假设污染空气中完全燃烧，质量流量计的O2/N2质量比在喷嘴出口为0.44，拉曼散射测量的O2/N2质量比为0.41-0.45，与质量流量计测量值吻合良好.O2/N2质量比测定的准确度在流量计测量中约为_+3%，在拉曼测量中约为+ 2%.</p>
+<ul>
+<li>x/D=10.8</li>
+</ul>
+<p>混合分数和H2摩尔分数下降,由于污染空气的夹带，在燃料流中检测到少量的O2、N2和H2O</p>
+<p>OH摩尔分数(~0.2%)略高于出口条件(图6m),表明存在一定的化学反应.燃料在抬举区域的混合过程也类似于亚声速抬举火焰.</p>
+<ul>
+<li>x/D=21.5和32.3</li>
+</ul>
+<p>有明显的化学反应.</p>
+<p>平均温度曲线(图7c、8c)显示正半径处的温度高于负半径处的温度.此外，在此位置，正半径的最大OH浓度超过1%(请注意图6、7、8中的刻度变化).这些不对称的温度和OH分布可能是由于燃料射流和污染空气的不对称或喷嘴出口污染空气中OH分布的不对称引起的。图4中的可视长曝光照片也显示了此处火焰的不对称性。O2、H2O、H2和OH等组分的剖面结果也与上述情况相一致.在火焰更强的一侧，消耗了更多的O2和H2(图7e, 7k, 8e, 8k)，同时产生了更多的H2O和OH(图7i, 7m, 8i, 8m).</p>
+<p>温度均方根剖面上,燃料喷射和污浊空气混合的两个内峰合并为一个单峰，而两个外峰仍然明显(图7d、8d).两个外峰是不对称的,因为污染空气相对于中心线向正方向有轻微的倾斜。在正半径处，静止空气附近的波动均方根温度要高于负半径处,这是由污染空气的倾斜以及转捩阶段受限所致.</p>
+<p>在x/D=32.3时，从氮气分布图(图8g)可以看出,污染空气和环境空气已经充分混合,不再有一个明显的纯污染空气区域(54.4%的氮)</p>
+<ul>
+<li>x/D=43.1</li>
+</ul>
+<p>该轴向位置处中心线附近的火焰温度和OH摩尔分数要高于其他轴向位置(释热最高的区域),O2摩尔分数剖面(图9e)显示，在燃料射流中心附近,O2几乎被完全消耗.</p>
+<ul>
+<li>x/D=64.6和86.1</li>
+</ul>
+<p>图10的H2摩尔分数也显示该位轴向位置处,氢气已经被消耗完,气体混合物处于贫燃状态(f &lt; 0.0299)。</p>
+<p>在x/D=86.1位置处,环境空气中过量的N2分子进入射流中心(图llg)。</p>
+<p>由于三体聚合反应和环境空气稀释，OH浓度降低.稍后我们将在x/D = 86.1(图11)处看到,火焰几乎处于平衡状态。温度和组分浓度分布也比上游地区平缓得多。</p>
+<ul>
+<li>数据说明</li>
+</ul>
+<p>上述数据是500或2000个独立激光图片的平均值。</p>
+<p>虽然混合和化学反应相互作用的直接信息不能从均值和均方根分布中获得，但它们确实为CFD模型的验证提供了一套数据.</p>
+<p>测量的均方根值表明，组分和温度脉动可能分别高达40%和20%.在燃烧模型中忽略这些波动对平均化学反应速率的影响，可能会导致较大误差，包括对次要污染物浓度、温度和着火点的预测的不准确.</p>
+<h2 id="流体力学尺度"><a href="#流体力学尺度" class="headerlink" title="流体力学尺度"></a>流体力学尺度</h2><p>通过计算火焰中湍流的长度和时间尺度，估算了拉曼散射系统所需的时空分辨率。在表2中，给出了5个下游位置的Kolmogorov长度尺度($\eta$)、Kolmogorov时间尺度($\tau_u$)和积分长度尺度($L$)。</p>
+<p>简单列出几个典型的特征尺度</p>
+<table>
+<thead>
+<tr>
+<th>$x/D$</th>
+<th>$r/R_f$</th>
+<th>$U$</th>
+<th>$T$</th>
+<th>$\eta$</th>
+<th>$\tau_u$</th>
+<th>L</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.85</td>
+<td>0.0</td>
+<td>1780</td>
+<td>0545</td>
+<td>0.008mm</td>
+<td>0.2$\mu s$</td>
+<td>3.4mm</td>
+</tr>
+<tr>
+<td>10.8</td>
+<td>0.0</td>
+<td>1105</td>
+<td>0555</td>
+<td>0.009mm</td>
+<td>0.4$\mu s$</td>
+<td>4.2mm</td>
+</tr>
+<tr>
+<td>21.5</td>
+<td>0.0</td>
+<td>1094</td>
+<td>1365</td>
+<td>0.021mm</td>
+<td>0.7$\mu s$</td>
+<td>4.9mm</td>
+</tr>
+<tr>
+<td>32.3</td>
+<td>0.0</td>
+<td>1181</td>
+<td>1760</td>
+<td>0.020mm</td>
+<td>0.7$\mu s$</td>
+<td>7.1mm</td>
+</tr>
+<tr>
+<td>43.1</td>
+<td>0.0</td>
+<td>1175</td>
+<td>2214</td>
+<td>0.025mm</td>
+<td>0.8$\mu s$</td>
+<td>7.4mm</td>
+</tr>
+</tbody></table>
+<h2 id="混合和有限速率反应的影响"><a href="#混合和有限速率反应的影响" class="headerlink" title="混合和有限速率反应的影响"></a>混合和有限速率反应的影响</h2><p>为了确定超声速反应流中湍流混合和化学反应的相互作用,将温度和多组分浓度的单点测量值与平衡和冻结状态下的值进行比较。</p>
+<p>平衡状态下燃料和空气混合物的温度及组分浓度由CHEMKIN计算得到.</p>
+<p>计算了六个位置处的湍流混合时间和Da数(湍流混合时间与化学反应时间之比)。这六个位置的散点图将显示超声速火焰中湍流混合和化学反应的相互作用.</p>
+<p>湍流混合时间计算方法:</p>
+<p>$$ \tau_t = \delta_{1/2} / (U - U_\infty)$$</p>
+<p>$\delta_{1/2}是射流速度剖面的宽度,$U$是当地射流中心速度,$U_\infty$是协流的速度.</p>
+<p>$x/D\geq32.3$位置处2体和3体反应的H2-air化学反应时间假设分别为15.4$\mu s$和~ 3ms</p>
+<p>在抬举区域(x/D=0.85和10.8)，化学反应时间必然要比湍流混合时间大得多，因为抬举区域几乎没有反应,因此Da数必然也会远大于1.</p>
+<p>当x/D = 86.1时，三体反应的Da值仍小于1，说明此处仍未达到化学平衡.在超燃冲压发动机的设计中，最优燃烧室长度必须足够长，以使OH自由基重新结合(Da&gt;1)，以保证是在燃烧室内而不是在排气羽流中释放它们的化学能.</p>
+<table>
+<thead>
+<tr>
+<th>$x/D$</th>
+<th>$y/D$</th>
+<th>$\Delta U$</th>
+<th>$\tau_t$</th>
+<th>$Da_{2-body}$</th>
+<th>$Da_{3-body}$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.85</td>
+<td>-0.65</td>
+<td>363</td>
+<td>0.0005</td>
+<td>$\ll 1$</td>
+<td>$\ll 1$</td>
+</tr>
+<tr>
+<td>10.8</td>
+<td>-0.65</td>
+<td>295</td>
+<td>0.0010</td>
+<td>$\ll 1$</td>
+<td>$\ll 1$</td>
+</tr>
+<tr>
+<td>32.3</td>
+<td>-1.10</td>
+<td>060</td>
+<td>0.4000</td>
+<td>026</td>
+<td>0.13</td>
+</tr>
+<tr>
+<td>32.3</td>
+<td>+1.10</td>
+<td>025</td>
+<td>1.0000</td>
+<td>065</td>
+<td>0.33</td>
+</tr>
+<tr>
+<td>43.1</td>
+<td>00000</td>
+<td>024</td>
+<td>1.1000</td>
+<td>071</td>
+<td>0.37</td>
+</tr>
+<tr>
+<td>86.1</td>
+<td>00000</td>
+<td>012</td>
+<td>2.1000</td>
+<td>136</td>
+<td>0.70</td>
+</tr>
+</tbody></table>
+<p>为了评估火焰中的有限速率化学的影响，将瞬时测量值与不发生反应的混合极限和平衡极限进行比较(图12-17)。本部分的散点图由500个或2000个独立的激光图像组成.</p>
+<p>实线表示绝热平衡条件,由燃料和污染空气在喷嘴出口的条件计算得到。除x/D=86.1处外，虚线表示无反应混合.</p>
+<ul>
+<li>x/D=0.85, y/D=-0.65</li>
+</ul>
+<p>在混合层中，靠近喷嘴出口处(x/D=0.85, y/D=-0.65)，只有混合没有反应，如图12所示~ 1150k的温度低于污染空气温度(1250k)，但高于燃料流温度(545k)。因为没有化学反应的混合此时发生，所以不会产生OH自由基，主要物质摩尔分数在虚线上(混合线)。这里湍流混合时间远远小于二体反应时间$Da_{2-body} \ll 1$)，燃料与空气预混，反应很少.</p>
+<ul>
+<li>x/D=10.8, y/D=-0.65</li>
+</ul>
+<p>在该位置处,贫燃侧(混合分数小)发生了少量反应(见图13)。大部分流体处于预混非着火状态.局部的反应产生了极少量的OH,(图13b)。该位置反应很弱,可能是由于在这个位置处有很大的应变率. 该位置的湍流混合时间仍旧较短(~1$\mu s$)，但与高温污染空气的混合可能会引起一定的自着火.</p>
+<ul>
+<li>x/D=32.3, y/D=+-1.1</li>
+</ul>
+<p>平均温度剖面显示正侧的平均温度高于负侧,这是由于早先讨论的射流不对称造成的.</p>
+<p>在负半径(y/D=-1.1)处,温度散点图(图14a)显示仅存在很少的反应，因为火焰温度远远低于平衡曲线,大多数OH分散点也在平衡曲线下(图14b),其他主要组分的散布点在平衡曲线和无反应曲线的混合之间(图14c, 14d)。这一位置的高标量耗散率导致很难发生较强的化学反应.</p>
+<p>在正半径(y/D=+1.1)处,由于反应更强列,火焰温度要远高于负半径位置.但是许多反应区并不稳定.这些反应区因高标量耗散率而高度褶皱。从图15a可以看出，该区域一个典型的反应区温度约为2000k，即比平衡温度低~650K.同时，许多OH值仍旧远低于该区域的平衡值(图15b).</p>
+<p>其中有些温度点反应性更强，基本上高于平衡曲线。在中等雷诺数下，差异扩散可能导致偏离平衡状态，使贫燃侧的温度高于平衡态，富燃侧的温度低于平衡态.<br>然而，这种影响在高雷诺数下变得不再重要。在超声速可压缩流中，温度和速度的相互作用也会产生超平衡温度。当速度减慢时，静态温度将升高。</p>
+<p>有些温度仅降低300k(图15a)，有些OH值达到超平衡(图15b)。这些可能是低标量耗散率下的反应火焰区域。温度处于亚平衡状态，OH自由基缓慢的三体聚合使OH基浓度达到超平衡状态。图15b中的OH摩尔分数峰值约为平衡峰值的2.5倍.这类似于亚声速抬举火焰中缓慢的三体聚合区域。除N2外，主要组分摩尔分数分布广泛，但均集中在平衡曲线附近。环境空气中过量的N2扩散到该位置，导致散布点偏离平衡曲线(图15c).</p>
+<p>将主要的组分浓度和温度测量值与亚声速火焰进行比较，可以观察到超声速火焰中脉动更加强烈。与亚声速火焰不同，超声速流的速度是很大，速度脉动会引起温度的强烈脉动，从而引起化学反应。超声速湍流火焰中这些增加的波动与混合分数无关.</p>
+<ul>
+<li>x/D=43.1, y/D=0</li>
+</ul>
+<p>在此位置，亚平衡温度(可达400k以下)和超平衡OH值是由缓慢的三体聚合反应产生的。注意在流动中有少量未燃尽的H2(图16c);因此产生较少的H2O(图16d)</p>
+<ul>
+<li>x/D=86.1, y/D=0</li>
+</ul>
+<p>远下游位置,火焰更接近平衡态.</p>
+<p>由于这是一个开放的火焰，实验室的空气在这个位置被带入火焰，并影响火焰温度和气体成分。</p>
+<p>图17a所示的平均散布点位于实线和虚线之间。在图17中，实线是基于喷管出口条件计算的绝热平衡条件。虚线为氢气在环境空气(296k, 1atm)中燃烧的绝热平衡条件。图17b中OH的均值散布点在实线上。虽然分散点在其中一条平衡曲线上，但由于环境空气夹带量未知，无法确定实际的平衡条件.</p>
+<p>然而，如果我们想象一条穿过平均温度数据的曲线(在实线和虚线之间)，那么OH的相应平衡曲线将落在图17b中所画的线之间。如果OH数据高于这最后一条平衡曲线，在这个位置就没有达到充分的平衡条件。计算出的Da数($Da_{3-bofy}$)= 0.7)仍然小于1，也小于亚声速火焰($Da_{3-bofy}$)= 1.77)的平衡区。这也表明还没有达到充分的平衡条件.</p>
+<p>如图17c所示，h2已经燃尽，环境空气夹带增加了N2浓度。O2在平衡曲线上(图17d)，因为在污染空气和环境空气中有相同数量的O2。H2O与温度有相同的趋势，并且落在两条平衡曲线之间.</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><ol>
+<li><p>在这种超声速火焰中，Kolmogorov长度和时间尺度通常分别为10-20 $\mu m$ 和0.5-10 $\mu s$。拉曼散射系统的时间分辨率(20ns)足以冻结流动的最小时间尺度，但空间分辨率(~ 0.4 mm)远远大于Kolmogorov长度尺度。但计算的(空间分辨率与积分比例尺的比值)表明，测量将至少捕获该流中90%的标量方差</p>
+</li>
+<li><p>只有在喷嘴出口附近发生混合(x/D=0.85)。由于湍流混合时间比化学反应时间短，所以不存在化学反应。少量的反应发生在抬举火焰基地的上游，由于与高温的污染空气的混合。</p>
+</li>
+<li><p>燃烧发生在抬举区域的下游.在那里，高的标量耗散率使火焰接近熄灭，导致温度和OH浓度处于亚平衡值。该区域的一些火焰区呈现超平衡OH浓度和亚平衡温度，这是反应性较强的火焰区三体缓慢聚合的结果。OH摩尔分数的峰值大约是平衡态峰值的2.5倍。这与亚声速抬举火焰的缓慢聚合区相一致.</p>
+</li>
+<li><p>散点图表明，与亚声速火焰相比，在超声速火焰中可以观察到更高的温度和浓度的波动,超声速可压缩火焰中的速度脉动会引起温度和化学标量的脉动</p>
+</li>
+<li><p>为二体和三体反应定义了两个Da数。通过对超声速火焰中各组分的浓度和温度与平衡态的比较，得到了Da2的值。二体反应必须大于60才能达到部分平衡，且Da3的值必须大于60。要使三体反应达到平衡，Da3必须大于1.</p>
+</li>
+<li><p>这些混合分数、温度和多组分浓度的同时测量可以更好地理解复杂的湍流化学相互作用，为CFD模型的输入和验证提供信息。例如，Baurle等人最近使用假设形状的PDF方法对这些结果进行了建模.</p>
+</li>
+</ol>
+<h1 id="Moule-2014-CNF-Highly-resolved-numerical-simulation-of-combustion-in-supersonic-hydrogen–air-coflowing-jets"><a href="#Moule-2014-CNF-Highly-resolved-numerical-simulation-of-combustion-in-supersonic-hydrogen–air-coflowing-jets" class="headerlink" title="Moule-2014-CNF-Highly resolved numerical simulation of combustion in supersonic hydrogen–air coflowing jets"></a>Moule-2014-CNF-Highly resolved numerical simulation of combustion in supersonic hydrogen–air coflowing jets</h1><h2 id="Abstract-2"><a href="#Abstract-2" class="headerlink" title="Abstract"></a>Abstract</h2><p>本文主要对高速(超声速)流动中的非预混燃烧进行了研究。计算使用了大涡模拟(LES)来模拟具有中等Da值的高雷诺数湍流燃烧问题。我们期望相应的封闭方法能够处理高马赫数湍流反应流(流动时间尺度和反应时间尺度处于同一量级)所遇到的特殊问题.</p>
+<p>该模型采用的部分搅拌反应器(PaSR)模型考虑了有限速率化学和小尺度混合效应，以下简称非定常部分搅拌反应器(U-PaSR).</p>
+<p>(i)在本研究的第一步，通过数值计算结果与实验数据的详细比较，评估了U-PaSR模型的封闭能力.计算与实验数据的对比结果表明，数值模拟很好地描述了射流燃烧物理过程。</p>
+<p>(ii)在本研究的第二步，根据数值模拟结果对火焰结构和火焰稳定进行了分析。采用Boivin等人提出的自点火诊断工具进行相应的后处理,结果证实了自点火过程在射流火焰稳定中的重要性.数值模拟结果还表明,可压缩同轴射流喷入到大气后的压力动力学过程，对火焰稳定具有重要影响.在以前的数值模拟中还没有相关的证明.</p>
+<h2 id="Introduction-2"><a href="#Introduction-2" class="headerlink" title="Introduction"></a>Introduction</h2><p>与实验研究相比，计算流体动力学(CFD)为此类高速湍流反应流的研究提供了一个有吸引力的选择和补充工具。然而，目前常用的燃烧模型一般基于快速反应假设，在这种受有限速率化学反应和点火现象控制的反应流中，这些模型都很难适用。</p>
+<p><strong>在高速(超声速)湍流反应流中，湍流流动和化学反应的特征时间尺度相近(Da数接近1).在这种燃烧模式下,湍流化学反应相互作用强烈，基于快速反应或化学平衡流假设(化学反应特征时间尺度远小于湍流流动特征时间尺度)的涡破碎、涡耗散，以及解耦处理湍流流动和化学反应的火焰面等燃烧模型，均不再适用,必须考虑化学非平衡效应.</strong></p>
+<p>因此,基于有限速率化学反应的燃烧模型更适合描述这种包含自点火现象,由化学反应主导的超声速燃烧过程.</p>
+<p>该论文的重点在于采用非定常部分搅拌反应器(U-PaSR)燃烧模型来模拟超声速湍流燃烧。非定常部分搅拌反应器(U-PaSR)目前被用来模拟火焰区域内组分和温度的非均匀效应.</p>
+<p>论文主要有两个目的,一个是通过与实验数据的比较来评估U-PaSR的封闭能力,另一个是基于模拟数据来分析射流火焰稳定问题.与Boivin等人的结果不同的是,Moule在流场中发现了影响火焰稳定的两个重要区域，一个在近场,出口附近，与过氧化氢(HO2)自由基的形成有关，另一个在远场，与激波压缩、伴随的温升和随后的放热有关.</p>
+<p>目前的手稿组织如下:下一节专门介绍数值方法,接着是对超声速抬举射流火焰的介绍，一方面是对实验的介绍，另一方面是对针对该问题的数值研究的介绍。然后简要介绍数值设置，包括网格和边界条件.最后是结果讨论,给出了计算结果与现有实验数据的详细比较，并与先前的数值结果进行了对比,然后将得到的计算结果应用于非预混火焰结构和火焰稳定过程的分析.</p>
+<h2 id="数学模型"><a href="#数学模型" class="headerlink" title="数学模型"></a>数学模型</h2><h3 id="控制方程"><a href="#控制方程" class="headerlink" title="控制方程"></a>控制方程</h3><p>可压缩反应流NS方程</p>
+<p>分子扩散:傅里叶热传导和Fickian扩散</p>
+<p>忽略 Soret 和 Dufour 效应,体积力以及热辐射效应.</p>
+<p>亚格子模型:Smagorinsky</p>
+<p>标量扩散:涡扩散模型,湍流$Sc_t=0.7$</p>
+<h3 id="湍流化学反应相互作用模型"><a href="#湍流化学反应相互作用模型" class="headerlink" title="湍流化学反应相互作用模型"></a>湍流化学反应相互作用模型</h3><p>瞬时反应速率的高度非线性(阿仑尼乌斯定律)使得它的滤波或平均项很难建模。处理高速(超声速)时燃烧时，通常基于准层流(QL)燃烧假设或均匀反应器(HR)进行初步的一阶简化，忽略了组分和温度脉动的影响.</p>
+<p>然而，在混合层中的热逃逸直至着火的过程中，组分脉动可能起着关键作用。因此，非定常部分搅拌反应器(U-PaSR)的概念提供了一个有趣的基础，将这些脉动相关的影响纳入到雷诺-平均Navier-Stokes (RANS)或大涡模拟(LES)框架中。由于UPaSR模型的基础与Vulis[8]和Magnussen在其早期著作中引入的涡流耗散概念(EDC)模型相同，参见参考文献[9-11]，我们首先简要总结了以下EDC模型的显著特征.</p>
+<h3 id="EDC模型"><a href="#EDC模型" class="headerlink" title="EDC模型"></a>EDC模型</h3><p>马格努森提出的EDC模型基于湍流的间歇性特征，这意味着化学反应发生在小尺度结构中，大部分的粘性耗散和分子混合过程都发生在这些结构中。</p>
+<p>标量耗散确实倾向于在空间中形成精细而细长的结构。同样值得注意的是，即使是无反应标量,标量梯度脉动优先与最大压缩应变率的方向一致。</p>
+<p>事实上，实验和数值研究都表明，标量梯度场比速度梯度场[12]更具有间歇性:标量耗散率(SDR)确实比湍流耗散率更具有间歇特性。湍流混合作用于小尺度细长结构附近，如丝状或蠕虫状的涡旋结构，其横向尺寸为科尔莫戈罗夫长度尺度$\eta_K$的量级(介于6至10$\eta_K$之间)。科学文献将这些强耗散的区域描述为具有高涡度拟能的旋转蠕虫周围的片状结构。读者可以参考[13,14]，以进一步了解最近在湍流燃烧模型的小尺度湍流描述方面取得的进展。</p>
+<p>在非预混的情况下,湍流标量混合的本质(例如SDR)是非常间歇性的，下面讨论的封闭方法是基于高雷诺数湍流的这种间歇性的本质。</p>
+<p>强耗散(混合)过程的结构与非均匀但涡量较弱的区域共存，常被称为无结构随机海，often referred to as a structureless random sea,在那里标量混合被简单地认为是低效的。EDC模型中,每个流体单元被分为小尺度结构区域(用*表示),和环境区域(用0表示).小尺度结构区域具有高标量耗散率,标量混合强烈,混合速率快,像良搅拌反应器,即完全搅拌反应器(PSR),由于良好的混合条件因而具有较快的反应速率.小尺度结构周围的其他区域,混合低效,未混合条件下反应的可能性则微乎其微。</p>
+<p>一般而言，平均反应速率$\overline {\dot\omega_k}$可以表示为:</p>
+<p>$$\overline {\dot\omega_k}=\int_\Psi {P(\psi)\dot\omega_k(\psi)}$$</p>
+<p>其中$P$为联合标量PDF,$\psi=[T,Y_k]^T$为标量矢量的样本空间.</p>
+<p>考虑到小尺度区域内混合速率的重要影响，(*)区标量分布更加均匀，因此在$\psi=\psi^*$位置处可以用狄拉克函数来表示.</p>
+<p>严格地说，(0)区可能远不是均匀的，因为它的特征是低效的混合水平，但为了简单起见，相应的未混合状态(0)也被表示为$\psi=\psi^0$位置处的一个狄拉克函数.</p>
+<p>因此假设概率密度函数为双峰的.非混合状态(0)的描述无疑可以从假定的PDF双峰分布(而非单峰分布)中受益。</p>
+<p>但是，应该指出，在非预混条件下，<strong>燃料和氧化剂之间的分子混合是燃烧的先决条件</strong>[13,14]，因此，极低的混合速率的区域(0)也可以被等同于非燃烧状态。这就解释了为什么没有花特别的努力来改进它的PDF描述.</p>
+<p>因此，假设PDF呈现双峰形状，分解为小尺度结构的贡献(*)和环境的贡献(0)</p>
+<p>$$P(\psi) = \gamma^<em>\delta(\psi-\psi^</em>) + (1-gamma^*)\delta(\psi-\psi^0)$$</p>
+<p>基于此，平均化学速率可以表示为</p>
+<p>$$\overline {\dot\omega_k}=\gamma^<em>\dot\omega_k(\psi^</em>) + (1-\gamma^*)\dot\omega_k(\psi^0)$$</p>
+<p>其中$\gamma^<em>$为小尺度结构的体积分数,例如分子过程的体积分数.另外基于上述讨论,未混合区(0)的反应贡献设为零,因此平均反应源项可以写为$\overline{\dot\omega}=\gamma^*\dot\omega(\psi^</em>)$.</p>
+<p>因此，EDC模型是一个多尺度的模型，其中表征小尺度结构体积分数的速度和混合时间尺度分别与Kolmogorov速度尺度$v_K$和Kolmogorov时间尺度$\tau_K$成比例.</p>
+<h3 id="U-PaSR模型"><a href="#U-PaSR模型" class="headerlink" title="U-PaSR模型"></a>U-PaSR模型</h3><p>U-PaSR也是一个多尺度模型.U-PaSR模型与EDC模型的主要区别在于:</p>
+<ol>
+<li><p>与小尺度结构相对应的混合时间尺度$\tau_m$的定义</p>
+</li>
+<li><p>小尺度区域体积分数$\gamma^*$的估计</p>
+</li>
+</ol>
+<p>U-PaSR模型中,小尺度结果的体积分数定义为</p>
+<p>$$\gamma^* = \tau_{ch}/(\tau_{ch} + \tau_m)$$</p>
+<p>U-PaSR模型是Fureby等人在PaSR的基础上考虑了时间和对流效应作的进一步拓展.值得注意的是，最近在高雷诺数下进行的数值模拟表明，对流项的考虑(或不考虑)并不会显著改变EPaSR模型的计算结果.</p>
+<p>EPaSR模型采用多相类比的方法，用典型的输运方程描述了小尺度结构(*)及其周围环境(0)。值得注意的是，Vullis和Magnussen的涡耗散模型,在忽略时间和对流效应的情况下,可以从U-PaSR和EPaSR模型中恢复。此外，本文提出的U-PaSR模型可以从EPaSR模型中推导出来.</p>
+<p>如前所述，小尺度结构体积分数$\gamma^*$实际上是反应区体积与混合和反应区体积之和的比值.</p>
+<p>该论文中,标量混合时间尺度$\tau_m=\sqrt{\tau_K\tau_{\Delta}}$.$\tau_K=\sqrt{\nu/\epsilon}$为Kolmogorov时间尺度,$\tau_{\Delta}$为亚格子时间尺度</p>
+<p>另一个要点是，上述TCI模型要满足SGS模型的限制,即在滤波尺度趋近于0时恢复DNS极限.即滤波尺度足够小时,要有$\gamma^*=1$.</p>
+<h2 id="超声速抬举射流火焰描述"><a href="#超声速抬举射流火焰描述" class="headerlink" title="超声速抬举射流火焰描述"></a>超声速抬举射流火焰描述</h2><h3 id="实验设置和相关数据"><a href="#实验设置和相关数据" class="headerlink" title="实验设置和相关数据"></a>实验设置和相关数据</h3><p>实验构型详细文献: by Jarret et al.</p>
+<p><a href="">Jarrett-1988-JANNAF-Measurements of temperature, density, and velocity in supersonic reacting flow for CFD code validation</a></p>
+<p>实验数据详细文献: by Cheng et al.</p>
+<p><a href="">Cheng-1991-AIAA Paper-Finite-rate chemistry effects in a Mach 2 reacting flow</a></p>
+<p><a href="">Cheng-1994-CNF-Raman measurement of mixing and finite-rate chemistry in a supersonic hydrogen-air diffusion flame</a></p>
+<p><a href="">Dancy-1996-AIAA Paper-The turbulent flow field downstream of an axisymmetric Mach 2 supersonic burner: LDA measurements</a></p>
+<p>该实验的目的是分析氢-空气混合物的自点火以及超声速条件下非预混燃烧火焰稳定所涉及的基本物理过程.</p>
+<p>其中污染空气的静温达到1250K,远高于氢空气的着火温度,如此高的温度有利于混合层内化学过程的早期发展，从而导致自着火和扩散火焰稳定.</p>
+<p>主燃烧室氢和富氧空气的燃烧提供了所需的滞止条件.燃烧室和燃料喷注器是水冷的。然而，虽然实验测量了冷却水的温度，但其具体值没有在现有的参考资料中并未说明。因此，燃烧室的壁温仍旧是未知的.除此之外，主燃烧室的内部几何结构也并不详细.</p>
+<p>中心氢气射流的滞止压力为778kPa，滞止温度为1750K。还提供了喷管出口污染空气的条件。由于这两股射流的压力都略高于环境压力，由此产生了连续低振幅振荡的压缩波和膨胀波。利用紫外自发拉曼散射和激光诱导荧光技术，实现了温度和组分浓度(主要组分和OH自由基)的同步测量.</p>
+<p>实验还提供了X/D= 0.85(离出口很近位置)位置处详细的流体动力学尺度和组分信息.火焰稳定抬举高度约在(X/D=25处.</p>
+<p>Cheng等人实验给出的的RMS值证实，温度和组分的脉动分别可以达到20%和40%.考虑到火焰涉自点火，且在剧烈脉动的流动条件下，非预混或部分预混反应物之间存在燃烧，这为高速湍流燃烧的数值模拟提供了一个具有挑战性的试验案例.</p>
+<h3 id="数值方法"><a href="#数值方法" class="headerlink" title="数值方法"></a>数值方法</h3><p>在大多数应用中，通常从燃烧器出口平面开始进行模拟,且根据Cheng等人的建议，一般采用在X/D = 0.85处的实验数据作为入口边界条件.</p>
+<h4 id="前人的模拟"><a href="#前人的模拟" class="headerlink" title="前人的模拟"></a>前人的模拟</h4><ul>
+<li>Jarrett et al.[26]</li>
+</ul>
+<p>采用了代数模型封闭湍流黏性，并结合Rogers和Chinitz[24]提出的一步化学反应机理来考虑有限速率化学效应。计算结果与实验数据进行了比较，对湍流粘度模型进行了微调，得到了满意的结果。</p>
+<ul>
+<li>Baurle et al. [30-33]</li>
+</ul>
+<p>开发并验证了一个基于假定的多元beta函数PDF的模型。并与实验结果进行了比较。考察了包括单方程模型和双方程模型在内的几种湍流模型，以及不同的化学反应机理，包括从Jachimowski[34]推导出的详细和简化的机理。结果表明，与实验数据相比，选择给定的湍流模型或化学机理所引起的差异仍然很小.</p>
+<ul>
+<li>Mobus et al. [35,36]</li>
+</ul>
+<p>基于输运型PDF模型,提出了基于蒙特卡罗方法求解标量(质量分数和焓)的联合PDF和标量-速度-湍流频率联合PDF的输运方程。采用Baurle等人研究[30]时提出的反应机理。基于第二种方法(联合尺度-速度-湍流频率PDF)的数值模拟结果与实验数据进行了最好的比较。同时发现QL方法高估了自点火区域的温度、OH和H2O质量分数峰值。</p>
+<ul>
+<li>Morgenthaler et al. [37]</li>
+</ul>
+<p>比较了基于PEUL模型[38]和之前由Sabelnikov等人的[39]扩展到超声速燃烧的火焰面模型的数值模拟结果。所得到的数值结果与实验数据存在一定的差异，这可能与燃烧模型保留的简化假设有关。特别是没有考虑外部环境空气的影响，没有对喷射器唇形进行建模，忽略了边界层的影响。</p>
+<ul>
+<li>Dauptain et al. [40]</li>
+</ul>
+<p>进行了这种超声速自由喷射火焰的LES模拟。在这项研究中，SGS速度脉动的影响用Smagorinsky模型封闭。燃烧用两步反应机理描述，不考虑SGS组分脉动(层流反应)的可能影响.从一般的观点来看，数值模拟倾向于高估射流内部的混合，预测的诱导长度(抬举高度)似乎被高估了，这可能归因于使用了简化的两步反应机理。</p>
+<p><strong>上述模拟都是用x/D=0.85处的实验条件作为x/D=0处的入口条件,喷嘴产生的温度和压力分布的非均质性被忽略了,而这些剖面可能在可压缩流场的建立中起到关键作用</strong></p>
+<ul>
+<li>Gerlinger et al.[41]</li>
+</ul>
+<p>评估了喷管流量对下游发生的自动点火过程的具体影响。然而，似乎值得注意的是，Gerlinger等人采用的几何形状。[41]是专门设计来恢复Cheng等人指定的[28]出口条件的，并不完全符合喷嘴的实际几何形状。作者系统地研究了喷嘴对主燃烧室自由基复合的影响，并对反应机理、网格尺寸和自点火延迟条件进行了参数化研究。</p>
+<ul>
+<li>Izard et al. [42]</li>
+</ul>
+<p>将Borghi和Gonzalez[43]的MIL模型应用于超音速条件，Gomet等人[44]提出了一种改进的流时间尺度表示方法，包括驻留时间尺度和混合时间尺度;所得结果与实验数据吻合较好。</p>
+<ul>
+<li>Boivin et al [2]</li>
+</ul>
+<p>进行了三维非定常数值模拟，其目的是研究简化反应机理与详细化学的相关性。采用经典的Smag.模型模拟了SGS湍流粘度，未考虑SGS湍流化学相互作用模型。该研究评估了一个三步反应机理的能力,还评估了之前由Boivin等人设计的自点火判据的相关性。结果显示高估了射流内部的混合，发现相应的温度分布不能很好地描述自点火区域.</p>
+<p>本文将着重分析非预混火焰结构，包括由自燃过程驱动的稳定区。与前人的计算不同的是,本文的数值模拟显示火焰稳定区受可压缩流场结构(激波和膨胀波、激波相互作用等)的强烈影响.包括(i)可压缩同轴射流结构以及(ii)外部环境空气和污染空间之间的可压缩混合层,这些都具有较大的特征对流马赫数.</p>
+<h2 id="超声速抬举射流火焰的大涡模拟"><a href="#超声速抬举射流火焰的大涡模拟" class="headerlink" title="超声速抬举射流火焰的大涡模拟"></a>超声速抬举射流火焰的大涡模拟</h2><h3 id="数值方法-1"><a href="#数值方法-1" class="headerlink" title="数值方法"></a>数值方法</h3><ul>
+<li><p>网格总数</p>
+<p>  本文:3100万</p>
+<p>  Dauptai:80万</p>
+<p>  Boivin:660万</p>
+</li>
+<li><p>网格分布</p>
+</li>
+</ul>
+<p><strong>喷管出口处、射流内部的特征单元尺寸已减小到0.2 mm.</strong>沿主燃烧室壁面的边界层由五层组成，厚度为0.1 mm**</p>
+<p>网格质量的计算是基于Celik等人的建议，对分子粘度和分辨粘度的相对贡献进行评估</p>
+<p>该网格被一个大的缓冲区包围,可以处理远场边界条件，没有任何数值稳定性问题</p>
+<ul>
+<li>亚格子湍流模型</li>
+</ul>
+<p>Smagorinsky 模型. 模型常数为0.1</p>
+<ul>
+<li>亚格子燃烧模型</li>
+</ul>
+<p>U-PaSR模型</p>
+<ul>
+<li>反应机理</li>
+</ul>
+<p>Jachimowski发展的9组分-19步反应机理</p>
+<ul>
+<li>计算程序</li>
+</ul>
+<p>Onera的 <code>CEDRE</code>求解器, 有限体积法, 非结构网格, 可压缩反应流NS方程</p>
+<p>无粘通量:HLLC (Harten-Lax-van Leer Contact) approximate Riemann solver, Van Leer限制器, 二阶精度</p>
+<p>时间离散: 二阶显示Runge-Kutta</p>
+<p>480个计算分区</p>
+<ul>
+<li>其他细节</li>
+</ul>
+<p>实验是在一个长时间的设备中进行的，因此热壁是在温度为Tw=500k的等温条件下进行的。<strong>由于缺乏实验数据，特别是在喷管出口截面的湍流谱，在边界条件下没有注入湍流。</strong></p>
+<h3 id="结果讨论-2"><a href="#结果讨论-2" class="headerlink" title="结果讨论"></a>结果讨论</h3><h4 id="与实验结果的对比"><a href="#与实验结果的对比" class="headerlink" title="与实验结果的对比"></a>与实验结果的对比</h4><ol>
+<li>平均速度分布(几个轴向位置截面上的分布以及沿着中心线上几个截面点的速度)</li>
+</ol>
+<p>四个轴向位置处x/D=[10.8,21.5,32.3,43.1]截面上的平均速度分布,还有中心线上几个截面上速度的分布,与实验符合的很好.</p>
+<p>实质上就是几个截面上的速度分布,截面上对准了,中心线的分布实际上就是几个截面上的射流中心的分布.</p>
+<p>平均速度曲线可以看出,喷嘴出口附近,射流速度低,污染空气速度高,随着向下游的发展,射流和污染空气逐渐混合,射流的速度逐步提高,同时,污染空气和环境空气间的混合层不断向环境空气发展,导致速度剖面向径向发展.到x/D=43.1位置处,速度已经发展成单峰分布.</p>
+<ol start="2">
+<li>温度和主要组分的平均和脉动分布</li>
+</ol>
+<p>将与对称轴上温度和主要组分摩尔分数的均值和均方根分布与实验结果进行比较.值得注意的是，<strong>计算的均方根值仅基于滤波值的时间脉动，即不考虑SGS脉动。</strong>.</p>
+<p>从沿对称线的分布可以看出,平均抬举高度的预测比较准确，但火焰温度在射流远场明显被低估了。氢和水的平均摩尔分数分布预测也很准。氧气的平均摩尔分数剖面是唯一与实验结果有差异的剖面，尤其是在远场误差十分明显.</p>
+<p>如在其他数值模拟结果中所观察到的，如[2]，氧的平均浓度剖面确实表现出非单调的行为，这与在实验中所观察到的相反。氧摩尔分数的第一个峰值(位于X/D=15处)主要是由于射流与协流之间的混合。随后的下降是由于稳定区的燃烧造成的。最后，氧摩尔分数的最后一次增加(从X/D=35开始)是因为外部环境空气稀释的结果。</p>
+<p>外部空气应该是很难进入到射流中心位置处的,所以其模拟应该是存在一定问题的,根据作者的分析,这是对外部混合层(污染空气和环境大气)发展的不恰当描述导致的。从作者的模拟云图来看,其模拟的外部混合层发展的比较剧烈,有很强的大尺度结构,这些大尺度结构可能把外部空气卷入到中心射流区,导致中心的氧气浓度异常升高.</p>
+<p>实际上从试验中可以看出,外部的混合层是向外逐渐发展的,大没有明显的大尺度结构,也就是没有大涡存在,计算中也应该保证外部混合层是逐渐向外扩展的,但没有大尺度结构.</p>
+<p>数值模拟得到的均方根分布总体上符合实验趋势，但大部分情况下对脉动的估计是偏小了.而在氢气的脉动上,在近场,约x/D=5到x/D=25这个诱导区,有异常高的脉动,脉动幅值最大甚至达到了0.6,这个是明显有问题的.</p>
+<ol start="3">
+<li>x/D=10.8</li>
+</ol>
+<p>没有观察到特别的不对称。由于在喷管出口处使用了高度细化的网格，以及根据滞止参数确定的相关边界条件，出口的分辨率很好.并与实验数据进行了比较。趋势和数量级的预测是正确的，但计算的结果并不完全符合实验测量。</p>
+<p>从均值分布来看,这个近场位置模拟的问题有:</p>
+<p>(1) 数值模拟对中间氢气和污染空气的混合预测的过快</p>
+<p>试验中这个位置的氢气比模拟的要窄,说明实际上这个位置处氢气还没有很好的扩散到污染空气中来,这个混合层应该更窄一些. 温度以及所有组分的结果都出现了这一问题.</p>
+<p>(2) 低估了污染空气和环境空气间混合层的发展.</p>
+<p>内部高估了射流和污染空气的混合,外部又低估了射流与空气的混合.从温度和水的分布可以看出,实验中该位置污染空气和环境空气间的分布比较光滑,而数值模拟中该位置的分布还是有明显的分界.而氧气的分布由于污染空气与环境空气接近,所以两者之间分界不是很明显.</p>
+<p>从脉动分布来看:</p>
+<p>温度的脉动来看,出口污染空气的脉动很强,射流脉动更强,但是由于一般很难准确给出出口的温度脉动,所以导致射流和协流内部的脉动很难准确给出.另外,外部混合层的两个脉动峰值比较接近,但是由于模拟低估了外部混合层的发展,所以混合层中心的脉动峰值相较于实验,更靠近中心.而内部混合层由于反而被高估,即发展过快,因此脉动峰值比实验更宽.实际上由于射流中心温度脉动实际上远高于协流,所以实验中并没有这双峰,但是仍旧可以看出来射流和协流明显的分界处要比模拟的窄.</p>
+<p>氢气组分脉动同样,内部混合层比实验更宽,且同前述一样,数值模拟的氢气脉动异常的高.氧气组分脉动较之于实验偏低,内部混合层的双峰距离也比实验宽.</p>
+<p>这里脉动分布的问题,主要还是对于射流和协流以及环境大气,没法给出准确的符合实验的脉动值,导致在出口位置的脉动就明显偏离实际,所以后续的结果只能对比两个混合层处峰值脉动的大致规律.</p>
+<p>标准稳定边界条件的影响在这里是明显可见的，特别是温度均方根分布，污染空气中的温度均方根被严重低估。</p>
+<p><strong>目前条件下,射流,协流和自由大气间连续的激波反射(膨胀),以及由此产生的马赫盘(钻石结构或马赫结构)似乎是影响该位置模拟精度的核心因素,温度脉动是正确预测温度区和抬举高度的次要因素.</strong></p>
+<ol start="4">
+<li>x/D=21.5</li>
+</ol>
+<p>均值分布结果:</p>
+<p>不考虑火焰非对称性的影响,该位置的模拟仍旧是比较准确的.当然前述的内部混合层发展过快,外部混合层发展过慢的问题仍旧存在,并且会影响到后面的每一处截面.</p>
+<p>脉动结果:</p>
+<p><strong>在该截面处，组分和温度均方值的分布有很明显的改善。非定常边界条件的可能影响似乎不重要，而脉动量受两个混合层的发展影响更大。</strong></p>
+<p>作者说这是他目前看到最好的均方值结果,而且,从温度RMS来看,去除实验中火焰的非对称性的影响,结果确实是十分准确的,内部混合层的两个波谷和外部混合层的两个波峰,都比较准确的模拟出来了.同样从脉动结果来看,内部混合层发展过快而外部过慢.</p>
+<p>内部混合层温度脉动的波谷是因为什么了?</p>
+<p>除了氢射流内部，温度波动的均方根值与实验测量值符合得很好。然而，值得注意的是，<strong>外部混合层的网格不够精细，不能令人满意地描述外部混合层和相关的环境空气夹杂的不稳定行为。因此，外部混合层的峰值没有被捕捉到,幅值也被大大低估</strong>.这个可能一定程度上还是因为出口的组分脉动没有给导致的.</p>
+<ol start="5">
+<li>x/D=32.3</li>
+</ol>
+<p>实验数据的不对称性仍然很明显。数值模拟得到的平均剖面与这些非对称数据的下分支吻合得很好。均方根波动曲线与结果基本一致。除了温度的均方根值，以及喷流内部的氧和水蒸气浓度的均方根值外，预测相对较好</p>
+<p>均值分布:</p>
+<p>这个位置基本上开始是单峰分布,也就是说,氢气射流与污染空气在中心附近已经基本混合在一起了.这个位置氢气组分显示,氢气分布还是略微要窄一些.</p>
+<p>由于实验火焰的不对称性在这里很明显,所以难以准确定位模拟的问题.</p>
+<p>脉动分布:</p>
+<p>由于射流继续向下游发展,受初始脉动影响更加弱化,所以脉动幅值上与实验趋于一致.但是从分布规律上出现了明显的问题.</p>
+<p>首先温度脉动上,实验是中心一个峰,外加外部混合层两个峰,但模拟结果中射流中心反而是脉动低谷,这在后面氧气和水的均方值上也是如此.</p>
+<p>氢气脉动与实验值符合的很好.</p>
+<p>模拟得到的氧气和水的均方根都是射流中心处是低谷,外部是双峰,而实验是只有一个射流中心的单峰.也就是说,试验中,上一位置处的双峰的脉动,到了这个截面位置已经明显的耗散了,也就是说,上面是在有明显的混合层的分布上,而到了这一位置,内部的混合层合为一个之后,脉动的两个峰也合并了.</p>
+<p><strong>而模拟的结果来看预测内部混合层的合并偏慢,这就可能与影响混合层合并的过程相关,这里影响最大的就是燃烧,燃烧越强,合并的越快,模拟预测的燃烧在这里偏弱,(散点图可以明显看到),所以延缓了这个过程,导致该位置处组分脉动还存在双峰,且中心温度脉动预测偏弱.</strong></p>
+<ol start="6">
+<li>x/D=43.1</li>
+</ol>
+<p>这个位置因为燃烧都比较充分,火焰的非对称性有一定程度的减弱.</p>
+<p>均值分布:</p>
+<p>预测的反应明显偏弱,温度均值偏低,氧气消耗偏少(剩的多),水生成偏少.但是怪异的是,中心氢气剩的又比实验少.感觉是反常理的.但是仔细观察也可以发现,实验氢气比较窄,说明两侧的反应比较充分,只剩下中心富燃区的氢气比较多,其他位置反应比较快.而模拟中,氢气均值峰值虽然偏小,但比较宽,说明两边的反应不够快,整体上还是反应强度较弱导致的.</p>
+<p>脉动分布:</p>
+<p>这里组分的脉动分布开始逐渐变成单峰,但还是具有一定的双峰特征,这应该还是反应不够强导致的在下游的影响.</p>
+<p>试验中由于充分的扩散燃烧,此处温度脉动受燃烧影响最大,射流中心反应比较剧烈,基本是一个单峰.而模拟中反应更加平缓,射流各处的反应比较相近,从组分均值和脉动都可以看出来.这可能还是射流没有充分混合导致的,说明氧气进到射流中心的还比较少.试验中由于该位置充分混合,氧气充分进入到射流中心,由于射流中心燃料充足,温度更高,反应自然更加剧烈.而模拟中由于前面位置燃烧较弱,此处混合就不够,导致射流中心没有充分燃烧起来,只是与整个射流达到一致的水平.可以想象在下一个位置模拟的结果会靠近上一个位置.</p>
+<p>这说明一点,就是这个算例的火焰基底位置模拟的不准,且火焰基底大于25D.整个模拟估计的反应偏弱,导致自点火预测的更迟,火焰诱导区更长,继而导致相应的结果.</p>
+<ol start="7">
+<li>散点图.</li>
+</ol>
+<p>主要组分,温度与混合分数之间的散点图.混合分数定义为:</p>
+<p>$$ Z = (Z_H - Z_H^{coflow}) / (Z_H^{fule} - Z_F^{coflow})$$</p>
+<p>其中$Z_H$是混合物中氢原子的质量分数,$Z_H=\sum \mu_k^HY_k$.其中$\mu_k^H$是组分k中氢原子的质量比,$Y_k$是相应的质量分数.试验中给出了两个化学平衡(实线)和纯混合(虚线)的两个极限.</p>
+<p>左边的图是实验结果,右边与之对应的是LES瞬时值在0.17ms时间长度里的累积结果.</p>
+<ul>
+<li>x/D=10.8,y/D=0.65</li>
+</ul>
+<p><strong>这个位置位于火焰稳定区之前,大致对应于诱导区的结束,或者说自点火区域的开始的位置。</strong></p>
+<p>温度和组分位于纯混合线附近，因此确定化学反应不是主要的。在实验和数值模拟中均观察到小当量比下的OH自由基。它们是由主燃烧室产生的燃烧产物。在模拟中，部分自由基在起始反应的起始过程中产生.</p>
+<p>相对而言这个位置基本处于纯混合状态,所以模拟的结果在幅值和分布上都与实验比较接近.</p>
+<ul>
+<li>x/D=32.3,y/D=1.1</li>
+</ul>
+<p>这个位置处于火焰稳定区之内,在所谓的钻石激波内?.与第一个位置的结果相比，温度和组分向它们的化学平衡值偏移。</p>
+<p>混合分数波动的范围，大约[0,0.12]，在计算结果中似乎比在实验中更大[0,0.08].更高的混合分数,说明这个位置氢气更多,即氢气混合层发展过快.模拟的混合分数波动范围大,恰恰也说明其对内部混合层的发展估计过快导致的,与前面氢气组分分布更宽也相对应.</p>
+<p><strong>整个数值模拟的特点就是对内部大尺度混合估计过强,但是反应又估计不足,这很有可能就是湍流燃烧模型的问题,U-PaSR模型中对$\gamma^*的估算过小,导致即使在混合更好的情况下,燃烧仍旧不足,所以这个可能是模型的问题.</strong></p>
+<p><strong>当然内部小尺度混合好不好不能直接用氢气的均值分布来确定,其只能反应大尺度混合的一些问题,小尺度混合情况可能还得要标量耗散率来表示.所以湍流模型有没有问题,可能还需要知道当地的混合究竟好不好.</strong></p>
+<p><strong>这个位置处,对射流中心的脉动估计普遍是不够的,该轴向位,射流中心可能就是反应原本最强烈的区域,但模拟估计的标量小尺度混合可能是不够的(组分脉动远小于实验,组分脉动多大程度上表征小尺度混合,还是另一个问题?),进而导致反应强度不够.</strong></p>
+<p><strong>亚格子脉动更能反应亚格子混合情况,而模拟给出的只是可接尺度的脉动,不能反应亚格子脉动情况</strong></p>
+<p>从实验中得到的最大温度(<del>3000K,在化学计量条件下)和水质量分数(</del>0.7),这些在计算中都没有达到。这可能在一定程度上是由于对均方根脉动水平的估计不足造成的，如图9和图10所示.实际上就是对化学反应估计的不足,而对化学反应估计不足的分析还是不够深入,简单的说是脉动的影响是难以令人信服的.</p>
+<p>在位于X/D=32.3和Y/D=-1.1的对称位置上，温度和成分的散点分布较少，因此应该正确看待脉动水平的差异.</p>
+<ul>
+<li>x/D=43.1,y/D=0</li>
+</ul>
+<p>该位置大致处于燃料快燃尽的位置.</p>
+<p>温度和组分大部分达到它们的平衡值.</p>
+<p>在该位置，混合分数变化的测量范围和模拟范围([0,0.1]和[0,0.09])比较吻合。但是也能明显看到,模拟的混合分数在射流中心位置的分布反而是较小的,这可能是模拟中更多氢气扩散开了,没有集中在射流中心了,导致最大的混合分数偏小.</p>
+<p>同样的问题,模拟中组分和温度的分布更加集中,没有实验分散的那么开,且幅值略微小于实验值,尤其是温度明显小于实验值,这个还是明显对反应的估计不足.</p>
+<p><strong>在x/D&lt;40处,混合分数的脉动幅度与实验混合分数的变化大致相同。这表明，混合分数脉动的可解尺度足以复现整个脉动水平，而SGS脉动的影响不显著。</strong></p>
+<p>上面这个结论还有待商榷?</p>
+<p>在火焰的远场位置，当前模拟的计算分辨率较小(网格更粗)，计算没有细化到足以捕获混合分数波动的程度.</p>
+<h4 id="与别人的计算对比"><a href="#与别人的计算对比" class="headerlink" title="与别人的计算对比"></a>与别人的计算对比</h4><p>与Mobus et al.[36]、Gomet et al.[44]和Boivin et al.[2]之前的数值模拟研究的计算数据进行定量比较。值得回顾的是，Mobus等人采用[36]输运型PDF方法，Gomet等人[44]采用设定型PDF方法,而Boivin等人的[2]的LES结果是通过层流反应得到的。因此，这三项计算性研究被保留下来，作为描述高速流动中湍流化学相互作用(TCI)的不同可用策略的代表。</p>
+<p>在第一个截面中(Gomet et al.[44]和LES, Boivin et al.[2]和本研究得到的计算结果X/D=10.8)非常相似。观测到的脉动可能仅仅是由于指定的不同边界条件造成的，在这个位置上，燃烧模型的效果并不明显.然而，值得注意的是，Boivin等人进行的LES模拟，[2]倾向于高估对称轴上的混合。</p>
+<p>在第二个截面上(X/D =21.5)，湍流和TCI模型的影响变得更加明显。与LES相比，Gomet et al.[44]或Mobus et al.[36]获得的RANS结果低估了对称轴上的混合。相应的PDF模型在本位置处倾向于预测自点火。</p>
+<p>第三截面上(X/D=32.3),Boivin et al的LES模拟[2]正确再现了对称轴上的实验数据.虽然明显低估了湍流射流的范围。</p>
+<p>在第四截面上(X/D=43.1),我们观察到与X/D=32.3处一样的趋势.</p>
+<p> Gomet等的运行结果。[44]和现在的LES产生类似的结果与实验数据的协议。</p>
+<p>在中心线(Y/D=0), Boivin et a的LES[2]倾向于高估对称轴上的混合和自着火,即其预测的反应更强(这可能就是层流反应速率过快导致的).</p>
+<p>与实验数据相比,目前的结果确实展示一个非常满意的趋势X/D&lt;35D时.在之后结果不能很好地描述。这可能是由于在该轴向位置后射流中心以及外部混合层的网格都不够细,导致影响到对称轴上的计算结果.</p>
+<h4 id="火焰结构"><a href="#火焰结构" class="headerlink" title="火焰结构"></a>火焰结构</h4><h4 id="火焰稳定"><a href="#火焰稳定" class="headerlink" title="火焰稳定"></a>火焰稳定</h4>
+    </div>
+
+    
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------------</div>
+    
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Guan Qingdi
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://guanqingdi.github.io/2019/11/Literature-Reading/" title="文献阅读笔记">https://guanqingdi.github.io/2019/11/Literature-Reading/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/writing/" rel="tag"><i class="fa fa-tag"></i> writing</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/Gaussian-White-Noise/" rel="prev" title="高斯白噪声生成方法">
+      <i class="fa fa-chevron-left"></i> 高斯白噪声生成方法
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/Markdown-Pictures/" rel="next" title="Markdown-Pictures">
+      Markdown-Pictures <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Boivin-2012-采用简化反应机理的超声速氢空气自点火稳定火焰模拟"><span class="nav-number">2.</span> <span class="nav-text">Boivin-2012-采用简化反应机理的超声速氢空气自点火稳定火焰模拟</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract"><span class="nav-number">2.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction"><span class="nav-number">2.2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#超声速火焰描述-实验结果"><span class="nav-number">2.3.</span> <span class="nav-text">超声速火焰描述(实验结果)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数值设置"><span class="nav-number">2.4.</span> <span class="nav-text">数值设置</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#反应机理"><span class="nav-number">2.5.</span> <span class="nav-text">反应机理</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结果讨论"><span class="nav-number">2.6.</span> <span class="nav-text">结果讨论</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#定性结果对比-云图"><span class="nav-number">2.6.1.</span> <span class="nav-text">定性结果对比(云图)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#定量结果对比-实验"><span class="nav-number">2.6.2.</span> <span class="nav-text">定量结果对比(实验)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结果讨论-1"><span class="nav-number">2.6.3.</span> <span class="nav-text">结果讨论</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#一种显示的自点火识别方法"><span class="nav-number">2.7.</span> <span class="nav-text">一种显示的自点火识别方法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#评述"><span class="nav-number">2.8.</span> <span class="nav-text">评述</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Cheng-1994-超声速同轴射流火焰实验"><span class="nav-number">3.</span> <span class="nav-text">Cheng-1994-超声速同轴射流火焰实验</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract-1"><span class="nav-number">3.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction-1"><span class="nav-number">3.2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Results-and-Discussion"><span class="nav-number">3.3.</span> <span class="nav-text">Results and Discussion</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流体力学尺度"><span class="nav-number">3.4.</span> <span class="nav-text">流体力学尺度</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#混合和有限速率反应的影响"><span class="nav-number">3.5.</span> <span class="nav-text">混合和有限速率反应的影响</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">3.6.</span> <span class="nav-text">结论</span></a></li></ol></li><li class="nav-item nav-level-1"><a class="nav-link" href="#Moule-2014-CNF-Highly-resolved-numerical-simulation-of-combustion-in-supersonic-hydrogen–air-coflowing-jets"><span class="nav-number">4.</span> <span class="nav-text">Moule-2014-CNF-Highly resolved numerical simulation of combustion in supersonic hydrogen–air coflowing jets</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Abstract-2"><span class="nav-number">4.1.</span> <span class="nav-text">Abstract</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Introduction-2"><span class="nav-number">4.2.</span> <span class="nav-text">Introduction</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数学模型"><span class="nav-number">4.3.</span> <span class="nav-text">数学模型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#控制方程"><span class="nav-number">4.3.1.</span> <span class="nav-text">控制方程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#湍流化学反应相互作用模型"><span class="nav-number">4.3.2.</span> <span class="nav-text">湍流化学反应相互作用模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#EDC模型"><span class="nav-number">4.3.3.</span> <span class="nav-text">EDC模型</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#U-PaSR模型"><span class="nav-number">4.3.4.</span> <span class="nav-text">U-PaSR模型</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#超声速抬举射流火焰描述"><span class="nav-number">4.4.</span> <span class="nav-text">超声速抬举射流火焰描述</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#实验设置和相关数据"><span class="nav-number">4.4.1.</span> <span class="nav-text">实验设置和相关数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#数值方法"><span class="nav-number">4.4.2.</span> <span class="nav-text">数值方法</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#前人的模拟"><span class="nav-number">4.4.2.1.</span> <span class="nav-text">前人的模拟</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#超声速抬举射流火焰的大涡模拟"><span class="nav-number">4.5.</span> <span class="nav-text">超声速抬举射流火焰的大涡模拟</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#数值方法-1"><span class="nav-number">4.5.1.</span> <span class="nav-text">数值方法</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#结果讨论-2"><span class="nav-number">4.5.2.</span> <span class="nav-text">结果讨论</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#与实验结果的对比"><span class="nav-number">4.5.2.1.</span> <span class="nav-text">与实验结果的对比</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#与别人的计算对比"><span class="nav-number">4.5.2.2.</span> <span class="nav-text">与别人的计算对比</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#火焰结构"><span class="nav-number">4.5.2.3.</span> <span class="nav-text">火焰结构</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#火焰稳定"><span class="nav-number">4.5.2.4.</span> <span class="nav-text">火焰稳定</span></a></li></ol></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Guan Qingdi"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Guan Qingdi</p>
+  <div class="site-description" itemprop="description">日常 | 湍流 | PDF | 燃烧 | 码渣</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/guanqingdi" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;guanqingdi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5770863755/home?wvr=5" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5770863755&#x2F;home?wvr=5" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guan Qingdi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">65k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">1:48</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='255,0,200' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+</body>
+</html>

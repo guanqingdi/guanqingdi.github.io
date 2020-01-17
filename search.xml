@@ -1,0 +1,1671 @@
+<?xml version="1.0" encoding="utf-8"?>
+<search>
+  <entry>
+    <title>曲线坐标下的合成湍流入口生成方法</title>
+    <url>/2020/01/%E6%9B%B2%E7%BA%BF%E5%9D%90%E6%A0%87%E4%B8%8B%E7%9A%84%E5%90%88%E6%88%90%E6%B9%8D%E6%B5%81%E5%85%A5%E5%8F%A3%E7%94%9F%E6%88%90%E6%96%B9%E6%B3%95/</url>
+    <content><![CDATA[<p>主要是总结吸收数字滤波方法,对其进行一定的改进,并将其应用在曲线坐标下湍流入口生成.</p>
+<a id="more"></a>
+
+<h2 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h2><p>通过一定的调研发现,数字滤波方法在湍流入口生成上具有比较好的效率优势,但是在曲线坐标下,一般都是通过映射方法,即在均匀的笛卡尔网格上生成相应的关系,然后将其映射或插值到曲线坐标网格上.</p>
+<p>另一种是Dhamankar等人提出了曲线坐标下非均匀网格的生成方法,但是讲的十分笼统,没有详细叙述其基本原理和具体过程.</p>
+<p>基于以上以及对Openfoam和南安普顿程序的理解,试着提出自己的认识以及更加详细的生成方法.</p>
+<h2 id="基本前提"><a href="#基本前提" class="headerlink" title="基本前提"></a>基本前提</h2><p>做这个的前提是,对于曲线坐标下的网格,在给定长度尺度的时候,一般是$L_{xu}, L_{xv}, L_{xw}, L_{yu}, L_{yv},…, L_{zw}$ .这个在曲线网格下,尤其是在不规则网格下,很难给定,它几乎就限定了入口的形状必须是规则且网格三个方向与坐标三个方向要大致一致.比如在O-block拓扑下,就很难给定相关的信息.</p>
+<h2 id="核心思想"><a href="#核心思想" class="headerlink" title="核心思想"></a>核心思想</h2><p>核心思想实际上是两种方法的结合,即首先要将非均匀的曲线网格,映射到均匀的曲线网格,然后从均匀的曲线网格上进行相应的长度尺度变换等</p>
+<ol>
+<li>从非均匀到均匀的映射</li>
+</ol>
+<p>这一步应该是以壁面为参照,沿着壁面的方向均匀分布网格,另一个方向与该方向正交.这个均匀分布的网格把实际的网格包含在了里面.</p>
+<p>该均布网格主要是得到两个重要参数,$\Delta e2$ 和 $\Delta e3$, 即该均匀分布网格的间距,注意该间距不是$\Delta y$ 和$\Delta_z$,同时这个间距仍旧都是物理单位,即都是以m作为基本单位.</p>
+<p>为什么要做这一步,其实这一步的主要目的就是把常规的积分长度尺度变成容易给定的方式,即我们根据距离壁面的距离来给定长度尺度是比较容易,或者比较直观的.</p>
+<ol start="2">
+<li>在均匀网格上进行相应的计算</li>
+</ol>
+<p>$\Delta e2$ 和 $\Delta e3$是均匀网格的基本单位,同样由次建立了新的坐标体系$e2, e3$,另一个方向是垂直于面的方向.</p>
+<p>在这个新的坐标体系下,由新的长度得到相关函数的具体形式,由此可以求解得到一系列滤波系数,进而对高斯信号进行滤波得到具有指定长度尺度的信号.</p>
+<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><p>根据思路,具体实现的最大的难点是,<strong>建立虚拟网格和映射方法</strong>,虚拟网格的建立是比较麻烦的,再这加上多区并行的问题,实在是一个比较复杂的问题.</p>
+<p>一般的建立方法是,根据y轴和z轴直接建立均匀网格,网格的数目为节点数目,但是这样的问题是,必须壁面就必须垂直与y或者z,也就是$e2$和$e3$与y和z方向是直接对应的.</p>
+<p>但是实际上的曲线坐标是不可能的,</p>
+<p>$L_{e2}$和$L_{e3}表示$e2$和$e3$方向的最大垂直距离,</p>
+]]></content>
+      <categories>
+        <category>Numerical Method</category>
+      </categories>
+      <tags>
+        <tag>programming</tag>
+        <tag>turbulent</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>湍流统计</title>
+    <url>/2019/12/%E6%B9%8D%E6%B5%81%E7%BB%9F%E8%AE%A1/</url>
+    <content><![CDATA[<a id="more"></a><h2 id="Pope-Turbulent-Flows-P69"><a href="#Pope-Turbulent-Flows-P69" class="headerlink" title="Pope, Turbulent Flows, P69."></a>Pope, <em>Turbulent Flows</em>, P69.</h2><h3 id="时间相关函数-自相关"><a href="#时间相关函数-自相关" class="headerlink" title="时间相关函数(自相关)"></a>时间相关函数(自相关)</h3><p><strong>自相关函数表征了一定时间内信号的相关性</strong>,其数学形式上就是同一位置不同时刻脉动关联量(乘积)的期望.如果是同一时刻,相关性为1,在其他状态下自相关函数均小于1,也可以为负数,即负相关.</p><p>时间相关函数就是自相关函数.</p><p>$$R(s) = \langle u(t)u(t+s) \rangle$$</p><a id="more"></a>
+
+
+
+
+<p>其中$u$表示的是脉动量(脉动速度).</p>
+<p>时间自相关函数的无穷时间积分就是积分时间尺度.</p>
+<p>高频过程的自相关函数更窄,低频过程的自相关函数更宽.这也很好理解,高频过程一般能量耗散更快,即’存活时间短’.积分时间尺度实际上就表征了它的这个特性.低频过程一般具有更大的能量,影响时间更长.</p>
+<h2 id="张兆顺-粘性流体动力学基础-P275"><a href="#张兆顺-粘性流体动力学基础-P275" class="headerlink" title="张兆顺, 粘性流体动力学基础, P275"></a>张兆顺, 粘性流体动力学基础, P275</h2><h3 id="空间相关函数定义"><a href="#空间相关函数定义" class="headerlink" title="空间相关函数定义"></a>空间相关函数定义</h3><p>$$ R_11(r_1,r_2,r_3) = \frac{\overline {u’(x)u’(x+r)}}{\overline{u’^2(x)}} $$</p>
+<p><strong>空间相关函数的无穷空间积分就是积分长度尺度</strong></p>
+<p>多数情况下,空间相关函数只给出沿着某一坐标方向分开两点的关联,如$R_{22}(r_1,0,0)$ 表示了沿着x轴相距为$r_1$的两点处$v’$的关联系数.</p>
+<p>空间相关函数的物理意义比较直观,例如对同一个旋涡的同一侧,速度通常有相同的方向,有着较强的正相关,而如果两个点距离远,那么相关性就较小,另外如果两点处于两涡之间,受不同涡控制其速度方向,或者处于同一个涡的两侧,速度方向相反,那么就形成负相关.</p>
+<p>给定空间距离r,也可以作类似的讨论,即尺度小于r的涡不会对相距为r的关联做出贡献,只有尺度大于r的涡才能对相距为r的关联做出贡献.</p>
+<p><strong>相距为r的相关函数是对尺度大于r的旋涡强度的度量</strong> 所以可以用积分</p>
+<p>$$ l= \int_0^{\infty} Rdr $$</p>
+<p>综合表征旋涡的尺度,即积分长度尺度,它表示了含能涡的尺度的量级.</p>
+<p>通常三个速度分量的相关函数不同,且同一速度分量沿着三个方向的相关函数一般也不同.可分为纵向和侧向关联.</p>
+<h3 id="时间相关"><a href="#时间相关" class="headerlink" title="时间相关"></a>时间相关</h3><p>$$R_{22}(\tau)=\frac{\overline{v’(t)v’(t+\tau)}}{\overline{v’^2(t)}}$$</p>
+<p>$\tau$为延迟时间.</p>
+<p>时间相关,或者说自相关研究湍流并不十分恰当,为了将自相关转换为有用的空间相关,泰勒提出了如下假设:</p>
+<blockquote>
+<p><strong>泰勒假设:<br> 若与平均速度比较,湍流脉动较小,且当通过一固定点时,旋涡并不明显变形,则具有时间滞后量$\tau$的速度脉动分量$v’$的自相关函数$R_{22}(\tau)$将与在x方向具有距离为$-U\tau$的空间相关函数$R_22(-U\tau,0,0)$相同.</strong></p>
+</blockquote>
+]]></content>
+      <categories>
+        <category>湍流</category>
+      </categories>
+      <tags>
+        <tag>湍流理论</tag>
+        <tag>统计分析</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>空间混合层</title>
+    <url>/2019/12/%E7%A9%BA%E9%97%B4%E6%B7%B7%E5%90%88%E5%B1%82/</url>
+    <content><![CDATA[<a id="more"></a><p>最小的湍流长度尺度是kolmogorov尺度$\eta$</p><p>$$ \eta = (\nu^3 / \epsilon)^{1/4} $$</p><p>其中$\nu$为动力黏度,$\epsilon$为湍动能耗散率,耗散率由下式进行近似</p><p>$$\epsilon = u_{rms}^3 / L$$</p><p>其中$u_{rms}$为湍流脉动速度,$L$为湍流积分长度尺度</p><a id="more"></a>
+
+
+
+
+
+
+<p>最小的标量尺度是Batchelor尺度$$</p>
+<p>$$\lambda_B = (\nu k^2/\epsilon)^{1/4}=\eta/(Sc)^{1/2}$$</p>
+<p>$Sc$为施密特数,一般假设为1?我们的程序里都是假设为0.74.如果假设为1,那么Batchelor尺度约等于湍流耗散尺度.</p>
+<h2 id="Ferrer-反应混合层"><a href="#Ferrer-反应混合层" class="headerlink" title="Ferrer 反应混合层"></a>Ferrer 反应混合层</h2><h3 id="翻译"><a href="#翻译" class="headerlink" title="翻译"></a>翻译</h3><h4 id="文献综述部分"><a href="#文献综述部分" class="headerlink" title="文献综述部分"></a>文献综述部分</h4><p>剪切混合物层是自由剪切流的一个例子，已经成为许多实验，理论以及数值性质研究的一部分。最初的作品致力于不可压缩的混合层。这些研究包括Spencer＆Jones（1971）[156]，Brown＆Roshko（1974）[21]和Dimotakis＆Brown（1976）[39]的著作。这些研究集中于剪切层的结构及其对混合物的影响。 Bell＆Mehta（1990）后来报道了以混合层的线性增长和平均量的归一化轮廓重叠为特征的自相似状态的研究[12]。</p>
+<p><strong>基于线性和非线性不稳定性理论以及直接数值模拟的数值研究表明，不可压缩状态（对流马赫数Mc &lt;0.4）和可压缩状态（Mc &lt;0.6）之间存在重要差异。在第一种情况下，开尔文-亥姆霍兹类型的流中二维不稳定性占主导地位，而在可压缩状态下，倾斜的不稳定性波似乎会产生三维结构[32、33、48、80， 108，134]。</strong>这两种行为已通过不同的研究实验性验证[17，29，45，141]</p>
+<p>惯性和反应性可压缩二维混合物层的大量模拟已经进行。其中大多数是相当古老的模拟，很大程度上受当时计算机的计算能力限制。惰性案件的一些例子是：柏忌[16]和斯坦利和萨卡[157]。这些二维模拟还受到缺乏大规模方向的限制，与实验研究相比，其中一些数量被高估了。反应性二维剪切混合物层的模拟也是许多论文和出版物的主题。<br>[32、113、135、148、159、160、172]。这些研究中的大多数提出了关于反应机理的简化。因此，这些模拟有时仅限于无限快的化学反应[32、113]，或者仅限于仅一步反应的化学反应[148]。</p>
+<p>显着的结果表明，<strong>通过化学反应，混合物层的生长速度大大降低，并且随着温度的升高或温度的降低，诱导长度的减少。氧化剂的流动速度。</strong></p>
+<p>用于描述化学动力学的简化假设与超音速燃烧过程不兼容，超音速燃烧过程的化学特征时间可能与流动的特征时间处于相同数量级。例如，当使用全局化学方法模拟空气-氢分布的超音速火焰，例如Cheng等人的火焰时，就会获得异常的组分浓度[56]。 [28]。<strong>用有限化学方法对二维混合物层进行的模拟突出显示了扩散火焰在由大涡结构形成的位于燃料侧的孤立气穴中的燃烧</strong>[159]。由氮的质量分数计算得出的混合物层生长速率的增加归因于燃烧产生的热膨胀[160]。</p>
+<p>最后，二维近似（不包括涡旋拉伸）已知会高估可变密度湍流火焰中的斜压效应[113]。显然，由化学反应产生的热量的释放导致密度的降低，运动粘度的提高，并因此导致流体动力学与化学动力学之间的耦合。因此，由混合区域中的温度升高引起的流体膨胀可以有助于混合层的生长速率的增长，这似乎是合乎逻辑的。</p>
+<p>在不可压缩饮食中，进行实验研究.为了降低流体动力学对混合物和反应速率的影响，我们以较低的放热速率进行了研究[19，115]。这些结果表明，由于存在三维涡旋结构（纵向涡旋和涡旋涡旋的组合），三维效应促进了反应产物的增加。还进行了其他具有较高放热水平的实验研究[73，107]。这些研究致力于燃烧对生长速率的影响以及该问题的发展，例如安装合适的几何体。这项工作中设想的冲击与混合层之间的相互作用已成为各种数值研究的主题[24、27]，这些研究证实了该方法在实际情况下的良好性能。也已经报道了入射冲击和混合层之间相互作用对燃烧的影响[159]。</p>
+<p>本章专门研究惰性和反应性二维可压缩混合物的层，主要有两个目标。首先，可以将本文框架内开发的计算工具获得的惰性和反应性二维混合物层空间发展的结果与文献中已报道的结果进行比较。但是，三维模拟对于捕获湍流的级联过程至关重要。因此，本节的第二个目的是将与二维混合物层相关的现象学与三维层的现象学联系起来。此<br>本章组织如下。 5.2节回顾了混合层的一般特性。第5.3节介绍了不可压缩空气混合物层的参考案例。 5.4节讨论了具有不同对流马赫数的惰性可压缩混合物层的研究，而5.6节讨论了等效的反应模拟。最后，第5.9节分析了对混合层和最终混合层发展的影响。<br>本节介绍了最重要的结果。</p>
+<h4 id="混合层一般性质"><a href="#混合层一般性质" class="headerlink" title="混合层一般性质"></a>混合层一般性质</h4><p>图5.1示出了示意性的剪切层1的几何形状在空间上开发从两个平行的流动。 在分离板之后，剪切层的纵向速度分布通常由双曲正切[16、123、148、157]模化.</p>
+<p>$$<br>u_{1}=\frac{U_{1}+U_{2}}{2}+\frac{U_{1}-U_{2}}{2} \tanh \left(\frac{2 x_{2}}{\delta_{\omega, 0}}\right)<br>$$</p>
+<p>其中U1和U2分别是快慢两股流动的速度(U1&gt; U2)。 变量$δω0≡δω（x = 0）$是指混合层的初始涡旋厚度。该厚度从该关系式计算</p>
+<p>$$<br>\delta_{\omega}=\frac{U_{1}-U_{2}}{\left|\partial\left\langle u_{1}\right\rangle_{f} / \partial x_{2}\right|_{\max }}<br>$$</p>
+<p>涡的厚度可以具有不同的定义，由于涡量和动量厚度的定义在文献中大量使用</p>
+<p>$$<br>\delta_{\theta}=\frac{1}{\rho_{0} \Delta U^{2}} \int_{-\infty}^{+\infty}\langle\rho\rangle\left(U_{1}-\left\langle u_{1}\right\rangle_{f}\right)\left(\left\langle u_{1}\right\rangle_{f}-U_{2}\right) \mathrm{d} x_{2}<br>$$</p>
+<p>其中 $\rho_0$ 是输入处两个平行流的平均密度。 将定义（5.2）和（5.5）用作剪切层的特征长度，将 $∆U = U1-U2$ 用作参考速度，将 $\rho_0$ 用作参考密度。 在纵向速度分布由关系（5.1）给出的情况下，即双曲正切，初始厚度验证关系</p>
+<p>$$<br>\delta_{\omega_0} = 4\delta_{\theta_0}<br>$$</p>
+<p>空间混合层涡旋厚度的增长率由下式给出：</p>
+<p>$$<br>\delta_{\omega}^{\prime}=\frac{1}{\eta} \frac{\mathrm{d} \delta_{\omega}}{\mathrm{d} x_{1}}<br>$$</p>
+<p>其中 $\eta=(U_1-U_2)/(U_1+U_2)$, 对于基于混合层随时间变化的近似模拟，将该增长率定义为</p>
+<p>$$<br>\delta_{\omega, t}^{\prime}=\frac{1}{\Delta U} \frac{\mathrm{d} \delta_{\omega}}{\mathrm{d} t}=\frac{4}{\delta_{\omega, 0}} \frac{\mathrm{d} \delta_{\omega}}{\mathrm{d} \tau}<br>$$</p>
+<p>$τ= 4∆Ut/δ_{ω_0}$。假定$Uc =(U1 + U2)/2$，这些关系验证</p>
+<p>$$<br>\delta_{\omega}^{\prime}=\frac{1}{\eta} \frac{\mathrm{d} \delta_{\omega}}{\mathrm{d} x_{1}}=\frac{1}{\eta} \frac{\mathrm{d} t}{\mathrm{d} x_{1}} \frac{\mathrm{d} \delta_{\omega}}{\mathrm{d} t}=\frac{2}{\Delta U} \frac{\mathrm{d} \delta_{\omega}}{\mathrm{d} t}=2 \delta_{\omega, t}^{\prime}<br>$$</p>
+<p>可以将相同的推理应用于动量厚度的增长率的定义。</p>
+<p>基于涡度厚度的雷诺数定义为</p>
+<p>$$<br>R e_{\omega}=\frac{\rho_{0} \Delta U \delta_{\omega}}{\mu_{0}}<br>$$</p>
+<p>其中考虑了动力粘度的平均值。 雷诺数和特征厚度的定义用于确定混合层的尺寸。</p>
+<p>Papamoschou＆Roshko [126]在他们的实验研究中定义了一个基准，以测量剪切层的可压缩性。 它是不同于实验室的伽利略参考系，以大型湍流结构Uc的速度移动。 在此坐标系中，每个流的对流马赫数定义为</p>
+<p>$$<br>M_{c_1} = \frac{U_1 - U_c}{c_1}<br>$$</p>
+<p>$$<br>M_{c_2} = \frac{U_c - U_2}{c_2}<br>$$</p>
+<p>其中c1和c2是每个流中的声速。 在Mc1和Mc2的数量不够高并且每种流的比热比保持相同的情况下，即γ1=γ2，Papamoschou和Roshko已经证明了这种关系</p>
+<p>$$<br>U_c = \frac{c_1 U_1 + c_2 U_2}{c_1 + c_2}<br>$$</p>
+<p>可以将公式（5.11）替换为（5.10），以获得剪切层的对流马赫数</p>
+<p>$$ M_c = \frac{\Delta U}{c_1 + c_2}$$</p>
+<p>即使在每个流中的比热γ的比率不同时，关系式（5.12）也将始终用于该工作。 这种选择的原因在参考文献[70]中是合理的，在该文献中表明，由于γ的变化而导致的对流马赫数的变化对于该值的相当宽的范围仍然受到限制。 尤其是，对于Mc∈[0，3]和γ∈[1.1，1.6]，此差异仍小于12％。 此外，方程（5.12）在文献中非常常用于每种流中比热比不同的情况[27、33、110、124、148、154]。</p>
+<p>通过方程（5.12）测得的可压缩性对混合层生长速率的影响可以与每种流动速度之比r = U2 / U1和密度比s =ρ2/ρ1。为此，通过具有相同速度和密度比的不可压缩混合物层的生长率来归一化可压缩混合物层的生长率。归一化之后，当将它们绘制为对流马赫数的函数时，增长率围绕一条曲线聚集。这种行为的一个例子在“有角度的实验曲线”中得到了说明，该曲线是从在几个空气-空气剪切层上进行的实验汇编中获得的。该曲线表明，<strong>随着对流马赫数的增加，增长率降低。因此，可压缩性表现为混合层的稳定机制，可减弱二维Kelvin-Helmholtz结构的不稳定模式，并有利于斜向不稳定模式的发展[48]。因此，可压缩的剪切层比不可压缩的剪切层具有更多的三维无序结构[55]。</strong></p>
+<p>速度和密度比对混合物层生长速率的影响在可压缩和不可压缩状态下实际上相似。 特别是，<strong>当最快的流量中存在最重的气体时，增长率会降低;如果最慢的流量中存在最重的气体，则增长率会提高[21]</strong>。 另外，增长率随着速度比U2 / U1的减小而增加，例如随着速度差U1和U2的增加而增加。</p>
+<h4 id="不可压二维混合层"><a href="#不可压二维混合层" class="headerlink" title="不可压二维混合层"></a>不可压二维混合层</h4><p>本节专门通过不可压缩混合物层的数值模拟研究，以确定其主要空气动力学特性。这些结果的数值验证将可以解决更复杂的情况。<br>这里提出的混合层配置与Bogey [16]提出的非常相似。每个流的速度设置为U1 = 100 m / s和U2 = 50 m / s，初始涡旋厚度设置为δω0= 1.6×10-3 m。初始雷诺数固定为Reω0= 5333，对流马赫数为Mc = 0.074。因此，由于对流马赫数非常低，因此它是不可压缩的混合物层。计算域的尺寸为L1 =320δω0和L2 =198δω0。利用1000个计算点和恒定的网格∆x1 =0.32δω0，该场在纵向上均匀离散。在横向方向上，网格从域的中心开始以1.8％的速率逐渐拉伸，其中网格尺寸固定为∆x2 =0.16δω0。在计算域的入口处，将施加Dirichlet类型条件，并在域的底部和顶部的输出处使用非反射条件。为了初始化计算，在压力p = 1 bar下，由密度为ρ= 1.22 kg / m3的氧气-氮气混合物（21％O2 + 79％N2）定义空气。纵向速度遵循双曲正切轮廓（5.1），而横向速度固定为零。为了激发K-H不稳定性，在$(x_{1,0},x_{2,0}）=(4δ_{ω0}，0)$处的横向速度分量添加如下式的随机扰动</p>
+<p>$$<br>v_{p}=\varepsilon \alpha U_{c} \exp \left(-\frac{\left(x_{1}-x_{1,0}\right)^{2}+\left(x_{2}-x_{2,0}\right)^{2}}{\Delta x_{0}^{2}}\right)<br>$$</p>
+<p>量ε表示-1和+1之间的随机数，α和∆x0分别是扰动的幅度和大小。在此仿真中，α=2×10-3和∆x0 =δθ0。根据Bogey [16]的说法，这种扰动旨在触发混合层的自然发展。 Stanley＆Sarkar [157]研究了不同扰动对混合层发展的影响。某些类型的强迫会导致与随机干扰（即白噪声）有关的不稳定性的早期触发。这些扰动有助于在显影的第一阶段人为地增加混合物层的生长速率，并且在一定距离之后，生长速率的斜率松弛以达到更接近于扰动所获得的值。随机的。本工作中提出的模拟仅使用随机扰动。这种类型的扰动还将用于研究可压缩性效应和热量产生速率对混合物层过渡的影响。使用分子运输的术语的简化描述，0.75的CFL和等于0.1的傅立叶数进行计算。</p>
+<p>图5.2显示了稳态时的涡度等值线和平均纵向速度。旋涡结构的出现在x1 =60δω0附近发生，这与柏忌的结果非常吻合。以随机方式形成的涡流有助于层的扩展，这由平均纵向速度的等值线的规则形状验证</p>
+<p>如图5.3所示，旋涡厚度和动量厚度的空间演变使得可以获得有关该剪切层的定量数量。在几乎为零增长的第一阶段之后，这两个量从x1 =50δω0线性增加。这种增长的线性特征已经在一些实验和数值研究中得到了报道（见表5.1）。在这项研究中，$η^{−1} dδω/dx1$的值等于0.166，这与表5.1中所示的不同参考一致。</p>
+<p>研究的另一个重要方面涉及平均纵向速度横向轮廓的自相似性以及从雷诺应力张量推导出的均方根速度轮廓（均方根）。图5.4（a）证实了在不同横坐标$x1^*≡x1/δω0$处绘制的平均纵向速度曲线的自相似性。从雷诺应力张量推导出的均方根速度曲线的相似性，图5.4（b）–5.4（d),是从x1≈100δω0获得的。<br>均方根速度的最大值已在表5.1中分组，以便将其与其他实验和数值研究进行比较。</p>
+<p>r11 = q | hu0 1u0 1i | / ∆U的最大值比使用其他二维数值模拟获得的值略高。但是，与这些三维模拟相比，r12 = q | hu0 1u0 2i | / ∆U的最大值仍然较低，但大于三维模拟或实验研究确定的最大值，因为<strong>湍动能在二维情况下被高估了</strong>。</p>
+<p>在此给出的结果与其他先前研究得出的结果之间取得了良好的一致性，从而有可能在数值上验证不可压缩混合物层数值模拟的计算代码的良好性能。在下文中，将讨论惰性和反应性可压缩二维混合物层的研究。</p>
+<h4 id="惰性可压缩混合层"><a href="#惰性可压缩混合层" class="headerlink" title="惰性可压缩混合层"></a>惰性可压缩混合层</h4><p>下面将要研究的混合物对应于与高速推进系统[28、110、148]有关的实验和数值研究，例如冲压喷气发动机和超燃冲压发动机。</p>
+<h5 id="混合物的描述"><a href="#混合物的描述" class="headerlink" title="混合物的描述"></a>混合物的描述</h5><p>鉴于其单位质量的能量高，由于氢气的自燃时间短，因此它是此类系统的首选燃料。为了减轻航空结构的重量，超燃冲压发动机的长度保持相当有限，并且燃烧室内的特征混合时间可以与氢-空气混合物的化学反应时间处于相同的数量级，这可以减少大大提高了燃烧效率。这些推进系统的发展为湍流剪切流开辟了一个新的研究领域，其目的是了解可压缩性显着影响混合和燃烧的基本机理。</p>
+<p>米勒等人的实验配置。 [110]用于研究可压缩性在反应性湍流剪切层中的影响，它由四个主要部分组成：陈旧的空气发生器系统，燃料喷射系统，测试室和系统放电。燃料流由用氮气（或氦气）稀释的氢气混合物组成，而废气流是由富氧空气中氢气的预燃烧产生的。在Miller等人的工作中，混合物层的放热率水平不足以改变大规模的结构，因此，在相同的可压缩性水平下，它们仍与惰性层相似。</p>
+<p>由于这项研究的目的之一是研究湍流剪切流的自燃现象，因此我们认为其构型与Miller等人的构型略有不同，总结于表5.2。这种混合配置用于惰性和反应性剪切层。表5.2的最后四列分为两组，以便将使用单个反应步骤的动力学方案（“整体化学”，CG）与使用具有几个基本反应的详细动力学方案的“数值模拟”（“详细化学”，CD）。如[110]中所建议的，氧化剂流（陈旧的空气）中存在的自由基的影响是不可忽略的，对于具有详细化学性质的数值模拟，必须予以考虑。为此，已经使用CHEMKIN库[86]进行了余额计算。这些计算使得可以确定化学平衡时给定混合物的组成，绝热温度以及自燃时间。根据Miller等人测量的实验数据，可以计算化学平衡时自由基的质量分数。表5.2中报告了这些数量的近似值。</p>
+<p>图5.5（a）显示了绝热平衡温度与混合比的关系</p>
+<p>$$<br>z=\frac{1}{1+\phi}\left(\phi \frac{Y_{C}}{Y_{C, c}}-\frac{Y_{O}}{Y_{O, o}}+1\right)<br>$$</p>
+<p>其中YC和YO分别是燃料和氧化剂的质量分数。 量YC，c是燃料侧燃料的质量分数，而Yo，o表示与氧化剂相同的量。 混合物的浓度为定义为</p>
+<p>$$<br>\phi=\frac{\nu_{O} W_{O}}{\nu_{C} W_{C}} \frac{Y_{C, c}}{Y_{O, o}}<br>$$</p>
+<p>将这项工作中使用的混合物结构的绝热平衡温度与文献中使用的各种混合物进行了比较：Miller等。 [110]，Cheng等。 [28]和Sekar＆Mukunda [148]。对应于最大放热速率的该温度用作混合物层中预期的最大温度水平的估计。在Miller等人的配置中，平衡绝热温度仍然低于陈旧空气（z = 0），这解释了作者观察到的结果，如上所述。在Cheng等人的实验配置中，由于燃烧引起的影响相对较大，将温度升高至接近化学计量比的2700 K（zst = 0.41）。</p>
+<p>最后，与Sekar＆Mukunda进行的数值模拟相对应的曲线显示出更大的影响。与这项工作中使用的配置相对应的曲线位于中间区域。使用与Miller等人相同的组成获得这种配置。和相同的陈旧气流温度（z = 0）。在燃料侧（z = 1），545 K的温度对应于Cheng等人测量的温度。与Miller等人的配置相比，氢气的质量分数降低了一半。这种选择可以使混合物的最高绝热温度足够高，从而在一定范围内产生较大的变化成分和温度值与当前的测试台兼容。</p>
+<p>图5.5（b）显示了为上述两种动力学方案选择的混合物构型中的预期自燃时间。全球化学（CG）的计算是根据Marinov等人的全球反应机制进行的。 [102]由一个单一的全球反应和4个物种组成，而详细化学（CD）的计算是根据ÓConaire等人的机制进行的。 [119]由21个基本反应和9个种类组成。总体图显示了最短的周转时间。在详细的图表中，氧化剂流中自由基（陈旧空气）的存在会减少自燃时间，同时会增加易燃区的范围。但是，自燃时间仍大于从整体反应机理获得的时间。根据这些结果，在不考虑自由基（清洁空气）存在的情况下，采用详细的化学方法进行的反应性数值模拟被证明是非常昂贵的，甚至是不切实际的，因为要达到有利于条件的计算域的尺寸混合物的自燃将非常重要。</p>
+<p>下面将使用表5.2中报告的混合物的结构来计算不同对流马赫数下的惰性混合物层。 从战略上选择这些值：根据Langley实验曲线，Mc = 0.35位于不可压缩状态的极限内（情况I-2D-0.35），Mc = 0.70（情况I-2D-0.70） 位于该曲线的过渡区域中，最后，属于可压缩状态的值Mc = 1.10（情况I-2D-1.10）。</p>
+<h5 id="仿真参数"><a href="#仿真参数" class="headerlink" title="仿真参数"></a>仿真参数</h5><p>不同压缩率的惰性混合物层如下所示。表5.3总结了每个剪切层的特性。在所有情况下，这些都是超音速混合层。密度比保持恒定，因为燃料和氧化剂的性质不变。该比率略高于单位，后者可以最初有利于增加增长率。齿轮比随着对流马赫数的增加而降低。为了实现这三种配置，燃料流的速度（图5.1中的上部流）保持恒定且略超音速，而陈旧的空气流的速度（更轻）则增加，以提高马赫数对流。最后，修改初始涡旋厚度δω0的值，以便在三种情况下在输入Reω0=640处获得雷诺数的恒定值。</p>
+<p>对于几乎不可压缩的情况，在尺寸为$L1×L2 =350δω0×80δω0$的笛卡尔计算域中进行数值模拟，而对于其他两种情况，则为$L1×L2 =350δω0×122δω0$。这些域分别离散为N1×N2 = 1739×369点和N1×N2 = 1739×403点。为了减少与模拟相关的计算成本，在两个空间方向上对网格进行拉伸。在横向，网格尺寸保持恒定区域中心和x2=±20δω0之间的$Δx2=0.168δω0$,具有恒定空间离散步骤的该区域涵盖了混合物层的整个显影区域。然后以40％的速率施加恒定的拉伸，直到$x2 =±30δω0$。除此之外，拉伸率设定为500％。在纵向上，如图5.6所示，施加连续拉伸。网格尺寸的最大值Δx1=0.40δω0，与Fu和Li [55]的空间混合层的DNS中保留的最大值相对应。最小网格尺寸∆x1=0.168δω0$，对应于时间混合层的不同DNS中使用的网格尺寸. Dirichlet类型边界条件应用于输入，而完全非反射条件应用于计算域的底部和顶部的输出。 由(5.13）给出的随机干扰，即白噪声，其中ε= 0.01且∆x0 =δθ，0添加到速度的横向分量（x1,0，x2,0 = 4δω，0，0）。 数值仿真的稳定性由固定在0.75的CFL和等于0.1的傅立叶数确保。</p>
+<p>对应于该混合层中的一个的横截面的轮廓的初步数值模拟进行的以分离的分子运输方面的影响。此模拟在长度L1 =80δω0的计算域中进行,一维分布在369个计算点中。初始解对应于物种和温度的双曲正切曲线，纵向速度为零。非反射边界条件在端部施加与上述相同的数值稳定性的标准被使用。图5.7示出了与传输的详细描述和简化方面的结果。 80微秒仿真时间是足够大的，一个粒子通过一个相应于壳体I-2D-0.35计算域。这个时间足够大，可以研究分子层在Mc = 0.35的混合层对流时间特性过程中对该粒子的影响。对于惰性情况下，运输条款的两种描述之间的差异仍然是相当低的。具体的做法是没有，在这些结果中，在该结构必需的光。尽管如此，下面仍将保留对运输条款的详细说明，因为与简化方法相比，此处额外模拟计算的成本仅为10％左右。</p>
+<h5 id="混合层的结构"><a href="#混合层的结构" class="headerlink" title="混合层的结构"></a>混合层的结构</h5><p>图5.8显示了具有涡度等值线的流动的瞬时可视化，对应于不同级别的可压缩性。</p>
+<p>在I-2D-0.35情况下，涡流的配对与不可压缩混合层的模拟（图5.2（a））以及Stanley＆Sarkar提出的结果相似。第一对出现在x1 =100δω0之前。但是，该距离明显大于不可压缩情况下的距离。这些涡流沿流动方向增长。</p>
+<p>情况I-2D-0.70显示出结构的不连贯发展。第一个配对在x1 =150δω0附近形成，从而产生更扭曲的涡旋结构。</p>
+<p>最后，图5.8（c）显示，随机激发未能触发Mc = 1.10时剪切层的不稳定性。这一结果与Fedioun＆Lardjane [48]致力于三维二元混合层时间稳定性线性分析的研究一致。</p>
+<p>随着对流马赫数的增加，剪切层不稳定性的最大放大模式实际上变成了三维。扰动传播的平面与发生二维流动的平面x1-x2偏移了某个角度。如图5.8（c）所示，这阻止了二维混合层的空间扩展。在下文中，仅在三维模拟中解决此可压缩性方案.</p>
+<p>图5.9显示了两种情况下氢的质量分数的瞬时场：I-2D-0.35和I-2D-0.70。 该图使得可以观察到可压缩性对结构以及混合物拓扑的影响。 对于准不可压缩状态（图5.9（a）），这些结构保留了更显着的连贯性，并且可以在横坐标上识别出三卷：x1≈227δω0，x1≈270δω0和x1≈320δω0。 另一方面，情况I-2D-0.70则呈现出更加混乱和拉长的结构</p>
+<h5 id="自相似状态"><a href="#自相似状态" class="headerlink" title="自相似状态"></a>自相似状态</h5><h4 id="能量平衡"><a href="#能量平衡" class="headerlink" title="能量平衡"></a>能量平衡</h4><h4 id="可压缩反应混合层"><a href="#可压缩反应混合层" class="headerlink" title="可压缩反应混合层"></a>可压缩反应混合层</h4>]]></content>
+  </entry>
+  <entry>
+    <title>化学反应机理</title>
+    <url>/2019/12/%E5%8C%96%E5%AD%A6%E5%8F%8D%E5%BA%94%E6%9C%BA%E7%90%86/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>对化学反应的相关理解</p>
+<a id="more"></a>
+
+<ul>
+<li>二体和三体反应</li>
+</ul>
+<p>Magre和Dibble(1988)提出，对于纯氢-空气火焰，二体反应的时间尺度约为$18\mu s$</p>
+<p>快速的二体反应产生的自由基会通过缓慢的三体聚合反应逐渐向化学平衡态衰减.</p>
+<p>在大气火焰中，这些聚合反应的典型时间尺度为3毫秒</p>
+<p>超平衡态的OH主要是由于缓慢的三体聚合反应造成的,这些超平衡的OH在远下游会通过三体聚合反应逐渐衰减到平衡态</p>
+<p>在远下游,主要组分的摩尔分数是接近平衡态的,这是由于湍流混合的局部时间尺度随着流向距离的增加而相应增大,使得二体反应趋向于部分平衡态.</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>超声速抬举射流火焰的LES-PDF模拟</title>
+    <url>/2019/11/%E8%B6%85%E5%A3%B0%E9%80%9F%E6%8A%AC%E4%B8%BE%E5%B0%84%E6%B5%81%E7%81%AB%E7%84%B0%E7%9A%84LES-PDF%E6%A8%A1%E6%8B%9F/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>该篇笔记记录超声速氢气抬举射流火焰模拟的基本情况.</p>
+<a id="more"></a>
+
+<h2 id="计算域设置"><a href="#计算域设置" class="headerlink" title="计算域设置"></a>计算域设置</h2><ul>
+<li>轴向模拟长度[x/D=50]</li>
+</ul>
+<p>目前来看,为了减少计算量,射流轴向一般模拟长度约为 x/D=50,因为这里基本包含了最关注的几个截面即x/D=[10.8,21.5,32.3,43.1].再往下是远下游位置,基本接近化学平衡态.所以最重要的是对前面部分的模拟,又由于射流和协流是超声速的,其扰动不会向上游传播,所以出口设置在x/D=50位置处,对前面火焰的模拟影响很小.</p>
+<ul>
+<li>径向模拟长度[y/D=40]</li>
+</ul>
+<p>径向主要是要考虑环境空气的影响,环境空气速度为零,其边界应该足够远以减少边界条件对射流的影响.考虑到现在的边界条件没有实现无反射边条,所以应该设置的足够远.参考Almeida的结果,其也是直接采用出口边条,所以径向取到了60D,这里首先试算采用一个40D的结果来看.</p>
+<h2 id="网格设置"><a href="#网格设置" class="headerlink" title="网格设置"></a>网格设置</h2><p>几个典型位置的特征尺度:</p>
+<table>
+<thead>
+<tr>
+<th>$x/D$</th>
+<th>$r/R_f$</th>
+<th>$U$</th>
+<th>$T$</th>
+<th>$\eta$</th>
+<th>$\tau_u$</th>
+<th>$L$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.85</td>
+<td>0.0</td>
+<td>1780m/s</td>
+<td>0545K</td>
+<td>0.008mm</td>
+<td>0.2 $\mu s$</td>
+<td>3.4mm</td>
+</tr>
+<tr>
+<td>10.8</td>
+<td>0.0</td>
+<td>1105m/s</td>
+<td>0555K</td>
+<td>0.009mm</td>
+<td>0.4 $\mu s$</td>
+<td>4.2mm</td>
+</tr>
+<tr>
+<td>21.5</td>
+<td>0.0</td>
+<td>1094m/s</td>
+<td>1365K</td>
+<td>0.021mm</td>
+<td>0.7 $\mu s$</td>
+<td>4.9mm</td>
+</tr>
+<tr>
+<td>32.3</td>
+<td>0.0</td>
+<td>1181m/s</td>
+<td>1760K</td>
+<td>0.020mm</td>
+<td>0.7 $\mu s$</td>
+<td>7.1mm</td>
+</tr>
+<tr>
+<td>43.1</td>
+<td>0.0</td>
+<td>1175m/s</td>
+<td>2214K</td>
+<td>0.025mm</td>
+<td>0.8 $\mu s$</td>
+<td>7.4mm</td>
+</tr>
+</tbody></table>
+<p>几个典型计算的相关设置:</p>
+<p>|作者|时间|期刊|计算域|网格|$\Delta x_{min}$|$\Delta x_{40}$|外部边条<br>|—|—|—|—|—|—|—|—|—|<br>|Boivin|2012|CNF|半球:r=10000D|四面体网格:6.6M|$0.1mm$|$0.4mm$|出口|<br>|Moule|2014|CNF|含喷嘴全尺寸模拟|笛卡尔网格:32M|$0.2mm$|N.C.|无反射|<br>|Bouheraoua|2017|CNF|70D×30D×30D|结构网格:268M|$0.06mm$|$0.215mm$|无反射|<br>|Almeida|2019|PCI|70D×60D×60D|结构网格:2M|||出口|</p>
+<p>一般来说混合层位置的特征尺度是最小的,但是基本相差不是很大,所以就以射流中心的特征尺度为参考布置网格,并在混合层中心进行加密.</p>
+<p>考虑到计算量,LES网格略粗于实际湍流特征长度$\eta$.</p>
+<p>首先选择一个跟Boivin类似的网格,$\Delta x_{min}=0.1mm$</p>
+<p>周向网格分布是均匀的,总共分为8个分区,每个分区的网格数是20,总共160个网格,161个网格结点.</p>
+]]></content>
+  </entry>
+  <entry>
+    <title>Python绘制离散数据概率密度函数PDF</title>
+    <url>/2019/11/PDFofDiscreteData/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>用python绘制离散数据的一维和二维PDF分布</p>
+<a id="more"></a>
+
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://www.cnblogs.com/bonelee/p/11050244.html" target="_blank" rel="noopener"><strong>非参数估计：核密度估计KDE</strong></a><br><a href="https://www.cnblogs.com/feffery/p/11128113.html" target="_blank" rel="noopener"><strong>（数据科学学习手札62）详解seaborn中的kdeplot、rugplot、distplot与jointplot</strong></a></p>
+<h2 id="一维的PDF分布"><a href="#一维的PDF分布" class="headerlink" title="一维的PDF分布"></a>一维的PDF分布</h2><p>核密度估计(kernel density estimation)是在概率论中用来估计未知的密度函数，属于非参数检验方法之一</p>
+<p>核密度估计其实就是通过核函数（如高斯）将每个数据点的数据+带宽当作核函数的参数，得到N个核函数，再线性叠加就形成了核密度的估计函数，归一化后就是核密度概率密度函数了。</p>
+<p>基本的方法是,画出一维离散数据的直方图,即先从离散数据的最小到最大值生成n个等宽的分区,然后统计离散点每个区出现的次数,得到直方图,然后次数除以每个区的宽度,就得到了频率.</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="string">读入二进制数据,二进制必须为单精度4字节</span></span><br><span class="line"><span class="string">'''</span></span><br><span class="line"><span class="keyword">import</span> numpy <span class="keyword">as</span> np</span><br><span class="line"><span class="keyword">import</span> struct</span><br><span class="line"><span class="keyword">import</span> matplotlib.pyplot <span class="keyword">as</span> plt</span><br><span class="line"></span><br><span class="line">result = np.zeros(shape=(<span class="number">10000</span>,<span class="number">4</span>))</span><br><span class="line"></span><br><span class="line">filename = <span class="string">'turbulent'</span></span><br><span class="line">f = open(filename, <span class="string">"rb"</span>)</span><br><span class="line"><span class="keyword">for</span> i <span class="keyword">in</span> range(<span class="number">10000</span>):</span><br><span class="line">    <span class="keyword">for</span> j <span class="keyword">in</span> range(<span class="number">4</span>):</span><br><span class="line">        data = f.read(<span class="number">4</span>)</span><br><span class="line">        elem = struct.unpack(<span class="string">"f"</span>, data)[<span class="number">0</span>]</span><br><span class="line">        result[i,j] = elem</span><br><span class="line"></span><br><span class="line">f.close()</span><br><span class="line"></span><br><span class="line">x  = result[:,<span class="number">0</span>]</span><br><span class="line">m  = result[:,<span class="number">1</span>]</span><br><span class="line">p1 = result[:,<span class="number">2</span>]</span><br><span class="line">p2 = result[:,<span class="number">3</span>]</span><br><span class="line"></span><br><span class="line"><span class="comment"># plt.figure(figsize=(10,4))</span></span><br><span class="line"><span class="comment"># plt.psd(p1)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># plt.figure(figsize=(10,4))</span></span><br><span class="line"><span class="comment"># plt.plot(x[0:10000],m[0:10000], p1[0:10000])</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># plt.figure(figsize=(10,4))</span></span><br><span class="line"><span class="comment"># plt.psd(p2)</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># plt.figure(figsize=(10,4))</span></span><br><span class="line"><span class="comment"># plt.plot(x[0:10000],m[0:10000],p2[0:10000])</span></span><br><span class="line"></span><br><span class="line">bins = np.linspace(min(p1),max(p1),<span class="number">20</span>)</span><br><span class="line">plt.figure(figsize=(<span class="number">10</span>,<span class="number">4</span>))</span><br><span class="line">plt.hist(p1, bins, density=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">bins = np.linspace(min(p2),max(p2),<span class="number">20</span>)</span><br><span class="line">plt.figure(figsize=(<span class="number">10</span>,<span class="number">4</span>))</span><br><span class="line">plt.hist(p2, bins, density=<span class="literal">True</span>)</span><br><span class="line"></span><br><span class="line">plt.show()</span><br><span class="line"><span class="comment"># plt.tight_layout()</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="二维的PDF"><a href="#二维的PDF" class="headerlink" title="二维的PDF"></a>二维的PDF</h2><p>二维的PDF实际上就是画出二维的直方图</p>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line">plt.figure(figsize=(<span class="number">10</span>,<span class="number">4</span>))</span><br><span class="line">plt.hist2d(p1,p2,bins=<span class="number">20</span>,cmap=<span class="string">'Blues'</span>)</span><br><span class="line">cb = plt.colorbar()</span><br><span class="line"></span><br><span class="line">plt.figure(figsize=(<span class="number">10</span>,<span class="number">4</span>))</span><br><span class="line">plt.hexbin(p1,p2,gridsize=<span class="number">30</span>, cmap=<span class="string">'Blues'</span>)</span><br><span class="line">cb = plt.colorbar()</span><br></pre></td></tr></table></figure>
+
+<h2 id="Seaborn中KDE计算方法"><a href="#Seaborn中KDE计算方法" class="headerlink" title="Seaborn中KDE计算方法"></a>Seaborn中KDE计算方法</h2><figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">import</span> seaborn <span class="keyword">as</span> sns</span><br><span class="line"></span><br><span class="line">sns.set()   <span class="comment">#切换到seaborn的默认运行配置</span></span><br><span class="line">plt.figure(figsize=(<span class="number">10</span>,<span class="number">4</span>))</span><br><span class="line">sns.kdeplot(p1,shade=<span class="literal">True</span>,color=<span class="string">"g"</span>)</span><br><span class="line"></span><br><span class="line">plt.figure(figsize=(<span class="number">10</span>,<span class="number">4</span>))</span><br><span class="line">sns.kdeplot(p2,shade=<span class="literal">True</span>,color=<span class="string">"g"</span>)</span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Data Statistic</category>
+      </categories>
+      <tags>
+        <tag>programming</tag>
+        <tag>python</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>湍流入口生成方法</title>
+    <url>/2019/11/Turbulent-Inlet/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>关于湍流入口生成方法的一些认识.</p>
+<a id="more"></a>
+
+<h1 id="主流的几种生成方法"><a href="#主流的几种生成方法" class="headerlink" title="主流的几种生成方法"></a>主流的几种生成方法</h1><ul>
+<li>层流自然转捩法</li>
+</ul>
+<p>最直接的湍流边界层生成方法.在远上游给定层流剖面,并增加一定随机扰动,然后让其自然转捩为湍流边界层.</p>
+<p>这种方法最主要用于研究转捩过程本身的模拟,并且在入口处不需要给定湍流脉动信息.</p>
+<p>其缺点也十分明显,自然转捩需要较长的物理距离,只模拟转捩过程的耗费已经很大.</p>
+<p>因此,一般会在入口处给定足够准确的入口条件,以保证流动能在较短的距离内发展出具有正确的摩擦力和积分尺度的真实湍流边界层.</p>
+<ul>
+<li>Fourier变化方法</li>
+</ul>
+<p>such as Batten et al. [1] and Davidson and Billson [3];</p>
+<ul>
+<li>正交分解方法</li>
+</ul>
+<p>采用实验数据,按照Druault等人的方法,通过正交分解重建湍流场.</p>
+<ul>
+<li><p>Di Mare 等人的数字滤波方法</p>
+</li>
+<li><p>合成涡方法</p>
+</li>
+<li><p>回收调节方法, Lund</p>
+</li>
+</ul>
+<h2 id="Klein-2003-JCP-A-digital-filter-based-generation-of-inflow-data-for-spatially-developing-direct-numerical-or-large-eddy-simulations"><a href="#Klein-2003-JCP-A-digital-filter-based-generation-of-inflow-data-for-spatially-developing-direct-numerical-or-large-eddy-simulations" class="headerlink" title="Klein-2003-JCP-A digital filter based generation of inflow data for spatially developing direct numerical or large eddy simulations"></a>Klein-2003-JCP-A digital filter based generation of inflow data for spatially developing direct numerical or large eddy simulations</h2><p><strong>合成湍流最简单的方法是在平均剖面上叠加随机扰动.</strong>由标准程序产生的随机信号,其能量均匀的分布在整个波数范围内(白噪声),也就是说其频谱近似于一条水平线.由于在低波数(大尺度)范围内能量的缺乏,伪湍流被立即阻尼到零,导致其结果与层流入口相似.</p>
+<p><strong>合成湍流的本质就是生成具有某些一定统计特性的速度信号.</strong>这些统计特性可以从实验中得到,例如平均值,脉动值和交叉关系,高阶矩,长度和时间尺度,能谱等等.</p>
+<ol>
+<li><p>首先为每个速度分量建立一个具有指定属性的三维信号Ui，典型的像两点统计(长度尺度,能谱)。如果只需要生成均匀各向同性湍流数据，那么这就是所有需要的.</p>
+</li>
+<li><p>如果所要求的湍流是各向异性的，则至少要考虑提供相应的雷诺应力张量.</p>
+</li>
+</ol>
+<p>数字滤波就是对随机信号进行数字滤波.</p>
+<p>为了建立两点相关函数,设$r_m$为一系列$\overline{r_m} = 0$,$\overline{r_mr_m}=1$的随机信号,定义一个卷积或数字线性非递归滤波器,</p>
+<p>$$ u_m = \sum_{n=-N}^{N} {b_nr_{m+n}} $$</p>
+<p>$b_n$为滤波系数,N与滤波器相关.当$m \neq n$时,${r_mr_n}=0$,因此可以得到$u_m$的相关函数</p>
+<p>$$\frac{\overline{u_mu_{m+k}}}{\overline{u_mu_m}} = \sum_{j=-N+k}^N {b_jb_{j-k}}/ \sum_{j=-N}^N b_j^2$$</p>
+<p>这意味着滤波系数和$u_m$的自相关函数之间存在关系.</p>
+<p>必须回答两个问题:</p>
+<ol>
+<li>如何将这个过程扩展到三维空间，</li>
+</ol>
+<p>通过三个一维滤波器的卷积，可以得到一个三维滤波器</p>
+<p>$b_ijk=b_i\cdot b_j \cdot b_k$</p>
+<ol start="2">
+<li>如何对该公式求逆.</li>
+</ol>
+<p>假设给定了一个自相关函数,如$\overline{u+mu_{m+k}}/\overline{u_mu_m}$.然后就可以利用多维牛顿法求系数$b_n$</p>
+<p>相较于自相关函数,长度尺度更加直观.因此作进一步的简化,即不再试图建立相关函数的详细形式,而是假设其仅仅取决于分开的距离和一个单一的长度尺度.</p>
+<p>可以把相关函数跟概率密度分布函数类比的来看,它同概率密度分布函数一样具有一定的形状.</p>
+<p>这意味着假设了一个特殊的$R_uu$形状。对于后期均匀湍流的情况，自相关函数取固定时间的形式为</p>
+<p>$$R_{uu}(r,0,0)=exp(-\frac{\pi r^2}{4L^2}) (with \ L=L(t)=\sqrt{2 \pi \nu (t-t_0)})$$</p>
+<p>这个相关函数是时间和空间同时存在的相关函数.</p>
+<p>该函数满足一些基本的属性,如$R_{uu}(0)=1,lim_{r\rightarrow\infty}R_{uu}(r)=0$,而且长度尺度$L$可以很容易给定.特别是滤波器系数可以的显式表示,不同迭代求解.</p>
+<p>假设$\Delta x$是网格间距,$L=n\Delta x$是期望的长度尺度，然后我们可以用离散形式写出来</p>
+<p>$$\frac{\overline{u_mu_{m+k}}}{\overline{u_mu_m}} = R_{uu}(k\Delta x) = exp \biggr(-\frac{\pi (k\Delta x)^2}{4(n\Delta x)^2} \biggr) = exp\biggr(-\frac{\pi k^2}{4n^2}\biggr) $$</p>
+<p>其中滤波系数</p>
+<p>$$ b_k \approx \tilde b_k \biggr / \biggr( \sum_{j=-N}^N \tilde b_j^2 \biggr)^{1/2}$$</p>
+<p>$$ \tilde b_k := exp\biggr( -\frac{\pi k^2}{2n^2}\biggr) $$</p>
+<p>上式近似成立,其误差为…,过滤器的支持应该足够大，以捕获长度尺度的两倍</p>
+<p>如果允许$b_k$的空间依赖性，那么通过在网格的不同位置应用不同的过滤系数集,就可以在空间上改变长度尺度。例如，在壁面流动中，当接近壁面时，壁面法向长度必须趋近于零。但必须指出的是，长度尺度的强烈变化导致相关函数偏离高斯形状。原因是公式(10)假设过滤系数为常数。</p>
+<p>动态生成流入数据(用于等距时间步进)的算法可能是这样的(另一种方法是生成大量数据，将其存储，并通过应用泰勒假设让其在入口平面进行对流)</p>
+<ol>
+<li><p>为入口对应的每个坐标方向选择一个长度尺度$L_y=n_y\Delta y,L_z=n_z\Delta z$,和一个时间尺度$L_x$,根据(15)条件选择一个滤波宽度</p>
+</li>
+<li><p>初始化并存储3个随机场</p>
+</li>
+<li><p>计算滤波系数</p>
+</li>
+<li><p>应用如下滤波过程</p>
+</li>
+</ol>
+<p>$$ U_\alpha(j,k) = \sum_{i’=-N_x}^{N_x} \sum_{j’=-N_y}^{N_y} \sum_{k’=-N_z}^{N_z} b(i’,j’,k’)R_i(i’,j+j’,k+k’)$$</p>
+<ol start="6">
+<li><p>进行坐标变化产生$u_\alpha(j,k)$</p>
+</li>
+<li><p>将$u_\alpha$赋给入口</p>
+</li>
+<li><p>舍弃y和z平面的$R_\alpha$,并且shift整个数据$R_\alpha(i,j,k)=R_\alpha(i+1,j,k)$,用新的随机数填满$R_\alpha(N_x,j,k)平面$</p>
+</li>
+<li><p>重复上述过程4-8</p>
+</li>
+</ol>
+<h2 id="Mare-2006-POF-Synthetic-turbulence-inflow-conditions-for-large-eddy-simulation"><a href="#Mare-2006-POF-Synthetic-turbulence-inflow-conditions-for-large-eddy-simulation" class="headerlink" title="Mare-2006-POF-Synthetic turbulence inflow conditions for large eddy simulation"></a>Mare-2006-POF-Synthetic turbulence inflow conditions for large eddy simulation</h2><p>对空间非均匀湍流的直接数值模拟或大涡模拟,都需要提湍流入口边界条件.潜在的含义是，任何计算的结果可能会受到规定的瞬时进口速度剖面的强烈影响。</p>
+<p>通常的做法是,由实验数据或者经验关系式,产生符合某些统计特性的合成湍流.</p>
+<p>本文提出了一种新的基于数字滤波器的湍流涌流数据生成方法，该方法能够再现指定的统计数据。提出了该方法的两种实现方式:一种是通过给定雷诺应力和长度尺度的简单方法，另一种是能够再现完整的雷诺应力张量以及任何给定的、局部定义的空间和时间相关函数的更详细的方法。</p>
+<p>将该方法应用于平面射流和发展中的壁面边界层，验证了该方法的适用性。</p>
+<p><strong>从数学角度看，精确边界和初值条件是偏微分方程组存在唯一解的必要条件.</strong></p>
+<p>RANS中一般给定平均速度剖面就已经足够了,对于LES和DNS,需要在入口提供更加详细的信息,需要速度的时间演化剖面,也就是要同时给定均值和脉动信息.</p>
+<p>该方法基于对已知或估计的统计数据的再现，不包含其他物理信息.在该方法的原始公式中，湍流相关函数是用单湍流长度和时间尺度来描述的。本文对该方法进行了扩展，使多维时空相关关系得以再现.</p>
+<h2 id="数字滤波的问题"><a href="#数字滤波的问题" class="headerlink" title="数字滤波的问题"></a>数字滤波的问题</h2><p>$\Delta x$是网格间距,$L=n\Delta x$是期望的长度尺度，然后我们可以用离散形式写出来</p>
+<p>$$\frac{\overline{u_mu_{m+k}}}{\overline{u_mu_m}} = R_{uu}(k\Delta x) = exp \biggr(-\frac{\pi (k\Delta x)^2}{4(n\Delta x)^2} \biggr) = exp\biggr(-\frac{\pi k^2}{4n^2}\biggr) $$</p>
+<p>其中滤波系数</p>
+<p>$$ b_k \approx \tilde b_k \biggr / \biggr( \sum_{j=-N}^N \tilde b_j^2 \biggr)^{1/2}$$</p>
+<p>$$ \tilde b_k := exp\biggr( -\frac{\pi k^2}{2n^2}\biggr) $$</p>
+<p>最后得到的是</p>
+<p>$$ u_m = \sum_{j=-N}^{N} {b_j r_{m+j}} $$</p>
+<p>这个$u_m$理论上来说是在均匀的$\Delta x$的网格上,$u_1, u_2, … u_k$这个随机序列才具有$L_x$积分长度尺度.因为两点相关函数的具体形式实际上假设了两点的距离是$k \Delta x$.</p>
+<p>如果是壁面加密网格怎么处理???根据给定的$L_y$,再由最小的$\Delta y$,计算出滤波宽度$N_y \geq 2n_y$.然后直接由网格节点$My$,确定$[1-N_y,M_y+N_y]$,根据同样的方法求出滤波系数.</p>
+<p>但是这种计算的结果就是把均匀网格的结果直接映射到了拉伸网格上.</p>
+]]></content>
+      <categories>
+        <category>Turbulent</category>
+      </categories>
+      <tags>
+        <tag>programming</tag>
+        <tag>turbulent</tag>
+        <tag>CFD</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>湍流燃烧</title>
+    <url>/2019/11/Turbulent-Combustion/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>记录对湍流燃烧的理解,内容来自书籍,文献以及互联网等多种渠道.</p>
+<a id="more"></a>
+
+<h1 id="Heinz-Pitsch-2006-Annu-Rev-Fluid-Mech-Large-eddy-simulation-LES-of-turbulent-combustion"><a href="#Heinz-Pitsch-2006-Annu-Rev-Fluid-Mech-Large-eddy-simulation-LES-of-turbulent-combustion" class="headerlink" title="Heinz Pitsch-2006-Annu. Rev. Fluid Mech-Large-eddy simulation (LES) of turbulent combustion"></a>Heinz Pitsch-2006-Annu. Rev. Fluid Mech-Large-eddy simulation (LES) of turbulent combustion</h1><h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>燃烧装置通常需要更快速的混合和更短的燃烧时间,同时还必须确保能稳定燃烧.为了实现上述要求,燃烧室中通常具有非常复杂的流动模式,如旋涡流、大尺度涡结构的破碎以及回流区等.用雷诺-平均纳维-斯托克斯(RANS)模拟来预测这种复杂流动燃烧过程，通常无法达到预测所需的精度.</p>
+<p>LES已经用于污染物生成预测,发动机燃烧,火焰回传,燃气轮机和燃烧不稳定</p>
+<p>在非预混燃烧中，只有当燃料和氧化剂在分子水平上充分混合时才能发生反应。湍流混合增加了标量扩散，但只有分子扩散才能形成使化学反应发生的混合物</p>
+<p>湍流将未燃烧的混合物和高温的燃烧产物搅拌在一起,然后只能通过分子扩散提升反应物的温度,并在该温度下发生自持的化学反应.</p>
+<p>标量的分子混合以及在此基础上的化学反应基本上发生在最小的湍流尺度(耗散尺度)上，并由标量方差的耗散率表征和量化，标量方差的耗散率在燃烧建模中起着重要作用.</p>
+<p>湍流燃烧对小尺度混合存在很强的依赖性.对于无限快化学反应条件下的非预混燃烧,湍流反应速率直接正比于标量耗散率.因此对于快速反应,平均的反应源项服从耗散谱.</p>
+<blockquote>
+<p>思考:但是对于化学非平衡下的燃烧,较大的标量耗散率反而可能导致局部熄火</p>
+</blockquote>
+<p>对于高雷诺数下的LES模拟,滤波后的反应源项实质上不存在可解部分,也就表明,同RANS一样,滤波的反应源项也需要建模.</p>
+<p><strong>LES通常无法解析滤波的反应源项,其与RANS一样,燃烧需要全部被模化.</strong></p>
+<p>LES在燃烧建模中的优势在于,无论是在无反应还是反应模拟中,其预测标量混合过程和标量耗散率的准确度要远高于RANS,这在复杂流动中尤为明显.而标量混合过程的准确预测对化学反应至关重要.</p>
+<p>湍流标量耗散率的脉动对燃烧过程具有重要的意义,与其在对中间组分的预测上.</p>
+<h2 id="非预混燃烧"><a href="#非预混燃烧" class="headerlink" title="非预混燃烧"></a>非预混燃烧</h2><p>非预混燃烧中,燃料和氧化剂初始是分开的.化学反应仅由组分的分子混合引起.如果化学反应足够快,在恰当当量比的位置会形成一个反应层,在反应层中,燃料和氧气被消耗并生成产物.</p>
+<p>对于工程应用中的氢和碳氢燃料，燃烧通常由分子混合的速率控制，尽管如果反应的时间尺度与湍流的时间尺度相接近，化学反应就变得重要.</p>
+<p>如果反应时间尺度和湍流时间尺度接近,湍流化学反应相互作用强烈,可能会发生局部熄火.</p>
+<p>此外，污染物形成的化学过程常常是由缓慢的化学反应控制的.</p>
+<p>燃料与氧化剂的混合速率可以用混合分数(非反应标量)来描述.混合分数的定义各有不同,但本质上混合分数是局部当量比的度量.因此混合分数是独立于化学反应的一个守恒标量.</p>
+<h3 id="守恒标量方法-大多数非预混燃烧模型的基础"><a href="#守恒标量方法-大多数非预混燃烧模型的基础" class="headerlink" title="守恒标量方法(大多数非预混燃烧模型的基础)"></a>守恒标量方法(大多数非预混燃烧模型的基础)</h3><p>在扩散燃烧中,考虑最简单的无限快化学反应,组分和温度都只是混合分数的函数,如果混合分数的亚格子概率密度函数已知,那么可以由此得到滤波的组分质量分数.</p>
+<p>$$ \widetilde{Y}_i = \int_0^1 Y_i(Z) f(Z) dZ $$</p>
+<p>其中$Z$即为混合分数,$f(Z)$为混合分数的边缘密度加权的滤波概率密度函数.</p>
+<p>简单的守恒标量模型一般假设无限快不可逆反应或者达到化学平衡态.</p>
+<p><strong>火焰面模型和条件矩封闭模型是描述有限速率反应的守恒标量模型。</strong></p>
+<p>这些模型本质上是为反应标量建立了以混合分数和其他可能参数(标量耗散率)为函数的状态关系.这样滤波量就可以以类似公式1的形式得到,其中使用了混合分数和标量耗散率的设定型联合概率密度函数.</p>
+<h3 id="FPDF-和-FDF"><a href="#FPDF-和-FDF" class="headerlink" title="FPDF 和 FDF"></a>FPDF 和 FDF</h3><p>概率密度函数在大多数非预混燃烧模型中起着核心作用,因此有必要强调FPDF的特殊意义.</p>
+<p>在RANS方法中，通过多次重复实验并记录给定时间和空间位置下的混合分数，可以确定一点的PDF.如果产生足够多的样本，那么就可以很好地确定系综的PDF值.</p>
+<p>在LES中，假设有一个简单的盒式滤波器，感兴趣的数据在一个微团中是单时刻,单点的概率分布，该微团与感兴趣点周围的滤波器大小相对应.如果在某一给定时间通过实验观测得到混合分数的空间分布，那么不能简单地从这些数据来评估FPDF，因为通过前述方法观测到的分布是这种特定实现下的特征(带有条件性)，而不是统计特性。</p>
+<p>基于其统计性质,FPDF必须由含有大量随机样本的系综来确定.</p>
+<p>在输运型PDF方法中,Pope引入了滤波密度函数FDF的概念,它描述了上述实验的局部滤波状态.也就是说上面LES的假想实验得到的分布实际上是滤波密度函数,而非滤波的概率密度函数.</p>
+<p>滤波密度函数FDF和滤波的概率密度函数FPDF是有区别的.FDF实际上只描述了单个实现.<strong>FPDF只能定义为在相同滤波场下(以滤波场为条件)的多次实现的FDF的平均(Fox 2003).</strong></p>
+<p>也就是说,一个FDF对应微团中的一次实现,然后在滤波场不变,或者说以滤波场为条件的情况下,在微团中进行多次实现,这样就可以得到多个以滤波场为条件的FDF,对这些FDF进行平均就可以得到所谓的滤波的概率密度函数FPDF.</p>
+<p>区分FDF和FPDF非常重要，特别是在使用直接数值模拟(DNS)数据来评估模型时，以及在输运型FDF模型中。</p>
+<blockquote>
+<p><strong>Only the FDF can be evaluated from typical DNS data, whereas the FPDF is required for subfilter modeling.</strong></p>
+</blockquote>
+<p>翻译1:只有FDF可以从典型的DNS数据进行评估，而FPDF无法从DNS数据中直接得到,其仍旧需要进行亚格子部分的建模.</p>
+<p>翻译2:FDF可以从典型的DNS数据进行评估，而亚格子建模需要的是FPDF.</p>
+<p>上述的翻译仍旧没有很好的理解!!!</p>
+<p>对于守恒标量模型，需要预设FPDF的形状.与RANS模型相似，通常假定混合分数的边缘FPDF为Beta分布，并由混合分数的一阶矩和二阶矩参数化.滤波的混合分数(一阶矩)由输运方程确定,而亚格子标量方差(这里说的是混合分数的方差吗?)通常用代数模型模化.</p>
+<p>RANS中使用beta函数时,湍流间歇性是误差的主要来源,可以预见,其在LES的可解尺度上同样存在影响.</p>
+<p>Cook &amp; Riley 1994, Jimenez et al. 1997,Wall et al. 2000利用常/变密度的非预混反应流DNS数据,研究了假定为beta分布的混合分数的FPDF的有效性。这些研究的主要结论是,beta分布为混合分数的FPDF提供了一个很好的估计，且其在LES中的效果比在RANS中要更好.</p>
+<p>此外，使用DNS数据中的混合分数方差对模型进行模化时，计算结果比使用通常的混合分数方差亚格子模型时表现得更好.</p>
+<p>然而，Tong(2001)和Tong et al.(2005)最近的研究表明，FPDF往往严重偏离Beta分布.</p>
+<p>一般而言,概率密度分布函数的形式与流动条件及化学反应速率有关,通过测量流动中惰性组分或微小颗粒浓度的概率分布可以确定混合分数的概率密度分布函数.</p>
+<h2 id="标量耗散率的模化"><a href="#标量耗散率的模化" class="headerlink" title="标量耗散率的模化"></a>标量耗散率的模化</h2><p>虽然这里讨论的燃烧模型使用了不同的概念和假设,但大都需要对标量耗散率进行模化.</p>
+<p>非预混燃烧中混合分数的耗散率是一个重要的基础参数,如果燃烧是由混合控制的,那么其就决定了滤波反应速率.</p>
+<p>高标量耗散率也会导致局部或全场火焰的熄火.</p>
+<p>设定型PDF模型同样需要对亚格子标量方差进行模化.</p>
+<p>下面的例子说明了非预混燃烧模型中标量方差和耗散率的重要性.</p>
+<h3 id="RANS中的标量耗散率模型"><a href="#RANS中的标量耗散率模型" class="headerlink" title="RANS中的标量耗散率模型"></a>RANS中的标量耗散率模型</h3><p>RANS中通常需要求解标量方差的输运方程,其中雷诺平均的标量耗散率是一个未封闭的汇项(sink term).再假设标量耗散的时间尺度和速度场的积分时间尺度成正比,由此得到</p>
+<p>$$ \langle \chi \rangle = C_\phi \frac{1}{\tau_t} \langle Z’^2 \rangle $$</p>
+<h3 id="LES中的标量耗散率模型"><a href="#LES中的标量耗散率模型" class="headerlink" title="LES中的标量耗散率模型"></a>LES中的标量耗散率模型</h3><p>LES中并不求解亚格子方差的输运方差,而是基于标量方差的生成率等于耗散率的假设,建立了如下的标量耗散率代数模型.</p>
+<p>$$ \widetilde \chi = 2D_t(\nabla \widetilde Z)2 $$</p>
+<p>其中生成项中的亚格子标量通量由涡扩散模型进行模化.</p>
+<p>虽然生成/耗散平衡假设似乎在所有耗散率模型中都被使用，但有强有力的证据表明它并不总是适用，这可能会对湍流燃烧模型产生严重的后果.</p>
+<p>Tong(2001)从无反应射流的滤波实验数据中发现，所谓的斜坡-悬崖结构的出现导致了局部的高标量耗散率和守恒标量的双模态滤波分布，而这不能用Beta分布来描述.</p>
+<p>由于斜坡-悬崖结构是大尺度湍流运动的直接结果，而不是能量级联的结果，因此不能用生成/耗散平衡假设来描述.</p>
+<p>最近，通过分析射流扩散火焰的实验数据也发现了同样的结论(Tong et al. 2005)。虽然双模态FDFs被观察到的概率很低(在x/D = 15的扩散火焰实验中大约为15%)，但是由于局部的高耗散率，这些可能对火焰结构的动力学非常重要。这也表明，在LES中输运型FDF模型中混合模型的准确性是非常重要的.</p>
+<p>在LES中使用标量方差和耗散率模型的另一个复杂性是数值上的。LES通常使用隐式滤波，隐式滤波是指通过数值网格的间距来实现滤波。因此，最小的分辨率实际上是under-resolved.</p>
+<p>由于数值扩散，这些尺度的能量含量被低估了。对于无反应的LES，这通常不那么重要，因为流动力学主要由大尺度的湍流控制。对于反应流，这是不同的:由式(3)和式(4)可以看出，标量耗散率和方差的模型依赖于滤波标量梯度的平方.</p>
+<p>然而，滤波标量梯度的平方在最小的可解尺度上才达到最大。同样，标量方差方程的生成项也依赖于这个量，因此，标量方差方程的解也低估了标量方差。</p>
+<p>因此，方程3或4的形式的模型，或包含亚格子方差输运方程的模型，只能用显式滤波或高阶精度的数值格式.</p>
+<p>显然，对于标量场的小尺度结构，需要新的标量方差和耗散率的建模方法。</p>
+<h2 id="LES非预混燃烧模型"><a href="#LES非预混燃烧模型" class="headerlink" title="LES非预混燃烧模型"></a>LES非预混燃烧模型</h2><h3 id="定常-非定常火焰面模型"><a href="#定常-非定常火焰面模型" class="headerlink" title="定常/非定常火焰面模型"></a>定常/非定常火焰面模型</h3><p>火焰面模型的基本假设:化学时间尺度足够短，反应发生在化学恰当比混合物周围的薄层中，其尺度小于最小的湍流尺度.</p>
+<p>这就产生了两个结果:反应区的结构仍然是层流的，而扩散输运基本上沿着与化学恰当比混合物表面垂直的方向发生。然后，可以将标量输运方程转化为一个以混合分数为独立坐标的系统.</p>
+<p>基于上述这些假设,可以得到火焰面方程,</p>
+<p>$$   $$</p>
+<h3 id="火焰面-进度变量模型-FPV"><a href="#火焰面-进度变量模型-FPV" class="headerlink" title="火焰面/进度变量模型(FPV)"></a>火焰面/进度变量模型(FPV)</h3><h3 id="条件矩封闭模型"><a href="#条件矩封闭模型" class="headerlink" title="条件矩封闭模型"></a>条件矩封闭模型</h3><h3 id="输运型FDF模型"><a href="#输运型FDF模型" class="headerlink" title="输运型FDF模型"></a>输运型FDF模型</h3>]]></content>
+      <categories>
+        <category>Turbulence</category>
+      </categories>
+      <tags>
+        <tag>combustion</tag>
+        <tag>writing</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Markdown-Pictures</title>
+    <url>/2019/11/Markdown-Pictures/</url>
+    <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>Markdown中图片的插入,大小位置调整等内容.</p>
+<a id="more"></a>
+
+<h2 id="插入图片"><a href="#插入图片" class="headerlink" title="插入图片"></a>插入图片</h2><figure class="highlight md"><table><tr><td class="code"><pre><span class="line">![<span class="string">图片描述</span>](<span class="link">图片链接</span>)</span><br><span class="line">![<span class="string">本地图片</span>](<span class="link">Pictures/Wallpaper.png</span>)</span><br><span class="line">![<span class="string">网络图片</span>](<span class="link">http://image.baidu.com/search/</span>)</span><br></pre></td></tr></table></figure>
+
+<p>关于图片路径,可以是本地的,也可以是存储在网络服务器上的.本地图片的路径可以是绝对路径,也可以是相对路径.</p>
+<h2 id="图片位置"><a href="#图片位置" class="headerlink" title="图片位置"></a>图片位置</h2><p>Markdown图片默认插入的位置是靠左,要改变位置需要在前面增加以下代码,该段代码是HTML&lt;div&gt;标签的align属性,用于内容的位置改变.</p>
+<figure class="highlight html"><table><tr><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">div</span> <span class="attr">align</span>=<span class="string">center</span>&gt;</span></span><br><span class="line">    This is some text!</span><br><span class="line"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>位置居中</li>
+</ul>
+<figure class="highlight md"><table><tr><td class="code"><pre><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">align</span>=<span class="string">center</span>&gt;</span></span>![<span class="string">图片描述</span>](<span class="link">图片链接</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>位置靠右</li>
+</ul>
+<figure class="highlight md"><table><tr><td class="code"><pre><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">div</span> <span class="attr">align</span>=<span class="string">right</span>&gt;</span></span>![<span class="string">图片描述</span>](<span class="link">图片链接</span>)</span><br></pre></td></tr></table></figure>
+
+<h2 id="图片大小"><a href="#图片大小" class="headerlink" title="图片大小"></a>图片大小</h2><figure class="highlight md"><table><tr><td class="code"><pre><span class="line"><span class="xml"><span class="tag">&lt;<span class="name">img</span> <span class="attr">src</span>=<span class="string">"http:..."</span> <span class="attr">width</span> = <span class="string">"100"</span> <span class="attr">height</span> = <span class="string">"100"</span> <span class="attr">div</span> <span class="attr">align</span>=<span class="string">right</span> /&gt;</span></span></span><br></pre></td></tr></table></figure>
+
+<p>如上格式，在图片的最后添加 width = “100” height = “100”，就可以设置图片的大小。也可以在后边输入百分比为多少，如 width = 20% height = 20%</p>
+<h2 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h2><p>Markdown更侧重于文档内容,不注重排版,版面的调整可以通过<code>HTML</code>标记语言来进行,但是不甚必要.</p>
+<p>而且上述方法在一些Markdown软件中的支持并不是很好,不同的软件可能有不同的实现方法,通用的方法就是使用<code>HTML</code>来实现上述图片的位置和大小调整</p>
+]]></content>
+      <categories>
+        <category>Markdown</category>
+      </categories>
+      <tags>
+        <tag>markdown</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>文献阅读笔记</title>
+    <url>/2019/11/Literature-Reading/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>湍流燃烧相关文献的阅读临时记录.</p>
+<a id="more"></a>
+
+<h1 id="Boivin-2012-采用简化反应机理的超声速氢空气自点火稳定火焰模拟"><a href="#Boivin-2012-采用简化反应机理的超声速氢空气自点火稳定火焰模拟" class="headerlink" title="Boivin-2012-采用简化反应机理的超声速氢空气自点火稳定火焰模拟"></a>Boivin-2012-采用简化反应机理的超声速氢空气自点火稳定火焰模拟</h1><blockquote>
+<p>Boivin(博伊文),马德里卡洛斯三世大学，勒加内斯，西班牙</p>
+</blockquote>
+<h2 id="Abstract"><a href="#Abstract" class="headerlink" title="Abstract"></a>Abstract</h2><p>Boivin等人发展了一种氢空气的三步简化反应机理,以更好的处理高温自点火/扩散燃烧和火焰传播过程,并在超声速抬举射流火焰的模拟中研究了简化反应机理在湍流燃烧模拟中的影响.</p>
+<p>通过与实验和详细机理的对比,验证了该简化反应机理的准确性.</p>
+<p>基于简化机理发展过程中引入的变量，提出了一种新的显式诊断方法，可以在氢空气燃烧模拟中方便地识别自点火区域.</p>
+<h2 id="Introduction"><a href="#Introduction" class="headerlink" title="Introduction"></a>Introduction</h2><p>为了涵盖自点火，在反应物和主自由基之间的支链反应的特征分析基础上，对反应机理进行了相应的修正.</p>
+<p>它已在预混和非预混层流火焰以及层流自点火中得到验证，适用于各种压力，温度和当量比.</p>
+<p>该射流抬举火焰的后处理分析同样是很有挑战性的工作,因为其瞬时稳定位置(火焰基底)波动很快,预混燃烧,非预混燃烧以及自点火过程在整个火焰稳定过程中都起到了重要作用.</p>
+<p>系统的识别火区域同样是一个关键问题.文章第4节提出了一种新的显式判断方法，通过联合使用多个物理量,快速识别自点火区域.</p>
+<h2 id="超声速火焰描述-实验结果"><a href="#超声速火焰描述-实验结果" class="headerlink" title="超声速火焰描述(实验结果)"></a>超声速火焰描述(实验结果)</h2><p>图中所示的是 NASA 兰利研究中心的超声速燃烧器基本构型,其基本工况如表所示.</p>
+<p>低温的氢气射流从内部中心体以声速喷出,氢气射流外围是高温的污染空气伴流,速度约为2马赫.</p>
+<p>射流和伴流的速度快,对流效应强,在火焰稳定区之前形成了较大的诱导区.火焰大致稳定在喷嘴出口约6厘米(25D)位置处.</p>
+<p>Cheng等人的实验提供了详细的动力学、混合和燃烧条件下的实验数据,通过拉曼散射和激光诱导荧光技术,获得了温度和组分(主要组分以及OH自由基)的同步瞬时测量。</p>
+<p>实验给出了距离燃烧器出口的x/D = 0.85、10.8、21.5、32.3、43.1、64.7和86.1位置处的径向分布,还给出了几个特定位置处温度和组分的散点分布图.</p>
+<p>射流出口平均速度$\bar u = 1200m/s$,是氢/空气层流火焰速度的数百倍.即使考虑射流的湍流度(20%)，流动速度也至少是爆燃速度的10倍,显然火焰不可能通过火焰传播来稳定.<strong>该算例中的超声速抬举射流火焰是通过冷氢和热污染空气之间混合层的自点火来稳定的</strong></p>
+<h2 id="数值设置"><a href="#数值设置" class="headerlink" title="数值设置"></a>数值设置</h2><blockquote>
+<p><strong>CERFACS</strong>开发的Navier-Stokes方程求解器 <strong>AVBP</strong></p>
+</blockquote>
+<ul>
+<li><p>AVBP是一种非结构化并行可压缩求解器，设计用于燃烧系统的大涡模拟(LES)或直接数值模拟(DNS).</p>
+</li>
+<li><p>亚格子湍流模型:Smagorinsky model</p>
+</li>
+<li><p>激波捕捉方法:中心格式+高黏性</p>
+</li>
+<li><p>亚格子扩散模型:梯度输运模型,湍流施密特数Sc=0.6</p>
+</li>
+<li><p>分子扩散:差异扩散,不同组分的扩散系数不同</p>
+</li>
+<li><p>亚格子燃烧模型:无模型,准层流假设(QL),所谓的可解尺度完全控制了火焰稳定区域的燃烧过程.(有问题)</p>
+</li>
+<li><p>入口条件:在污染空气伴流中叠加均匀各向同性湍流,均方根速度为300m/s,与实验测量的射流出口20%的速度脉动相一致.</p>
+</li>
+<li><p>计算区域与网格:660万非结构网格,边界足够远以保证计算中没有扰动能到达.</p>
+</li>
+</ul>
+<p>采用层流条件初步计算了与自点火过程相关的物理尺度,以估算湍流条件下的网格分辨率要求.采用DNS程序模拟了H2和污染空气一维混合层的演化过程.</p>
+<p><img src="Literature-Reading/1D_mixing_layer.png" alt="1D-mixing-layer"></p>
+<p>一维混合层算例的设计:左面是污染空气伴流,右面是氢气射流,随时间演化.在一维混合层算例中,<strong>自点火发生在反应最剧烈的混合分数$f_{mr}$处</strong>,导致产生了两个预混前沿,并形成一个尾随的扩散火焰.</p>
+<p>在火焰稳定区域($0&lt;x/D&lt;50$)，混合是一个关键的现象，必须从最大的尺度到最小的尺度进行捕获.</p>
+<p>在$x/D&lt;40$ 区域, $0.1&lt;\Delta x&lt;0.4 mm$以保证对混合和自点火过程的分辨率.根据Cheng等人的实验,最小网格间距与实验积分尺度以及柯尔莫戈罗夫尺度之比分别为0.02和10的数量级.</p>
+<p>为了说明其火焰稳定区的网格解析度问题,其进行了后验的测试,对比了该区域亚格子湍流黏性$\mu_t$和层流黏性$\mu$的大小,从结果来看,湍流黏性约是层流黏性的10倍左右,然后其得出了诱导区的湍流结构是被很好的解析了的.</p>
+<p>文中说因此这一部分不需要燃烧模型,但实际上这样的网格解析度还是远远不够的,所以燃烧模型仍旧是十分重要的.</p>
+<p>进一步对下游而言，亚格子湍流燃烧模型的缺失将导致扩散火焰的低分辨率.但这并不意味着数值上的不稳定性，因为组分和温度梯度是由可解量控制的。</p>
+<p>由于火焰稳定是自点火过程控制的，而不是火焰向上游的传播，因此扩散火焰中缺少亚格子模型并不影响火焰稳定的位置.</p>
+<p>最终的时间步长为$2×10^{-8}s$,低于任何化学动力学时间尺度的时间.</p>
+<h2 id="反应机理"><a href="#反应机理" class="headerlink" title="反应机理"></a>反应机理</h2><p>验证3步简化机理(从12步骨架机理简化而来),并与详细机理(21步)进行对比</p>
+<p>$$ 3H2 + O2 =&gt; 2H2O + 2H $$<br>$$ H + H + M =&gt; H2 + M $$<br>$$ H2 + O2 =&gt; HO2 + H $$</p>
+<p>该三步反应机理包含了对O和OH在超过第二爆炸极限的自点火过程中稳态假设失效的修正，其有效性和数值稳定性还有待于在湍流火焰中进行验证.</p>
+<p>在导致自点火的支链反应阶段对反应速率进行修正,修正系数取决于反应物的浓度和温度.</p>
+<p>HO2对自点火具有很好的标记作用,为了确定何时何地针对自点火进行反应速率的修正,定义了变量$\alpha$</p>
+<p>$$<br>\alpha = (production rate(HO2) - destruction rate(HO2)) / production rate(HO2)<br>$$</p>
+<p>在H原子具有正生成率的区域,如果 $\alpha$ 大于某个阈值,则判定为自点火.若条件不满足,那么反应速率的修正便是不需要的.在计算过程中阈值为$\alpha&gt;0.05$</p>
+<p>在对湍流中自点火过程的模拟中,由于反应速率可能具有很强的梯度，这种开关在原则上会引起数值问题.</p>
+<h2 id="结果讨论"><a href="#结果讨论" class="headerlink" title="结果讨论"></a>结果讨论</h2><p>主要对比了三种机理的区别,第一种是详细机理,第二种是没有包含修正的简化机理,第三种是包含修正的简化机理.</p>
+<h3 id="定性结果对比-云图"><a href="#定性结果对比-云图" class="headerlink" title="定性结果对比(云图)"></a>定性结果对比(云图)</h3><p><img src="Literature-Reading/HO2_mass_fraction.png" alt="HO2瞬时和时均质量分数云图"></p>
+<p>详细机理预测的火焰稳定位置约在距射流出口25D位置处,与实验结果吻合的很好.</p>
+<p>包含了修正的反应机理预测的结果,不论是火焰稳定位置还是温度和HO2径向的分布,都与详细机理十分接近.</p>
+<p>而没有包含修正的简化机理对抬举高度预测严重不足，大约缩短了40%. 此外从平均的火焰基底形状可以看出该简化机理预测的自点火更窄.</p>
+<p>而没有包含修正的机理预测的火焰稳定位置和火焰形状均发生了很大的变化.这再次表明自点火是这种抬举射流火焰稳定的关键机制.</p>
+<h3 id="定量结果对比-实验"><a href="#定量结果对比-实验" class="headerlink" title="定量结果对比(实验)"></a>定量结果对比(实验)</h3><p>主要对比了 <code>温度</code>,<code>H2</code>,<code>O2</code>,<code>H2O</code>和自由基<code>HO2</code>的平均和均方根结果</p>
+<p>诱导区$x/D=10.8$和21.5位置处,详细机理和简化机理预测的主要组分和温度的均值和均方根分布基本一致,HO2摩尔分数的预测也很相似</p>
+<p>数值模拟的均值与实验吻合的较好,脉动值是比较难准确模拟的量,即使中心区域的峰值没有很好地再现，但模拟中的均方根波动在大小上与实验结果相当.</p>
+<p>除了均值和均方根的线图,还给出了几个特定位置瞬时的散点图,同时画出了混合线(无反应)和平衡线(化学平衡假设下的燃烧)</p>
+<ul>
+<li>x/D=10.8</li>
+</ul>
+<p>在出口附近的测点,温度和主要组分的分布都十分接近混合线,表明该位置附近几乎没有反应发生.这也表明对大尺度混合的准确预测(分辨率)是准确预测抬举高度的必要条件.</p>
+<p>一些微量的OH在实验中以非常低的混合分数出现，这与实验中报道的贫预燃产物相对应，而与点火开始无关.</p>
+<ul>
+<li>x/D=32.3和x/D=43.1</li>
+</ul>
+<p>在稳定燃烧的区域,组分和温度逐渐接近绝热平衡水平,预测的结果与实验比较相近,但仍有一定的差距,主要是在稳定燃烧区域模拟的结果散点分布比较集中,比较解决绝热平衡状态,但实际上实验的结果显示,火焰仍旧处在非平衡的状态,组分和温度的散布仍旧是比较明显的.</p>
+<p>实验和模拟散点图的条件平均可以得到很好的一致性，但是这些散点在垂直方向上的散步有明显的不同,它与在对称轴附近温度和组分的较低均方根波动有关.也可以理解成其对湍流脉动的估计不足,导致反应更加倾向与绝热平衡状态.</p>
+<p>Boivin分析这是因为入口湍流脉动的原因,因为其给的是各向同性湍流,没有描述唇口造成的不均匀性,导致对该位置处湍流脉动的估计不足.</p>
+<p>实际上很可能不单单是这个原因,一般的湍流燃烧模型,尤其是他还没有采用湍流燃烧模型,预测的结果都比较偏向绝热平衡态,由于没有很好的估计小尺度上分子扩散,湍流混合和化学反应的相互作用,很难准确给出温度和组分的散点分布.</p>
+<p>Boivin最后结合模拟结果(入口附近的散点分布)指出,入口湍流脉动对整体的混合可能影响不是很大,模拟的流动质量足以研究有限速率反应对火焰稳定的影响.</p>
+<ul>
+<li>x/D=20和x/D=25</li>
+</ul>
+<p>瞬时自点火开始的位置.散点图的分布比较广.在x/D=25的区域,出现了自点火,所有的组分强烈脉动,大部分的氢过氧化氢被消耗了，在这些条件下触发了H2氧化特有的链分支反应.</p>
+<h3 id="结果讨论-1"><a href="#结果讨论-1" class="headerlink" title="结果讨论"></a>结果讨论</h3><ol>
+<li><p>入口湍流脉动的影响值得研究,但是其并不影响整体的火焰稳定,这似乎是纯化学反应相关的.</p>
+</li>
+<li><p>另一个问题是实验的火焰似乎比模拟的火焰要更宽.这个问题在近期的所有模拟中都存在.可能受真实的燃烧器几何构型的影响</p>
+</li>
+<li><p>火焰的最高温度被高估了约150k,这是使用简化机理的众所周知的缺陷:自由基的选择对比热Cp的计算有很大的影响，因此对热力学也有很大的影响。</p>
+</li>
+</ol>
+<h2 id="一种显示的自点火识别方法"><a href="#一种显示的自点火识别方法" class="headerlink" title="一种显示的自点火识别方法"></a>一种显示的自点火识别方法</h2><p>氢过氧化氢自由基HO2通常在点火混合物中达到典型的峰值，因此它被广泛应用于自点火的检测和显示</p>
+<p>然而，HO2的浓度在靠近火焰富燃料反应区的混合物中也会达到峰值.同时自点火过程中HO2浓度随局部条件的变化极大,当同时存在多个局部极大值时，会阻碍对某些自燃点的检测.</p>
+<h2 id="评述"><a href="#评述" class="headerlink" title="评述"></a>评述</h2><p>该篇文章的主要方面还是在验证其提出的简化<strong>反应机理</strong>.</p>
+<p>Cheng的这个算例,是一个由高温自点火稳定的超声速抬举射流火焰算例,流动具有很强的脉动,整个过程中涉及自点火,扩散和预混等多种形式的湍流燃烧过程,对简化反应机理来说,是很有挑战性的.</p>
+<p>简化机理可以节省计算时间,但同时也无法全面准确的描述燃烧的所有过程.为了达到简化计算的目的,简化机理一般会去除一些不太重要的组分和基元反应.但这些不太重要的部分大都基于特定的反应条件,所以简化的反应机理可能存在随反应条件变化,结果不稳定的问题.详细化学反应机理通常具有更加广的适用范围.</p>
+<p>为了提高简化反应机理的预测能力,一般会对反应速率常数进行优化.</p>
+<p>超声速抬举射流火焰中,自点火是其实现火焰稳定的主要原因,所以对自点火过程的准确模拟是该算例的重要基础.而对自点火,熄火以及火焰抬举等特征,一般很难用简化反应机理进行精确的描述.</p>
+<blockquote>
+<p>说明:关于简化机理部分的认识来自<a href="http://www.cnki.com.cn/Article/CJFDTotal-MTZH200404000.htm" target="_blank" rel="noopener">反应动力学机理简化的研究现状及进展</a></p>
+</blockquote>
+<p>点火延迟时间和火焰传播速度是考察机理的两个比较常用的指标,对于不同的模拟问题,关注的重点有所不同.对于这种自点火主导的燃烧算例,显然点火延迟时间是更加重要的一个指标.</p>
+<p>Boivin的工作更偏向化学部分,内容的重点是对比了不同反应机理下的模拟结果,验证了其三步简化机理的准确性.其对具体问题的分析上就比较简单,或者比较偏向用化学反应来解释.</p>
+<p>在模拟方法上,其网格只有660万,在流动模拟上其用了Smagorinsky模型,但是对燃烧模型的影响明显估计不足,其认为在该网格下可以准确解析大尺度混合和反应,认为反应主要受可解尺度量的控制,严重低估了小尺度层面上分子混合,湍流脉动和化学反应之间的复杂相互作用.</p>
+<hr>
+<h1 id="Cheng-1994-超声速同轴射流火焰实验"><a href="#Cheng-1994-超声速同轴射流火焰实验" class="headerlink" title="Cheng-1994-超声速同轴射流火焰实验"></a>Cheng-1994-超声速同轴射流火焰实验</h1><h2 id="Abstract-1"><a href="#Abstract-1" class="headerlink" title="Abstract"></a>Abstract</h2><p>将拉曼散射和激光诱导荧光(LIPF)结合起来,可以同时测量温度、主要组分(h2,02, N2, H20)和OH自由基的浓度.</p>
+<p>声速的氢气射流与2马赫的污染空气环形射流混合形成了轴对称火焰。实验获得了温度,组分浓度和混合分数的时均和均方根脉动值.</p>
+<p>将组分和温度的同步测量结果与冻结化学(混合线)和平衡化学极限(平衡线)进行比较，以评估混合和化学的局部状态。</p>
+<p>在抬举的火焰基底上游，氢气射流与高温的污染空气混合,产生了少量的反应.在火焰基底下游，强烈的湍流混合导致温度和OH浓度的亚平衡值.</p>
+<p>在超声速火焰中，由于速度和温度的相互作用，温度和物质浓度的脉动要高于亚声速火焰.</p>
+<p>在火焰的远下游位置，缓慢的三体聚合反应会导致超平衡的OH浓度，使得温度低于平衡值.</p>
+<h2 id="Introduction-1"><a href="#Introduction-1" class="headerlink" title="Introduction"></a>Introduction</h2><p>氢气点火延迟时间短,氢空气的混合时间短</p>
+<p>缓慢的化学动力学导致的不完全燃烧会极大地影响燃烧效率。</p>
+<p>由于重量限制，超燃冲压发动机燃烧室的长度是有限的.如果燃烧室不够长，由于三体缓慢聚合而产生的超平衡自由基会导致推力减小。</p>
+<p>为了设计更轻的重量和更短的超声速燃烧室，必须了解有限速率的化学效应。然而，由于高速、高焓反应流测量的困难，对超声速反应流中有限速率化学效应的实验研究还很缺乏</p>
+<p>在超声速反应流中，温度和组分等反应标量的时间和空间尺度通常达到耗散尺度(分别小于1ms和1mm),因此对反应标量的测量是十分困难的.</p>
+<p>物理探针缺少足够的时空分辨率,且在超声速流中会产生激波,从而加速探针附近的化学反应.因此需要更先进的非接触测量手段.</p>
+<p>用自发振动拉曼散射法测定了主要组分的浓度和温度,用激光诱导荧光测定OH浓度.通过这些浓度测量,可以计算出当地的燃料-空气比(混合分数)</p>
+<p>利用拉曼散射和PLIF方法，可以得到超声速反应流中混合(混合物分数)和化学反应的瞬时局部状态.组分和温度的同步测量结果可以与冻结化学和平衡化学极限进行对比,以了解有限反应速率在整个超声速火焰中的重要性程度.</p>
+<p>温度和多组分的测量也为CFD计算的燃烧模型提供了验证信息.人们提出了许多复杂的超声速反应流湍流燃烧模型，但这些模型缺乏准确的非侵入性实验数据的支持.</p>
+<ul>
+<li><p><strong>实验测得的污染空气射流出口速度脉动为20%</strong>.这种明显的脉动可能是由于在2马赫喷管中对LDV不同粒子的阻力效应引起的.污染空气中$Al_2O_3$粒子($<del>1\mu m$)的慢时间响应($</del>5\mu s$)使喷管出口处的测量速度比计算值低10-20%.</p>
+</li>
+<li><p><strong>实验测得的污染空气射流出口的标量脉动是平缓的(5%)</strong></p>
+</li>
+<li><p>中心氢气射流的雷诺数为15600.(基于射流内径D=2.36mm)</p>
+</li>
+<li><p>拉曼散射测量在以下位置沿径向进行的:x/D = 0.85、10.8、21.5、32.3、43.1、64.7、86.1.对于每个位置，径向扫描大约需要30-40分钟.每个测量位置的数据包括500张照片.在一些地点记录了2000张激光照片，以便对散点图作出更准确的统计.</p>
+</li>
+<li><p>火焰稳定位置(火焰基底)位于x/D=25位置处.火焰的亮度呈周期性地变化，表明存在弱激波结构.在x/d=25附近处，火焰在这些弱激波的影响下趋于稳定.</p>
+</li>
+</ul>
+<p><img src="Literature-Reading/Spark_schlieren.png" alt="火焰激光纹影图像"></p>
+<p><img src="Literature-Reading/Long_exposure_visual_photograph.png" alt="火焰长曝光图像"></p>
+<ul>
+<li><p>文中提到的最靠近出口的截面(x/D=0.85),污染空气的柯尔莫戈罗夫时间尺度约为$0.6\mu s$. 不知道这个是怎么得到的?</p>
+</li>
+<li><p>用不受碰撞猝灭影响的激光诱导荧光方法(LIPF)测定了氢氧自由基的浓度</p>
+</li>
+<li><p><strong>混合分数$f$是描述燃料与氧化剂混合状态的守恒标量</strong>.混合物的分数是根据拉曼散射测量的组分结果计算出来的，即由燃料流产生的质量除以总质量</p>
+</li>
+</ul>
+<p>$$ x = {(2[H_2]+2[H_2O]) / (32[O_2] + 28[N_2] + 18[H_2O] + 2[H_2])} $$<br>$$ f = {(x - Z_{H,a})} / {(1 - Z_{H,a})} $$</p>
+<p>其中 $Z_{H,a}$ 是污染空气中氢原子的质量分数.混合分数$f$在纯氢气中为1,纯空气中为0,在恰当计量数下为0.0299.</p>
+<ul>
+<li>实验误差</li>
+</ul>
+<p>室温下N2浓度测量的相对标准偏差在2.7%，在2300K的化学恰当比的火焰中为6.3%.在化学恰当比火焰中，温度和OH测量值的相对标准偏差分别为11.7%和13.2%.</p>
+<h2 id="Results-and-Discussion"><a href="#Results-and-Discussion" class="headerlink" title="Results and Discussion"></a>Results and Discussion</h2><blockquote>
+<p><strong>射流中心位置的选择也是十分重要的点</strong></p>
+</blockquote>
+<p>对这种轴对称射流火焰，由于安装困难和主喷管在高温污染空气中的热膨胀，无法获得精确的轴对称射流火焰.因此，射流的中心(y=0)被选择在混合分数最大和N2摩尔分数最小的位置.</p>
+<ul>
+<li>x/D=0.85</li>
+</ul>
+<p>该位置由于燃烧器的遮挡,镜头能够收集的光约减少了20%.数据的处理中也考虑了燃烧器的阴影.</p>
+<p>平均混合分数在燃料(1)和空气(0)中的值之间变化.在混合分数计算(式1)中，由于污染空气中水蒸气浓度较高(26%摩尔分数)，所以污染空气中氢原子的质量分数必须包括在内.</p>
+<p>污染空气的平均温度约为1250k.污浊空气中，OH基的含量约为0.1%摩尔分数,大约是用LIPF方法检测结果的三倍.OH自由基在污染空气的滞止腔内形成，由于自由基聚合缓慢而出现在环形喷嘴出口.对于正的y值，OH浓度在喷嘴出口更高.</p>
+<p>氢燃料以295k的温度供给燃烧器，并在射流出口加热至545k.温度的升高是由从污染空气向氢气燃料管的热传递引起的.</p>
+<p>在该位置处，氢气射流和污染空气之间几乎没有反应.环形剪切层中的混合情况如温度脉动图所示。两个内峰是燃料射流与污染空气混合产生的，两个外峰是污染空气与环境空气混合产生的.</p>
+<p>为了验证数据一致性，将喷嘴出口处(x/D=0.85)污染空气中的拉曼散射测量的组分浓度值与流量计测量值进行比较.假设污染空气中完全燃烧，质量流量计的O2/N2质量比在喷嘴出口为0.44，拉曼散射测量的O2/N2质量比为0.41-0.45，与质量流量计测量值吻合良好.O2/N2质量比测定的准确度在流量计测量中约为_+3%，在拉曼测量中约为+ 2%.</p>
+<ul>
+<li>x/D=10.8</li>
+</ul>
+<p>混合分数和H2摩尔分数下降,由于污染空气的夹带，在燃料流中检测到少量的O2、N2和H2O</p>
+<p>OH摩尔分数(~0.2%)略高于出口条件(图6m),表明存在一定的化学反应.燃料在抬举区域的混合过程也类似于亚声速抬举火焰.</p>
+<ul>
+<li>x/D=21.5和32.3</li>
+</ul>
+<p>有明显的化学反应.</p>
+<p>平均温度曲线(图7c、8c)显示正半径处的温度高于负半径处的温度.此外，在此位置，正半径的最大OH浓度超过1%(请注意图6、7、8中的刻度变化).这些不对称的温度和OH分布可能是由于燃料射流和污染空气的不对称或喷嘴出口污染空气中OH分布的不对称引起的。图4中的可视长曝光照片也显示了此处火焰的不对称性。O2、H2O、H2和OH等组分的剖面结果也与上述情况相一致.在火焰更强的一侧，消耗了更多的O2和H2(图7e, 7k, 8e, 8k)，同时产生了更多的H2O和OH(图7i, 7m, 8i, 8m).</p>
+<p>温度均方根剖面上,燃料喷射和污浊空气混合的两个内峰合并为一个单峰，而两个外峰仍然明显(图7d、8d).两个外峰是不对称的,因为污染空气相对于中心线向正方向有轻微的倾斜。在正半径处，静止空气附近的波动均方根温度要高于负半径处,这是由污染空气的倾斜以及转捩阶段受限所致.</p>
+<p>在x/D=32.3时，从氮气分布图(图8g)可以看出,污染空气和环境空气已经充分混合,不再有一个明显的纯污染空气区域(54.4%的氮)</p>
+<ul>
+<li>x/D=43.1</li>
+</ul>
+<p>该轴向位置处中心线附近的火焰温度和OH摩尔分数要高于其他轴向位置(释热最高的区域),O2摩尔分数剖面(图9e)显示，在燃料射流中心附近,O2几乎被完全消耗.</p>
+<ul>
+<li>x/D=64.6和86.1</li>
+</ul>
+<p>图10的H2摩尔分数也显示该位轴向位置处,氢气已经被消耗完,气体混合物处于贫燃状态(f &lt; 0.0299)。</p>
+<p>在x/D=86.1位置处,环境空气中过量的N2分子进入射流中心(图llg)。</p>
+<p>由于三体聚合反应和环境空气稀释，OH浓度降低.稍后我们将在x/D = 86.1(图11)处看到,火焰几乎处于平衡状态。温度和组分浓度分布也比上游地区平缓得多。</p>
+<ul>
+<li>数据说明</li>
+</ul>
+<p>上述数据是500或2000个独立激光图片的平均值。</p>
+<p>虽然混合和化学反应相互作用的直接信息不能从均值和均方根分布中获得，但它们确实为CFD模型的验证提供了一套数据.</p>
+<p>测量的均方根值表明，组分和温度脉动可能分别高达40%和20%.在燃烧模型中忽略这些波动对平均化学反应速率的影响，可能会导致较大误差，包括对次要污染物浓度、温度和着火点的预测的不准确.</p>
+<h2 id="流体力学尺度"><a href="#流体力学尺度" class="headerlink" title="流体力学尺度"></a>流体力学尺度</h2><p>通过计算火焰中湍流的长度和时间尺度，估算了拉曼散射系统所需的时空分辨率。在表2中，给出了5个下游位置的Kolmogorov长度尺度($\eta$)、Kolmogorov时间尺度($\tau_u$)和积分长度尺度($L$)。</p>
+<p>简单列出几个典型的特征尺度</p>
+<table>
+<thead>
+<tr>
+<th>$x/D$</th>
+<th>$r/R_f$</th>
+<th>$U$</th>
+<th>$T$</th>
+<th>$\eta$</th>
+<th>$\tau_u$</th>
+<th>L</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.85</td>
+<td>0.0</td>
+<td>1780</td>
+<td>0545</td>
+<td>0.008mm</td>
+<td>0.2$\mu s$</td>
+<td>3.4mm</td>
+</tr>
+<tr>
+<td>10.8</td>
+<td>0.0</td>
+<td>1105</td>
+<td>0555</td>
+<td>0.009mm</td>
+<td>0.4$\mu s$</td>
+<td>4.2mm</td>
+</tr>
+<tr>
+<td>21.5</td>
+<td>0.0</td>
+<td>1094</td>
+<td>1365</td>
+<td>0.021mm</td>
+<td>0.7$\mu s$</td>
+<td>4.9mm</td>
+</tr>
+<tr>
+<td>32.3</td>
+<td>0.0</td>
+<td>1181</td>
+<td>1760</td>
+<td>0.020mm</td>
+<td>0.7$\mu s$</td>
+<td>7.1mm</td>
+</tr>
+<tr>
+<td>43.1</td>
+<td>0.0</td>
+<td>1175</td>
+<td>2214</td>
+<td>0.025mm</td>
+<td>0.8$\mu s$</td>
+<td>7.4mm</td>
+</tr>
+</tbody></table>
+<h2 id="混合和有限速率反应的影响"><a href="#混合和有限速率反应的影响" class="headerlink" title="混合和有限速率反应的影响"></a>混合和有限速率反应的影响</h2><p>为了确定超声速反应流中湍流混合和化学反应的相互作用,将温度和多组分浓度的单点测量值与平衡和冻结状态下的值进行比较。</p>
+<p>平衡状态下燃料和空气混合物的温度及组分浓度由CHEMKIN计算得到.</p>
+<p>计算了六个位置处的湍流混合时间和Da数(湍流混合时间与化学反应时间之比)。这六个位置的散点图将显示超声速火焰中湍流混合和化学反应的相互作用.</p>
+<p>湍流混合时间计算方法:</p>
+<p>$$ \tau_t = \delta_{1/2} / (U - U_\infty)$$</p>
+<p>$\delta_{1/2}是射流速度剖面的宽度,$U$是当地射流中心速度,$U_\infty$是协流的速度.</p>
+<p>$x/D\geq32.3$位置处2体和3体反应的H2-air化学反应时间假设分别为15.4$\mu s$和~ 3ms</p>
+<p>在抬举区域(x/D=0.85和10.8)，化学反应时间必然要比湍流混合时间大得多，因为抬举区域几乎没有反应,因此Da数必然也会远大于1.</p>
+<p>当x/D = 86.1时，三体反应的Da值仍小于1，说明此处仍未达到化学平衡.在超燃冲压发动机的设计中，最优燃烧室长度必须足够长，以使OH自由基重新结合(Da&gt;1)，以保证是在燃烧室内而不是在排气羽流中释放它们的化学能.</p>
+<table>
+<thead>
+<tr>
+<th>$x/D$</th>
+<th>$y/D$</th>
+<th>$\Delta U$</th>
+<th>$\tau_t$</th>
+<th>$Da_{2-body}$</th>
+<th>$Da_{3-body}$</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>0.85</td>
+<td>-0.65</td>
+<td>363</td>
+<td>0.0005</td>
+<td>$\ll 1$</td>
+<td>$\ll 1$</td>
+</tr>
+<tr>
+<td>10.8</td>
+<td>-0.65</td>
+<td>295</td>
+<td>0.0010</td>
+<td>$\ll 1$</td>
+<td>$\ll 1$</td>
+</tr>
+<tr>
+<td>32.3</td>
+<td>-1.10</td>
+<td>060</td>
+<td>0.4000</td>
+<td>026</td>
+<td>0.13</td>
+</tr>
+<tr>
+<td>32.3</td>
+<td>+1.10</td>
+<td>025</td>
+<td>1.0000</td>
+<td>065</td>
+<td>0.33</td>
+</tr>
+<tr>
+<td>43.1</td>
+<td>00000</td>
+<td>024</td>
+<td>1.1000</td>
+<td>071</td>
+<td>0.37</td>
+</tr>
+<tr>
+<td>86.1</td>
+<td>00000</td>
+<td>012</td>
+<td>2.1000</td>
+<td>136</td>
+<td>0.70</td>
+</tr>
+</tbody></table>
+<p>为了评估火焰中的有限速率化学的影响，将瞬时测量值与不发生反应的混合极限和平衡极限进行比较(图12-17)。本部分的散点图由500个或2000个独立的激光图像组成.</p>
+<p>实线表示绝热平衡条件,由燃料和污染空气在喷嘴出口的条件计算得到。除x/D=86.1处外，虚线表示无反应混合.</p>
+<ul>
+<li>x/D=0.85, y/D=-0.65</li>
+</ul>
+<p>在混合层中，靠近喷嘴出口处(x/D=0.85, y/D=-0.65)，只有混合没有反应，如图12所示~ 1150k的温度低于污染空气温度(1250k)，但高于燃料流温度(545k)。因为没有化学反应的混合此时发生，所以不会产生OH自由基，主要物质摩尔分数在虚线上(混合线)。这里湍流混合时间远远小于二体反应时间$Da_{2-body} \ll 1$)，燃料与空气预混，反应很少.</p>
+<ul>
+<li>x/D=10.8, y/D=-0.65</li>
+</ul>
+<p>在该位置处,贫燃侧(混合分数小)发生了少量反应(见图13)。大部分流体处于预混非着火状态.局部的反应产生了极少量的OH,(图13b)。该位置反应很弱,可能是由于在这个位置处有很大的应变率. 该位置的湍流混合时间仍旧较短(~1$\mu s$)，但与高温污染空气的混合可能会引起一定的自着火.</p>
+<ul>
+<li>x/D=32.3, y/D=+-1.1</li>
+</ul>
+<p>平均温度剖面显示正侧的平均温度高于负侧,这是由于早先讨论的射流不对称造成的.</p>
+<p>在负半径(y/D=-1.1)处,温度散点图(图14a)显示仅存在很少的反应，因为火焰温度远远低于平衡曲线,大多数OH分散点也在平衡曲线下(图14b),其他主要组分的散布点在平衡曲线和无反应曲线的混合之间(图14c, 14d)。这一位置的高标量耗散率导致很难发生较强的化学反应.</p>
+<p>在正半径(y/D=+1.1)处,由于反应更强列,火焰温度要远高于负半径位置.但是许多反应区并不稳定.这些反应区因高标量耗散率而高度褶皱。从图15a可以看出，该区域一个典型的反应区温度约为2000k，即比平衡温度低~650K.同时，许多OH值仍旧远低于该区域的平衡值(图15b).</p>
+<p>其中有些温度点反应性更强，基本上高于平衡曲线。在中等雷诺数下，差异扩散可能导致偏离平衡状态，使贫燃侧的温度高于平衡态，富燃侧的温度低于平衡态.<br>然而，这种影响在高雷诺数下变得不再重要。在超声速可压缩流中，温度和速度的相互作用也会产生超平衡温度。当速度减慢时，静态温度将升高。</p>
+<p>有些温度仅降低300k(图15a)，有些OH值达到超平衡(图15b)。这些可能是低标量耗散率下的反应火焰区域。温度处于亚平衡状态，OH自由基缓慢的三体聚合使OH基浓度达到超平衡状态。图15b中的OH摩尔分数峰值约为平衡峰值的2.5倍.这类似于亚声速抬举火焰中缓慢的三体聚合区域。除N2外，主要组分摩尔分数分布广泛，但均集中在平衡曲线附近。环境空气中过量的N2扩散到该位置，导致散布点偏离平衡曲线(图15c).</p>
+<p>将主要的组分浓度和温度测量值与亚声速火焰进行比较，可以观察到超声速火焰中脉动更加强烈。与亚声速火焰不同，超声速流的速度是很大，速度脉动会引起温度的强烈脉动，从而引起化学反应。超声速湍流火焰中这些增加的波动与混合分数无关.</p>
+<ul>
+<li>x/D=43.1, y/D=0</li>
+</ul>
+<p>在此位置，亚平衡温度(可达400k以下)和超平衡OH值是由缓慢的三体聚合反应产生的。注意在流动中有少量未燃尽的H2(图16c);因此产生较少的H2O(图16d)</p>
+<ul>
+<li>x/D=86.1, y/D=0</li>
+</ul>
+<p>远下游位置,火焰更接近平衡态.</p>
+<p>由于这是一个开放的火焰，实验室的空气在这个位置被带入火焰，并影响火焰温度和气体成分。</p>
+<p>图17a所示的平均散布点位于实线和虚线之间。在图17中，实线是基于喷管出口条件计算的绝热平衡条件。虚线为氢气在环境空气(296k, 1atm)中燃烧的绝热平衡条件。图17b中OH的均值散布点在实线上。虽然分散点在其中一条平衡曲线上，但由于环境空气夹带量未知，无法确定实际的平衡条件.</p>
+<p>然而，如果我们想象一条穿过平均温度数据的曲线(在实线和虚线之间)，那么OH的相应平衡曲线将落在图17b中所画的线之间。如果OH数据高于这最后一条平衡曲线，在这个位置就没有达到充分的平衡条件。计算出的Da数($Da_{3-bofy}$)= 0.7)仍然小于1，也小于亚声速火焰($Da_{3-bofy}$)= 1.77)的平衡区。这也表明还没有达到充分的平衡条件.</p>
+<p>如图17c所示，h2已经燃尽，环境空气夹带增加了N2浓度。O2在平衡曲线上(图17d)，因为在污染空气和环境空气中有相同数量的O2。H2O与温度有相同的趋势，并且落在两条平衡曲线之间.</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><ol>
+<li><p>在这种超声速火焰中，Kolmogorov长度和时间尺度通常分别为10-20 $\mu m$ 和0.5-10 $\mu s$。拉曼散射系统的时间分辨率(20ns)足以冻结流动的最小时间尺度，但空间分辨率(~ 0.4 mm)远远大于Kolmogorov长度尺度。但计算的(空间分辨率与积分比例尺的比值)表明，测量将至少捕获该流中90%的标量方差</p>
+</li>
+<li><p>只有在喷嘴出口附近发生混合(x/D=0.85)。由于湍流混合时间比化学反应时间短，所以不存在化学反应。少量的反应发生在抬举火焰基地的上游，由于与高温的污染空气的混合。</p>
+</li>
+<li><p>燃烧发生在抬举区域的下游.在那里，高的标量耗散率使火焰接近熄灭，导致温度和OH浓度处于亚平衡值。该区域的一些火焰区呈现超平衡OH浓度和亚平衡温度，这是反应性较强的火焰区三体缓慢聚合的结果。OH摩尔分数的峰值大约是平衡态峰值的2.5倍。这与亚声速抬举火焰的缓慢聚合区相一致.</p>
+</li>
+<li><p>散点图表明，与亚声速火焰相比，在超声速火焰中可以观察到更高的温度和浓度的波动,超声速可压缩火焰中的速度脉动会引起温度和化学标量的脉动</p>
+</li>
+<li><p>为二体和三体反应定义了两个Da数。通过对超声速火焰中各组分的浓度和温度与平衡态的比较，得到了Da2的值。二体反应必须大于60才能达到部分平衡，且Da3的值必须大于60。要使三体反应达到平衡，Da3必须大于1.</p>
+</li>
+<li><p>这些混合分数、温度和多组分浓度的同时测量可以更好地理解复杂的湍流化学相互作用，为CFD模型的输入和验证提供信息。例如，Baurle等人最近使用假设形状的PDF方法对这些结果进行了建模.</p>
+</li>
+</ol>
+<h1 id="Moule-2014-CNF-Highly-resolved-numerical-simulation-of-combustion-in-supersonic-hydrogen–air-coflowing-jets"><a href="#Moule-2014-CNF-Highly-resolved-numerical-simulation-of-combustion-in-supersonic-hydrogen–air-coflowing-jets" class="headerlink" title="Moule-2014-CNF-Highly resolved numerical simulation of combustion in supersonic hydrogen–air coflowing jets"></a>Moule-2014-CNF-Highly resolved numerical simulation of combustion in supersonic hydrogen–air coflowing jets</h1><h2 id="Abstract-2"><a href="#Abstract-2" class="headerlink" title="Abstract"></a>Abstract</h2><p>本文主要对高速(超声速)流动中的非预混燃烧进行了研究。计算使用了大涡模拟(LES)来模拟具有中等Da值的高雷诺数湍流燃烧问题。我们期望相应的封闭方法能够处理高马赫数湍流反应流(流动时间尺度和反应时间尺度处于同一量级)所遇到的特殊问题.</p>
+<p>该模型采用的部分搅拌反应器(PaSR)模型考虑了有限速率化学和小尺度混合效应，以下简称非定常部分搅拌反应器(U-PaSR).</p>
+<p>(i)在本研究的第一步，通过数值计算结果与实验数据的详细比较，评估了U-PaSR模型的封闭能力.计算与实验数据的对比结果表明，数值模拟很好地描述了射流燃烧物理过程。</p>
+<p>(ii)在本研究的第二步，根据数值模拟结果对火焰结构和火焰稳定进行了分析。采用Boivin等人提出的自点火诊断工具进行相应的后处理,结果证实了自点火过程在射流火焰稳定中的重要性.数值模拟结果还表明,可压缩同轴射流喷入到大气后的压力动力学过程，对火焰稳定具有重要影响.在以前的数值模拟中还没有相关的证明.</p>
+<h2 id="Introduction-2"><a href="#Introduction-2" class="headerlink" title="Introduction"></a>Introduction</h2><p>与实验研究相比，计算流体动力学(CFD)为此类高速湍流反应流的研究提供了一个有吸引力的选择和补充工具。然而，目前常用的燃烧模型一般基于快速反应假设，在这种受有限速率化学反应和点火现象控制的反应流中，这些模型都很难适用。</p>
+<p><strong>在高速(超声速)湍流反应流中，湍流流动和化学反应的特征时间尺度相近(Da数接近1).在这种燃烧模式下,湍流化学反应相互作用强烈，基于快速反应或化学平衡流假设(化学反应特征时间尺度远小于湍流流动特征时间尺度)的涡破碎、涡耗散，以及解耦处理湍流流动和化学反应的火焰面等燃烧模型，均不再适用,必须考虑化学非平衡效应.</strong></p>
+<p>因此,基于有限速率化学反应的燃烧模型更适合描述这种包含自点火现象,由化学反应主导的超声速燃烧过程.</p>
+<p>该论文的重点在于采用非定常部分搅拌反应器(U-PaSR)燃烧模型来模拟超声速湍流燃烧。非定常部分搅拌反应器(U-PaSR)目前被用来模拟火焰区域内组分和温度的非均匀效应.</p>
+<p>论文主要有两个目的,一个是通过与实验数据的比较来评估U-PaSR的封闭能力,另一个是基于模拟数据来分析射流火焰稳定问题.与Boivin等人的结果不同的是,Moule在流场中发现了影响火焰稳定的两个重要区域，一个在近场,出口附近，与过氧化氢(HO2)自由基的形成有关，另一个在远场，与激波压缩、伴随的温升和随后的放热有关.</p>
+<p>目前的手稿组织如下:下一节专门介绍数值方法,接着是对超声速抬举射流火焰的介绍，一方面是对实验的介绍，另一方面是对针对该问题的数值研究的介绍。然后简要介绍数值设置，包括网格和边界条件.最后是结果讨论,给出了计算结果与现有实验数据的详细比较，并与先前的数值结果进行了对比,然后将得到的计算结果应用于非预混火焰结构和火焰稳定过程的分析.</p>
+<h2 id="数学模型"><a href="#数学模型" class="headerlink" title="数学模型"></a>数学模型</h2><h3 id="控制方程"><a href="#控制方程" class="headerlink" title="控制方程"></a>控制方程</h3><p>可压缩反应流NS方程</p>
+<p>分子扩散:傅里叶热传导和Fickian扩散</p>
+<p>忽略 Soret 和 Dufour 效应,体积力以及热辐射效应.</p>
+<p>亚格子模型:Smagorinsky</p>
+<p>标量扩散:涡扩散模型,湍流$Sc_t=0.7$</p>
+<h3 id="湍流化学反应相互作用模型"><a href="#湍流化学反应相互作用模型" class="headerlink" title="湍流化学反应相互作用模型"></a>湍流化学反应相互作用模型</h3><p>瞬时反应速率的高度非线性(阿仑尼乌斯定律)使得它的滤波或平均项很难建模。处理高速(超声速)时燃烧时，通常基于准层流(QL)燃烧假设或均匀反应器(HR)进行初步的一阶简化，忽略了组分和温度脉动的影响.</p>
+<p>然而，在混合层中的热逃逸直至着火的过程中，组分脉动可能起着关键作用。因此，非定常部分搅拌反应器(U-PaSR)的概念提供了一个有趣的基础，将这些脉动相关的影响纳入到雷诺-平均Navier-Stokes (RANS)或大涡模拟(LES)框架中。由于UPaSR模型的基础与Vulis[8]和Magnussen在其早期著作中引入的涡流耗散概念(EDC)模型相同，参见参考文献[9-11]，我们首先简要总结了以下EDC模型的显著特征.</p>
+<h3 id="EDC模型"><a href="#EDC模型" class="headerlink" title="EDC模型"></a>EDC模型</h3><p>马格努森提出的EDC模型基于湍流的间歇性特征，这意味着化学反应发生在小尺度结构中，大部分的粘性耗散和分子混合过程都发生在这些结构中。</p>
+<p>标量耗散确实倾向于在空间中形成精细而细长的结构。同样值得注意的是，即使是无反应标量,标量梯度脉动优先与最大压缩应变率的方向一致。</p>
+<p>事实上，实验和数值研究都表明，标量梯度场比速度梯度场[12]更具有间歇性:标量耗散率(SDR)确实比湍流耗散率更具有间歇特性。湍流混合作用于小尺度细长结构附近，如丝状或蠕虫状的涡旋结构，其横向尺寸为科尔莫戈罗夫长度尺度$\eta_K$的量级(介于6至10$\eta_K$之间)。科学文献将这些强耗散的区域描述为具有高涡度拟能的旋转蠕虫周围的片状结构。读者可以参考[13,14]，以进一步了解最近在湍流燃烧模型的小尺度湍流描述方面取得的进展。</p>
+<p>在非预混的情况下,湍流标量混合的本质(例如SDR)是非常间歇性的，下面讨论的封闭方法是基于高雷诺数湍流的这种间歇性的本质。</p>
+<p>强耗散(混合)过程的结构与非均匀但涡量较弱的区域共存，常被称为无结构随机海，often referred to as a structureless random sea,在那里标量混合被简单地认为是低效的。EDC模型中,每个流体单元被分为小尺度结构区域(用*表示),和环境区域(用0表示).小尺度结构区域具有高标量耗散率,标量混合强烈,混合速率快,像良搅拌反应器,即完全搅拌反应器(PSR),由于良好的混合条件因而具有较快的反应速率.小尺度结构周围的其他区域,混合低效,未混合条件下反应的可能性则微乎其微。</p>
+<p>一般而言，平均反应速率$\overline {\dot\omega_k}$可以表示为:</p>
+<p>$$\overline {\dot\omega_k}=\int_\Psi {P(\psi)\dot\omega_k(\psi)}$$</p>
+<p>其中$P$为联合标量PDF,$\psi=[T,Y_k]^T$为标量矢量的样本空间.</p>
+<p>考虑到小尺度区域内混合速率的重要影响，(*)区标量分布更加均匀，因此在$\psi=\psi^*$位置处可以用狄拉克函数来表示.</p>
+<p>严格地说，(0)区可能远不是均匀的，因为它的特征是低效的混合水平，但为了简单起见，相应的未混合状态(0)也被表示为$\psi=\psi^0$位置处的一个狄拉克函数.</p>
+<p>因此假设概率密度函数为双峰的.非混合状态(0)的描述无疑可以从假定的PDF双峰分布(而非单峰分布)中受益。</p>
+<p>但是，应该指出，在非预混条件下，<strong>燃料和氧化剂之间的分子混合是燃烧的先决条件</strong>[13,14]，因此，极低的混合速率的区域(0)也可以被等同于非燃烧状态。这就解释了为什么没有花特别的努力来改进它的PDF描述.</p>
+<p>因此，假设PDF呈现双峰形状，分解为小尺度结构的贡献(*)和环境的贡献(0)</p>
+<p>$$P(\psi) = \gamma^<em>\delta(\psi-\psi^</em>) + (1-gamma^*)\delta(\psi-\psi^0)$$</p>
+<p>基于此，平均化学速率可以表示为</p>
+<p>$$\overline {\dot\omega_k}=\gamma^<em>\dot\omega_k(\psi^</em>) + (1-\gamma^*)\dot\omega_k(\psi^0)$$</p>
+<p>其中$\gamma^<em>$为小尺度结构的体积分数,例如分子过程的体积分数.另外基于上述讨论,未混合区(0)的反应贡献设为零,因此平均反应源项可以写为$\overline{\dot\omega}=\gamma^*\dot\omega(\psi^</em>)$.</p>
+<p>因此，EDC模型是一个多尺度的模型，其中表征小尺度结构体积分数的速度和混合时间尺度分别与Kolmogorov速度尺度$v_K$和Kolmogorov时间尺度$\tau_K$成比例.</p>
+<h3 id="U-PaSR模型"><a href="#U-PaSR模型" class="headerlink" title="U-PaSR模型"></a>U-PaSR模型</h3><p>U-PaSR也是一个多尺度模型.U-PaSR模型与EDC模型的主要区别在于:</p>
+<ol>
+<li><p>与小尺度结构相对应的混合时间尺度$\tau_m$的定义</p>
+</li>
+<li><p>小尺度区域体积分数$\gamma^*$的估计</p>
+</li>
+</ol>
+<p>U-PaSR模型中,小尺度结果的体积分数定义为</p>
+<p>$$\gamma^* = \tau_{ch}/(\tau_{ch} + \tau_m)$$</p>
+<p>U-PaSR模型是Fureby等人在PaSR的基础上考虑了时间和对流效应作的进一步拓展.值得注意的是，最近在高雷诺数下进行的数值模拟表明，对流项的考虑(或不考虑)并不会显著改变EPaSR模型的计算结果.</p>
+<p>EPaSR模型采用多相类比的方法，用典型的输运方程描述了小尺度结构(*)及其周围环境(0)。值得注意的是，Vullis和Magnussen的涡耗散模型,在忽略时间和对流效应的情况下,可以从U-PaSR和EPaSR模型中恢复。此外，本文提出的U-PaSR模型可以从EPaSR模型中推导出来.</p>
+<p>如前所述，小尺度结构体积分数$\gamma^*$实际上是反应区体积与混合和反应区体积之和的比值.</p>
+<p>该论文中,标量混合时间尺度$\tau_m=\sqrt{\tau_K\tau_{\Delta}}$.$\tau_K=\sqrt{\nu/\epsilon}$为Kolmogorov时间尺度,$\tau_{\Delta}$为亚格子时间尺度</p>
+<p>另一个要点是，上述TCI模型要满足SGS模型的限制,即在滤波尺度趋近于0时恢复DNS极限.即滤波尺度足够小时,要有$\gamma^*=1$.</p>
+<h2 id="超声速抬举射流火焰描述"><a href="#超声速抬举射流火焰描述" class="headerlink" title="超声速抬举射流火焰描述"></a>超声速抬举射流火焰描述</h2><h3 id="实验设置和相关数据"><a href="#实验设置和相关数据" class="headerlink" title="实验设置和相关数据"></a>实验设置和相关数据</h3><p>实验构型详细文献: by Jarret et al.</p>
+<p><a href="">Jarrett-1988-JANNAF-Measurements of temperature, density, and velocity in supersonic reacting flow for CFD code validation</a></p>
+<p>实验数据详细文献: by Cheng et al.</p>
+<p><a href="">Cheng-1991-AIAA Paper-Finite-rate chemistry effects in a Mach 2 reacting flow</a></p>
+<p><a href="">Cheng-1994-CNF-Raman measurement of mixing and finite-rate chemistry in a supersonic hydrogen-air diffusion flame</a></p>
+<p><a href="">Dancy-1996-AIAA Paper-The turbulent flow field downstream of an axisymmetric Mach 2 supersonic burner: LDA measurements</a></p>
+<p>该实验的目的是分析氢-空气混合物的自点火以及超声速条件下非预混燃烧火焰稳定所涉及的基本物理过程.</p>
+<p>其中污染空气的静温达到1250K,远高于氢空气的着火温度,如此高的温度有利于混合层内化学过程的早期发展，从而导致自着火和扩散火焰稳定.</p>
+<p>主燃烧室氢和富氧空气的燃烧提供了所需的滞止条件.燃烧室和燃料喷注器是水冷的。然而，虽然实验测量了冷却水的温度，但其具体值没有在现有的参考资料中并未说明。因此，燃烧室的壁温仍旧是未知的.除此之外，主燃烧室的内部几何结构也并不详细.</p>
+<p>中心氢气射流的滞止压力为778kPa，滞止温度为1750K。还提供了喷管出口污染空气的条件。由于这两股射流的压力都略高于环境压力，由此产生了连续低振幅振荡的压缩波和膨胀波。利用紫外自发拉曼散射和激光诱导荧光技术，实现了温度和组分浓度(主要组分和OH自由基)的同步测量.</p>
+<p>实验还提供了X/D= 0.85(离出口很近位置)位置处详细的流体动力学尺度和组分信息.火焰稳定抬举高度约在(X/D=25处.</p>
+<p>Cheng等人实验给出的的RMS值证实，温度和组分的脉动分别可以达到20%和40%.考虑到火焰涉自点火，且在剧烈脉动的流动条件下，非预混或部分预混反应物之间存在燃烧，这为高速湍流燃烧的数值模拟提供了一个具有挑战性的试验案例.</p>
+<h3 id="数值方法"><a href="#数值方法" class="headerlink" title="数值方法"></a>数值方法</h3><p>在大多数应用中，通常从燃烧器出口平面开始进行模拟,且根据Cheng等人的建议，一般采用在X/D = 0.85处的实验数据作为入口边界条件.</p>
+<h4 id="前人的模拟"><a href="#前人的模拟" class="headerlink" title="前人的模拟"></a>前人的模拟</h4><ul>
+<li>Jarrett et al.[26]</li>
+</ul>
+<p>采用了代数模型封闭湍流黏性，并结合Rogers和Chinitz[24]提出的一步化学反应机理来考虑有限速率化学效应。计算结果与实验数据进行了比较，对湍流粘度模型进行了微调，得到了满意的结果。</p>
+<ul>
+<li>Baurle et al. [30-33]</li>
+</ul>
+<p>开发并验证了一个基于假定的多元beta函数PDF的模型。并与实验结果进行了比较。考察了包括单方程模型和双方程模型在内的几种湍流模型，以及不同的化学反应机理，包括从Jachimowski[34]推导出的详细和简化的机理。结果表明，与实验数据相比，选择给定的湍流模型或化学机理所引起的差异仍然很小.</p>
+<ul>
+<li>Mobus et al. [35,36]</li>
+</ul>
+<p>基于输运型PDF模型,提出了基于蒙特卡罗方法求解标量(质量分数和焓)的联合PDF和标量-速度-湍流频率联合PDF的输运方程。采用Baurle等人研究[30]时提出的反应机理。基于第二种方法(联合尺度-速度-湍流频率PDF)的数值模拟结果与实验数据进行了最好的比较。同时发现QL方法高估了自点火区域的温度、OH和H2O质量分数峰值。</p>
+<ul>
+<li>Morgenthaler et al. [37]</li>
+</ul>
+<p>比较了基于PEUL模型[38]和之前由Sabelnikov等人的[39]扩展到超声速燃烧的火焰面模型的数值模拟结果。所得到的数值结果与实验数据存在一定的差异，这可能与燃烧模型保留的简化假设有关。特别是没有考虑外部环境空气的影响，没有对喷射器唇形进行建模，忽略了边界层的影响。</p>
+<ul>
+<li>Dauptain et al. [40]</li>
+</ul>
+<p>进行了这种超声速自由喷射火焰的LES模拟。在这项研究中，SGS速度脉动的影响用Smagorinsky模型封闭。燃烧用两步反应机理描述，不考虑SGS组分脉动(层流反应)的可能影响.从一般的观点来看，数值模拟倾向于高估射流内部的混合，预测的诱导长度(抬举高度)似乎被高估了，这可能归因于使用了简化的两步反应机理。</p>
+<p><strong>上述模拟都是用x/D=0.85处的实验条件作为x/D=0处的入口条件,喷嘴产生的温度和压力分布的非均质性被忽略了,而这些剖面可能在可压缩流场的建立中起到关键作用</strong></p>
+<ul>
+<li>Gerlinger et al.[41]</li>
+</ul>
+<p>评估了喷管流量对下游发生的自动点火过程的具体影响。然而，似乎值得注意的是，Gerlinger等人采用的几何形状。[41]是专门设计来恢复Cheng等人指定的[28]出口条件的，并不完全符合喷嘴的实际几何形状。作者系统地研究了喷嘴对主燃烧室自由基复合的影响，并对反应机理、网格尺寸和自点火延迟条件进行了参数化研究。</p>
+<ul>
+<li>Izard et al. [42]</li>
+</ul>
+<p>将Borghi和Gonzalez[43]的MIL模型应用于超音速条件，Gomet等人[44]提出了一种改进的流时间尺度表示方法，包括驻留时间尺度和混合时间尺度;所得结果与实验数据吻合较好。</p>
+<ul>
+<li>Boivin et al [2]</li>
+</ul>
+<p>进行了三维非定常数值模拟，其目的是研究简化反应机理与详细化学的相关性。采用经典的Smag.模型模拟了SGS湍流粘度，未考虑SGS湍流化学相互作用模型。该研究评估了一个三步反应机理的能力,还评估了之前由Boivin等人设计的自点火判据的相关性。结果显示高估了射流内部的混合，发现相应的温度分布不能很好地描述自点火区域.</p>
+<p>本文将着重分析非预混火焰结构，包括由自燃过程驱动的稳定区。与前人的计算不同的是,本文的数值模拟显示火焰稳定区受可压缩流场结构(激波和膨胀波、激波相互作用等)的强烈影响.包括(i)可压缩同轴射流结构以及(ii)外部环境空气和污染空间之间的可压缩混合层,这些都具有较大的特征对流马赫数.</p>
+<h2 id="超声速抬举射流火焰的大涡模拟"><a href="#超声速抬举射流火焰的大涡模拟" class="headerlink" title="超声速抬举射流火焰的大涡模拟"></a>超声速抬举射流火焰的大涡模拟</h2><h3 id="数值方法-1"><a href="#数值方法-1" class="headerlink" title="数值方法"></a>数值方法</h3><ul>
+<li><p>网格总数</p>
+<p>  本文:3100万</p>
+<p>  Dauptai:80万</p>
+<p>  Boivin:660万</p>
+</li>
+<li><p>网格分布</p>
+</li>
+</ul>
+<p><strong>喷管出口处、射流内部的特征单元尺寸已减小到0.2 mm.</strong>沿主燃烧室壁面的边界层由五层组成，厚度为0.1 mm**</p>
+<p>网格质量的计算是基于Celik等人的建议，对分子粘度和分辨粘度的相对贡献进行评估</p>
+<p>该网格被一个大的缓冲区包围,可以处理远场边界条件，没有任何数值稳定性问题</p>
+<ul>
+<li>亚格子湍流模型</li>
+</ul>
+<p>Smagorinsky 模型. 模型常数为0.1</p>
+<ul>
+<li>亚格子燃烧模型</li>
+</ul>
+<p>U-PaSR模型</p>
+<ul>
+<li>反应机理</li>
+</ul>
+<p>Jachimowski发展的9组分-19步反应机理</p>
+<ul>
+<li>计算程序</li>
+</ul>
+<p>Onera的 <code>CEDRE</code>求解器, 有限体积法, 非结构网格, 可压缩反应流NS方程</p>
+<p>无粘通量:HLLC (Harten-Lax-van Leer Contact) approximate Riemann solver, Van Leer限制器, 二阶精度</p>
+<p>时间离散: 二阶显示Runge-Kutta</p>
+<p>480个计算分区</p>
+<ul>
+<li>其他细节</li>
+</ul>
+<p>实验是在一个长时间的设备中进行的，因此热壁是在温度为Tw=500k的等温条件下进行的。<strong>由于缺乏实验数据，特别是在喷管出口截面的湍流谱，在边界条件下没有注入湍流。</strong></p>
+<h3 id="结果讨论-2"><a href="#结果讨论-2" class="headerlink" title="结果讨论"></a>结果讨论</h3><h4 id="与实验结果的对比"><a href="#与实验结果的对比" class="headerlink" title="与实验结果的对比"></a>与实验结果的对比</h4><ol>
+<li>平均速度分布(几个轴向位置截面上的分布以及沿着中心线上几个截面点的速度)</li>
+</ol>
+<p>四个轴向位置处x/D=[10.8,21.5,32.3,43.1]截面上的平均速度分布,还有中心线上几个截面上速度的分布,与实验符合的很好.</p>
+<p>实质上就是几个截面上的速度分布,截面上对准了,中心线的分布实际上就是几个截面上的射流中心的分布.</p>
+<p>平均速度曲线可以看出,喷嘴出口附近,射流速度低,污染空气速度高,随着向下游的发展,射流和污染空气逐渐混合,射流的速度逐步提高,同时,污染空气和环境空气间的混合层不断向环境空气发展,导致速度剖面向径向发展.到x/D=43.1位置处,速度已经发展成单峰分布.</p>
+<ol start="2">
+<li>温度和主要组分的平均和脉动分布</li>
+</ol>
+<p>将与对称轴上温度和主要组分摩尔分数的均值和均方根分布与实验结果进行比较.值得注意的是，<strong>计算的均方根值仅基于滤波值的时间脉动，即不考虑SGS脉动。</strong>.</p>
+<p>从沿对称线的分布可以看出,平均抬举高度的预测比较准确，但火焰温度在射流远场明显被低估了。氢和水的平均摩尔分数分布预测也很准。氧气的平均摩尔分数剖面是唯一与实验结果有差异的剖面，尤其是在远场误差十分明显.</p>
+<p>如在其他数值模拟结果中所观察到的，如[2]，氧的平均浓度剖面确实表现出非单调的行为，这与在实验中所观察到的相反。氧摩尔分数的第一个峰值(位于X/D=15处)主要是由于射流与协流之间的混合。随后的下降是由于稳定区的燃烧造成的。最后，氧摩尔分数的最后一次增加(从X/D=35开始)是因为外部环境空气稀释的结果。</p>
+<p>外部空气应该是很难进入到射流中心位置处的,所以其模拟应该是存在一定问题的,根据作者的分析,这是对外部混合层(污染空气和环境大气)发展的不恰当描述导致的。从作者的模拟云图来看,其模拟的外部混合层发展的比较剧烈,有很强的大尺度结构,这些大尺度结构可能把外部空气卷入到中心射流区,导致中心的氧气浓度异常升高.</p>
+<p>实际上从试验中可以看出,外部的混合层是向外逐渐发展的,大没有明显的大尺度结构,也就是没有大涡存在,计算中也应该保证外部混合层是逐渐向外扩展的,但没有大尺度结构.</p>
+<p>数值模拟得到的均方根分布总体上符合实验趋势，但大部分情况下对脉动的估计是偏小了.而在氢气的脉动上,在近场,约x/D=5到x/D=25这个诱导区,有异常高的脉动,脉动幅值最大甚至达到了0.6,这个是明显有问题的.</p>
+<ol start="3">
+<li>x/D=10.8</li>
+</ol>
+<p>没有观察到特别的不对称。由于在喷管出口处使用了高度细化的网格，以及根据滞止参数确定的相关边界条件，出口的分辨率很好.并与实验数据进行了比较。趋势和数量级的预测是正确的，但计算的结果并不完全符合实验测量。</p>
+<p>从均值分布来看,这个近场位置模拟的问题有:</p>
+<p>(1) 数值模拟对中间氢气和污染空气的混合预测的过快</p>
+<p>试验中这个位置的氢气比模拟的要窄,说明实际上这个位置处氢气还没有很好的扩散到污染空气中来,这个混合层应该更窄一些. 温度以及所有组分的结果都出现了这一问题.</p>
+<p>(2) 低估了污染空气和环境空气间混合层的发展.</p>
+<p>内部高估了射流和污染空气的混合,外部又低估了射流与空气的混合.从温度和水的分布可以看出,实验中该位置污染空气和环境空气间的分布比较光滑,而数值模拟中该位置的分布还是有明显的分界.而氧气的分布由于污染空气与环境空气接近,所以两者之间分界不是很明显.</p>
+<p>从脉动分布来看:</p>
+<p>温度的脉动来看,出口污染空气的脉动很强,射流脉动更强,但是由于一般很难准确给出出口的温度脉动,所以导致射流和协流内部的脉动很难准确给出.另外,外部混合层的两个脉动峰值比较接近,但是由于模拟低估了外部混合层的发展,所以混合层中心的脉动峰值相较于实验,更靠近中心.而内部混合层由于反而被高估,即发展过快,因此脉动峰值比实验更宽.实际上由于射流中心温度脉动实际上远高于协流,所以实验中并没有这双峰,但是仍旧可以看出来射流和协流明显的分界处要比模拟的窄.</p>
+<p>氢气组分脉动同样,内部混合层比实验更宽,且同前述一样,数值模拟的氢气脉动异常的高.氧气组分脉动较之于实验偏低,内部混合层的双峰距离也比实验宽.</p>
+<p>这里脉动分布的问题,主要还是对于射流和协流以及环境大气,没法给出准确的符合实验的脉动值,导致在出口位置的脉动就明显偏离实际,所以后续的结果只能对比两个混合层处峰值脉动的大致规律.</p>
+<p>标准稳定边界条件的影响在这里是明显可见的，特别是温度均方根分布，污染空气中的温度均方根被严重低估。</p>
+<p><strong>目前条件下,射流,协流和自由大气间连续的激波反射(膨胀),以及由此产生的马赫盘(钻石结构或马赫结构)似乎是影响该位置模拟精度的核心因素,温度脉动是正确预测温度区和抬举高度的次要因素.</strong></p>
+<ol start="4">
+<li>x/D=21.5</li>
+</ol>
+<p>均值分布结果:</p>
+<p>不考虑火焰非对称性的影响,该位置的模拟仍旧是比较准确的.当然前述的内部混合层发展过快,外部混合层发展过慢的问题仍旧存在,并且会影响到后面的每一处截面.</p>
+<p>脉动结果:</p>
+<p><strong>在该截面处，组分和温度均方值的分布有很明显的改善。非定常边界条件的可能影响似乎不重要，而脉动量受两个混合层的发展影响更大。</strong></p>
+<p>作者说这是他目前看到最好的均方值结果,而且,从温度RMS来看,去除实验中火焰的非对称性的影响,结果确实是十分准确的,内部混合层的两个波谷和外部混合层的两个波峰,都比较准确的模拟出来了.同样从脉动结果来看,内部混合层发展过快而外部过慢.</p>
+<p>内部混合层温度脉动的波谷是因为什么了?</p>
+<p>除了氢射流内部，温度波动的均方根值与实验测量值符合得很好。然而，值得注意的是，<strong>外部混合层的网格不够精细，不能令人满意地描述外部混合层和相关的环境空气夹杂的不稳定行为。因此，外部混合层的峰值没有被捕捉到,幅值也被大大低估</strong>.这个可能一定程度上还是因为出口的组分脉动没有给导致的.</p>
+<ol start="5">
+<li>x/D=32.3</li>
+</ol>
+<p>实验数据的不对称性仍然很明显。数值模拟得到的平均剖面与这些非对称数据的下分支吻合得很好。均方根波动曲线与结果基本一致。除了温度的均方根值，以及喷流内部的氧和水蒸气浓度的均方根值外，预测相对较好</p>
+<p>均值分布:</p>
+<p>这个位置基本上开始是单峰分布,也就是说,氢气射流与污染空气在中心附近已经基本混合在一起了.这个位置氢气组分显示,氢气分布还是略微要窄一些.</p>
+<p>由于实验火焰的不对称性在这里很明显,所以难以准确定位模拟的问题.</p>
+<p>脉动分布:</p>
+<p>由于射流继续向下游发展,受初始脉动影响更加弱化,所以脉动幅值上与实验趋于一致.但是从分布规律上出现了明显的问题.</p>
+<p>首先温度脉动上,实验是中心一个峰,外加外部混合层两个峰,但模拟结果中射流中心反而是脉动低谷,这在后面氧气和水的均方值上也是如此.</p>
+<p>氢气脉动与实验值符合的很好.</p>
+<p>模拟得到的氧气和水的均方根都是射流中心处是低谷,外部是双峰,而实验是只有一个射流中心的单峰.也就是说,试验中,上一位置处的双峰的脉动,到了这个截面位置已经明显的耗散了,也就是说,上面是在有明显的混合层的分布上,而到了这一位置,内部的混合层合为一个之后,脉动的两个峰也合并了.</p>
+<p><strong>而模拟的结果来看预测内部混合层的合并偏慢,这就可能与影响混合层合并的过程相关,这里影响最大的就是燃烧,燃烧越强,合并的越快,模拟预测的燃烧在这里偏弱,(散点图可以明显看到),所以延缓了这个过程,导致该位置处组分脉动还存在双峰,且中心温度脉动预测偏弱.</strong></p>
+<ol start="6">
+<li>x/D=43.1</li>
+</ol>
+<p>这个位置因为燃烧都比较充分,火焰的非对称性有一定程度的减弱.</p>
+<p>均值分布:</p>
+<p>预测的反应明显偏弱,温度均值偏低,氧气消耗偏少(剩的多),水生成偏少.但是怪异的是,中心氢气剩的又比实验少.感觉是反常理的.但是仔细观察也可以发现,实验氢气比较窄,说明两侧的反应比较充分,只剩下中心富燃区的氢气比较多,其他位置反应比较快.而模拟中,氢气均值峰值虽然偏小,但比较宽,说明两边的反应不够快,整体上还是反应强度较弱导致的.</p>
+<p>脉动分布:</p>
+<p>这里组分的脉动分布开始逐渐变成单峰,但还是具有一定的双峰特征,这应该还是反应不够强导致的在下游的影响.</p>
+<p>试验中由于充分的扩散燃烧,此处温度脉动受燃烧影响最大,射流中心反应比较剧烈,基本是一个单峰.而模拟中反应更加平缓,射流各处的反应比较相近,从组分均值和脉动都可以看出来.这可能还是射流没有充分混合导致的,说明氧气进到射流中心的还比较少.试验中由于该位置充分混合,氧气充分进入到射流中心,由于射流中心燃料充足,温度更高,反应自然更加剧烈.而模拟中由于前面位置燃烧较弱,此处混合就不够,导致射流中心没有充分燃烧起来,只是与整个射流达到一致的水平.可以想象在下一个位置模拟的结果会靠近上一个位置.</p>
+<p>这说明一点,就是这个算例的火焰基底位置模拟的不准,且火焰基底大于25D.整个模拟估计的反应偏弱,导致自点火预测的更迟,火焰诱导区更长,继而导致相应的结果.</p>
+<ol start="7">
+<li>散点图.</li>
+</ol>
+<p>主要组分,温度与混合分数之间的散点图.混合分数定义为:</p>
+<p>$$ Z = (Z_H - Z_H^{coflow}) / (Z_H^{fule} - Z_F^{coflow})$$</p>
+<p>其中$Z_H$是混合物中氢原子的质量分数,$Z_H=\sum \mu_k^HY_k$.其中$\mu_k^H$是组分k中氢原子的质量比,$Y_k$是相应的质量分数.试验中给出了两个化学平衡(实线)和纯混合(虚线)的两个极限.</p>
+<p>左边的图是实验结果,右边与之对应的是LES瞬时值在0.17ms时间长度里的累积结果.</p>
+<ul>
+<li>x/D=10.8,y/D=0.65</li>
+</ul>
+<p><strong>这个位置位于火焰稳定区之前,大致对应于诱导区的结束,或者说自点火区域的开始的位置。</strong></p>
+<p>温度和组分位于纯混合线附近，因此确定化学反应不是主要的。在实验和数值模拟中均观察到小当量比下的OH自由基。它们是由主燃烧室产生的燃烧产物。在模拟中，部分自由基在起始反应的起始过程中产生.</p>
+<p>相对而言这个位置基本处于纯混合状态,所以模拟的结果在幅值和分布上都与实验比较接近.</p>
+<ul>
+<li>x/D=32.3,y/D=1.1</li>
+</ul>
+<p>这个位置处于火焰稳定区之内,在所谓的钻石激波内?.与第一个位置的结果相比，温度和组分向它们的化学平衡值偏移。</p>
+<p>混合分数波动的范围，大约[0,0.12]，在计算结果中似乎比在实验中更大[0,0.08].更高的混合分数,说明这个位置氢气更多,即氢气混合层发展过快.模拟的混合分数波动范围大,恰恰也说明其对内部混合层的发展估计过快导致的,与前面氢气组分分布更宽也相对应.</p>
+<p><strong>整个数值模拟的特点就是对内部大尺度混合估计过强,但是反应又估计不足,这很有可能就是湍流燃烧模型的问题,U-PaSR模型中对$\gamma^*的估算过小,导致即使在混合更好的情况下,燃烧仍旧不足,所以这个可能是模型的问题.</strong></p>
+<p><strong>当然内部小尺度混合好不好不能直接用氢气的均值分布来确定,其只能反应大尺度混合的一些问题,小尺度混合情况可能还得要标量耗散率来表示.所以湍流模型有没有问题,可能还需要知道当地的混合究竟好不好.</strong></p>
+<p><strong>这个位置处,对射流中心的脉动估计普遍是不够的,该轴向位,射流中心可能就是反应原本最强烈的区域,但模拟估计的标量小尺度混合可能是不够的(组分脉动远小于实验,组分脉动多大程度上表征小尺度混合,还是另一个问题?),进而导致反应强度不够.</strong></p>
+<p><strong>亚格子脉动更能反应亚格子混合情况,而模拟给出的只是可接尺度的脉动,不能反应亚格子脉动情况</strong></p>
+<p>从实验中得到的最大温度(<del>3000K,在化学计量条件下)和水质量分数(</del>0.7),这些在计算中都没有达到。这可能在一定程度上是由于对均方根脉动水平的估计不足造成的，如图9和图10所示.实际上就是对化学反应估计的不足,而对化学反应估计不足的分析还是不够深入,简单的说是脉动的影响是难以令人信服的.</p>
+<p>在位于X/D=32.3和Y/D=-1.1的对称位置上，温度和成分的散点分布较少，因此应该正确看待脉动水平的差异.</p>
+<ul>
+<li>x/D=43.1,y/D=0</li>
+</ul>
+<p>该位置大致处于燃料快燃尽的位置.</p>
+<p>温度和组分大部分达到它们的平衡值.</p>
+<p>在该位置，混合分数变化的测量范围和模拟范围([0,0.1]和[0,0.09])比较吻合。但是也能明显看到,模拟的混合分数在射流中心位置的分布反而是较小的,这可能是模拟中更多氢气扩散开了,没有集中在射流中心了,导致最大的混合分数偏小.</p>
+<p>同样的问题,模拟中组分和温度的分布更加集中,没有实验分散的那么开,且幅值略微小于实验值,尤其是温度明显小于实验值,这个还是明显对反应的估计不足.</p>
+<p><strong>在x/D&lt;40处,混合分数的脉动幅度与实验混合分数的变化大致相同。这表明，混合分数脉动的可解尺度足以复现整个脉动水平，而SGS脉动的影响不显著。</strong></p>
+<p>上面这个结论还有待商榷?</p>
+<p>在火焰的远场位置，当前模拟的计算分辨率较小(网格更粗)，计算没有细化到足以捕获混合分数波动的程度.</p>
+<h4 id="与别人的计算对比"><a href="#与别人的计算对比" class="headerlink" title="与别人的计算对比"></a>与别人的计算对比</h4><p>与Mobus et al.[36]、Gomet et al.[44]和Boivin et al.[2]之前的数值模拟研究的计算数据进行定量比较。值得回顾的是，Mobus等人采用[36]输运型PDF方法，Gomet等人[44]采用设定型PDF方法,而Boivin等人的[2]的LES结果是通过层流反应得到的。因此，这三项计算性研究被保留下来，作为描述高速流动中湍流化学相互作用(TCI)的不同可用策略的代表。</p>
+<p>在第一个截面中(Gomet et al.[44]和LES, Boivin et al.[2]和本研究得到的计算结果X/D=10.8)非常相似。观测到的脉动可能仅仅是由于指定的不同边界条件造成的，在这个位置上，燃烧模型的效果并不明显.然而，值得注意的是，Boivin等人进行的LES模拟，[2]倾向于高估对称轴上的混合。</p>
+<p>在第二个截面上(X/D =21.5)，湍流和TCI模型的影响变得更加明显。与LES相比，Gomet et al.[44]或Mobus et al.[36]获得的RANS结果低估了对称轴上的混合。相应的PDF模型在本位置处倾向于预测自点火。</p>
+<p>第三截面上(X/D=32.3),Boivin et al的LES模拟[2]正确再现了对称轴上的实验数据.虽然明显低估了湍流射流的范围。</p>
+<p>在第四截面上(X/D=43.1),我们观察到与X/D=32.3处一样的趋势.</p>
+<p> Gomet等的运行结果。[44]和现在的LES产生类似的结果与实验数据的协议。</p>
+<p>在中心线(Y/D=0), Boivin et a的LES[2]倾向于高估对称轴上的混合和自着火,即其预测的反应更强(这可能就是层流反应速率过快导致的).</p>
+<p>与实验数据相比,目前的结果确实展示一个非常满意的趋势X/D&lt;35D时.在之后结果不能很好地描述。这可能是由于在该轴向位置后射流中心以及外部混合层的网格都不够细,导致影响到对称轴上的计算结果.</p>
+<h4 id="火焰结构"><a href="#火焰结构" class="headerlink" title="火焰结构"></a>火焰结构</h4><h4 id="火焰稳定"><a href="#火焰稳定" class="headerlink" title="火焰稳定"></a>火焰稳定</h4>]]></content>
+      <categories>
+        <category>Literature Reading</category>
+      </categories>
+      <tags>
+        <tag>writing</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>高斯白噪声生成方法</title>
+    <url>/2019/11/Gaussian-White-Noise/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>记录高斯白噪声生成方法,以及其在数值模拟中的简单应用.</p>
+<a id="more"></a>
+
+<h1 id="高斯白噪声"><a href="#高斯白噪声" class="headerlink" title="高斯白噪声"></a>高斯白噪声</h1><ul>
+<li><p>Noise</p>
+</li>
+<li><p>White</p>
+</li>
+<li><p>Guassian</p>
+</li>
+</ul>
+<h1 id="高斯白噪声的生成方法"><a href="#高斯白噪声的生成方法" class="headerlink" title="高斯白噪声的生成方法"></a>高斯白噪声的生成方法</h1><p>在数值模拟中,高斯白噪声的生成实际上就是产生一系列离散(时间离散)的高斯随机数.</p>
+<p>这里只采用了简单的Box-Muller方法.</p>
+<ol>
+<li><p>首先产生服从 U(0,1) 的均匀随机数 $x1$ 和 $x2$</p>
+</li>
+<li><p>通过Box-Muller变换(瑞利分布导出的公式)生成服从 N(0,1) 的高斯随机数 $y1$ 和 $y2$(相互独立)</p>
+</li>
+</ol>
+<p>$$ y1 = cos(2\pi x1) * \sqrt{-2lnx2} $$<br>$$ y2 = sin(2\pi x1) * \sqrt{-2lnx2} $$</p>
+<p>简单的Fortran生成示意如下:</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">call</span> <span class="built_in">random_seed</span>()</span><br><span class="line"><span class="keyword">call</span> <span class="built_in">random_number</span>(x1)</span><br><span class="line"></span><br><span class="line"><span class="keyword">call</span> <span class="built_in">random_seed</span>()</span><br><span class="line"><span class="keyword">call</span> <span class="built_in">random_number</span>(x2)</span><br><span class="line"></span><br><span class="line">y1 = <span class="built_in">cos</span>(<span class="number">2</span>*PI*x1) * <span class="built_in">sqrt</span>(-<span class="number">2</span>*<span class="built_in">log</span>(x2))</span><br><span class="line">y2 = <span class="built_in">sin</span>(<span class="number">2</span>*PI*x1) * <span class="built_in">sqrt</span>(-<span class="number">2</span>*<span class="built_in">log</span>(x2))</span><br></pre></td></tr></table></figure>
+
+<p>参考链接: <a href="http://blog.sciencenet.cn/blog-430991-730847.html" target="_blank" rel="noopener"><strong>Fortran学习笔记(4): 伪随机数生成方法</strong></a></p>
+<p>还有其他两种方法,一个是利用<strong>分布函数的反函数</strong>, 另一个是利用<strong>中心极限定理</strong>.</p>
+<p>参考链接: <a href="https://blog.csdn.net/u010899985/article/details/80784810" target="_blank" rel="noopener"><strong>正态分布随机数生成算法</strong></a></p>
+]]></content>
+      <categories>
+        <category>Numerical Method</category>
+      </categories>
+      <tags>
+        <tag>fortran</tag>
+        <tag>math</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>个人常用的Linux命令汇总</title>
+    <url>/2019/11/Linux-Commond/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>个人用到的Linux命令汇总在此,方便后续查询</p>
+<a id="more"></a>
+
+<h1 id="条件分支"><a href="#条件分支" class="headerlink" title="条件分支"></a>条件分支</h1><ul>
+<li>判断前一个命令是否执行成功, <code>$?</code> 返回前一个命令的执行结果</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span> [ $? -eq 0 ] <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"Succeed"</span></span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="string">"Fail"</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<p>也可以在每一条命令前进行判断,保证上一步执行正确才进行下一步的执行.</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">[ $? -eq 0 ] &amp;&amp; zip -r tmp.zip tmp/</span><br><span class="line">[ $? -eq 0 ] &amp;&amp; zip -s 500M tmp.zip --out Out.zip</span><br><span class="line">[ $? -eq 0 ] &amp;&amp; rm tmp.zip</span><br></pre></td></tr></table></figure>
+
+<p>shel中的其他判断</p>
+<table>
+<thead>
+<tr>
+<th>命令</th>
+<th>意义</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>-eq</td>
+<td>等于</td>
+</tr>
+<tr>
+<td>-ne</td>
+<td>不等于</td>
+</tr>
+<tr>
+<td>-lt</td>
+<td>小于</td>
+</tr>
+<tr>
+<td>-gt</td>
+<td>大于</td>
+</tr>
+<tr>
+<td>ge</td>
+<td>大于等于</td>
+</tr>
+<tr>
+<td>le</td>
+<td>小于等于</td>
+</tr>
+</tbody></table>
+<h1 id="输入输出命令"><a href="#输入输出命令" class="headerlink" title="输入输出命令"></a>输入输出命令</h1><h2 id="输出"><a href="#输出" class="headerlink" title="输出"></a>输出</h2><ol>
+<li><p>输出到屏幕</p>
+</li>
+<li><p>输出到文件</p>
+</li>
+</ol>
+<h2 id="输入"><a href="#输入" class="headerlink" title="输入"></a>输入</h2><ol>
+<li>从命令行输入</li>
+</ol>
+<p>如下分卷压缩指定文件的 <strong>zip.sh</strong> 脚本, 提示从shell输入两个变量</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line"><span class="built_in">read</span> -p <span class="string">"Please Input FileIn:"</span> FileIn</span><br><span class="line"><span class="built_in">read</span> -p <span class="string">"Please Input FileOU:"</span> FileOu</span><br><span class="line">zip -r <span class="variable">$FileIn</span>.zip <span class="variable">$FileIn</span>/ &amp;&amp; zip -s 500M <span class="variable">$FileIn</span>.zip --out <span class="variable">$FileOu</span>.zip</span><br></pre></td></tr></table></figure>
+
+<p>也可以结合管道符让脚本自动读入提前设置好的内容,例如:</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$echo</span> -e <span class="string">"FileIn\nFileOU\n"</span> | ./zip.sh</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>从文件中读入</li>
+</ol>
+<h1 id="压缩-解压命令"><a href="#压缩-解压命令" class="headerlink" title="压缩/解压命令"></a>压缩/解压命令</h1><h2 id="分卷压缩-解压"><a href="#分卷压缩-解压" class="headerlink" title="分卷压缩/解压"></a>分卷压缩/解压</h2><ul>
+<li><strong>zip</strong>采用<code>-s</code>命令进行分卷压缩和解压:</li>
+</ul>
+<ol>
+<li>首先需要将源文件(test/)压缩成一个大的zip压缩包(tes.zip),直接进行分卷压缩操作会失败</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$zip</span> -r test.zip <span class="built_in">test</span>/</span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>针对压缩完成的zip压缩包(test.zip)进行分卷操作(每卷500M),分卷结束会在当前文件夹下生成out.zip、out.z01、out.z02…等结果文件</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$zip</span> -s 500M test.zip --out out.zip</span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>解压文件时,首先要将分卷合并成一个zip文件,然后直接解压,解压过程中出现了部分警告,但是不影响结果.</li>
+</ol>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="variable">$cat</span> out.* &gt; test.zip</span><br><span class="line"><span class="variable">$unzip</span> test.zip</span><br></pre></td></tr></table></figure>
+
+<h1 id="判断文件或路径是否存在"><a href="#判断文件或路径是否存在" class="headerlink" title="判断文件或路径是否存在"></a>判断文件或路径是否存在</h1><ul>
+<li>路径</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">path=<span class="string">"/home"</span></span><br><span class="line"><span class="keyword">if</span> [ -d <span class="variable">$path</span> ];<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> dir <span class="variable">$path</span> exist!</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> dir <span class="variable">$path</span> not exist!</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>文件</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">file=<span class="string">"/home/log.txt"</span></span><br><span class="line"><span class="keyword">if</span> [ -f <span class="variable">$file</span> ];<span class="keyword">then</span></span><br><span class="line">    <span class="built_in">echo</span> file <span class="variable">$file</span> exist!</span><br><span class="line"><span class="keyword">else</span></span><br><span class="line">    <span class="built_in">echo</span> file <span class="variable">$file</span> not exist!</span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Linux</category>
+      </categories>
+      <tags>
+        <tag>commond</tag>
+        <tag>linux</tag>
+        <tag>shell</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>MPI-Nonblock-Communication</title>
+    <url>/2019/11/MPI-Nonblock-Communication/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><a id="more"></a>
+
+<h1 id="MPI-非阻塞通信"><a href="#MPI-非阻塞通信" class="headerlink" title="MPI 非阻塞通信"></a>MPI 非阻塞通信</h1><p>非阻塞通信的基本步骤总结如下:</p>
+<ol>
+<li><p>准备接受缓冲区 this%RecvBuffer(:,:,:)</p>
+</li>
+<li><p>进行接受消息的动作,立即返回</p>
+</li>
+<li><p>准备发送缓冲区 this%SendBuffer(:,:,:)</p>
+</li>
+<li><p>进行发送消息的动作,立即返回</p>
+</li>
+<li><p>等待发送完成,释放发送缓冲区</p>
+</li>
+<li><p>等待接受完成,进行相应操作后,释放接收缓冲区</p>
+</li>
+</ol>
+]]></content>
+      <categories>
+        <category>MPI</category>
+      </categories>
+      <tags>
+        <tag>fortran</tag>
+        <tag>programming</tag>
+        <tag>parallel</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>VS-Code软件操作相关记录</title>
+    <url>/2019/11/VS-Code/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>记录VSCode软件的一些操作记录</p>
+<a id="more"></a>
+
+<p>#</p>
+]]></content>
+      <categories>
+        <category>Software</category>
+      </categories>
+      <tags>
+        <tag>vs-code</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>粒子追踪方法</title>
+    <url>/2019/11/Particle-Tracking/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>对PDF方法中粒子追踪方法的一些思考.</p>
+<a id="more"></a>
+
+<h1 id="计算空间和物理空间粒子追踪方法的比较"><a href="#计算空间和物理空间粒子追踪方法的比较" class="headerlink" title="计算空间和物理空间粒子追踪方法的比较"></a>计算空间和物理空间粒子追踪方法的比较</h1><h2 id="理论上的区别"><a href="#理论上的区别" class="headerlink" title="理论上的区别"></a>理论上的区别</h2><p>物理空间的追踪是基于一个统一的全局坐标,物理坐标来进行的,所以物理空间的粒子追踪在多区情况下是没有太大的区别和改动的.</p>
+<p>而计算空间是不存在一个统一的全局坐标,计算空间的粒子追踪是基于局部坐标进行的,在分区内部,是不需要粒子追踪方法的,但是在多区情况下,穿越分区的粒子需要进行额外的追踪.这种额外的追踪实际上也有不同的实现,一个是对穿越分区的粒子转换为物理追踪方法,另一个是设计两个分区间局部坐标的转换矩阵,实现两个分区局部坐标的转换.</p>
+<h2 id="数值上的区别"><a href="#数值上的区别" class="headerlink" title="数值上的区别"></a>数值上的区别</h2><p>可以设计简单的二维数值实验,以验证两种方法在<strong>计算效率</strong>上的差异.</p>
+<p>基本的构思是,设计一套比较简单的非正交结构网格,然后在网格中散布粒子,粒子的初始位置和数目也是固定的,均匀分布在网格中,给粒子赋值一个随时间变化的理论上的速度场,这样可以严格两种方法的粒子初始位置和粒子运动,也就是两种方法下粒子的轨迹是完全一致的.</p>
+<p>这个网格可以设计为单区和多区两种,分别测试不同情况下的计算效率.</p>
+<p>多区情况下要保证粒子速度场的一致,那么速度场就必须是物理坐标和时间的函数.多区下要保证粒子初始位置的一致,那么就要在网格中固定数目,然后根据网格坐标和粒子数目初始化粒子位置.</p>
+<p>时间迭代用简单的一阶欧拉格式,保持时间步长一致.</p>
+]]></content>
+      <categories>
+        <category>Numerical Method</category>
+      </categories>
+      <tags>
+        <tag>fortran</tag>
+        <tag>particles</tag>
+        <tag>PDF</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>多块并行计算中的通信问题</title>
+    <url>/2019/11/Multi-Blocks-Communication/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>在CFD大规模并行计算中,一个比较重要的问题就是如何实现复杂多块分区间的通讯.本文主要针对的是多块结构网格,实现内部边界的计算通讯.</p>
+<a id="more"></a>
+
+<h1 id="转换矩阵"><a href="#转换矩阵" class="headerlink" title="转换矩阵"></a>转换矩阵</h1><p>转换矩阵是核心,其将两个分区的<strong>矢量坐标</strong>联系起来.基于统一的坐标原点(0,0,0),可以实现两个分区<strong>坐标</strong>的转换.</p>
+<p>此外,这种转换本质上就是计算坐标的转换,或者说是结构网格索引的转换.</p>
+<p>$$ index2 = T*(index1-begin1) + begin2 $$</p>
+]]></content>
+      <categories>
+        <category>MPI</category>
+      </categories>
+      <tags>
+        <tag>fortran</tag>
+        <tag>parallel</tag>
+        <tag>numerical method</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Fortran 面向对象程序设计</title>
+    <url>/2019/10/Fortran-OOP/</url>
+    <content><![CDATA[<p><img src="Fortran-OOP/Fortran_Programming.jpg" alt=""></p>
+<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>记录Fortran面向对象的学习过程, 归纳总结相关的重要知识点. 核心内容是 <strong>Chapman</strong> 的 <em>Fortran程序设计(第四版)</em>,结合了部分学习python面向对象时的内容.</p>
+<a id="more"></a>
+
+<h1 id="类和对象"><a href="#类和对象" class="headerlink" title="类和对象"></a>类和对象</h1><p>对象是具体的,程序中的对象与现实世界中的对象十分类似,都具备某些属性和一定的行为.例如<code>宠物狗</code>,<code>宠物猫</code>等都是一定的对象,狗和猫可以拥有<code>名字年龄</code>等属性,也可以进行<code>吃饭睡觉</code>等一定的行为.</p>
+<p>类是抽象的,是对一类对象逻辑上的抽象,例如可以将前述的<code>宠物猫</code>和<code>宠物狗</code>抽象归纳为<code>宠物</code>这一类.类中自然也抽象了对象的各种属性和行为.在类中,<strong>数据成员</strong>用来定义数据类型,如<code>名字年龄</code>等属性定义的数据类型声明等,<strong>成员函数</strong>则定义了对数据域的操作,或者说定义了具体的行为.</p>
+<p>从这个例子也可以直观的看到,抽象的过程本身是不唯一的,甚至是具有一定的随意性的,可以将<code>宠物狗</code>和<code>宠物猫</code>抽象为<code>动物</code>,甚至也可以是<code>生物</code>,这个抽象的程度根据程序员对要解决问题的分析理解和选择来确定的,没有唯一性,但也要尽可能选择比较恰当的抽象范围,不要过小导致没有概括性,也不要过大导致没有什么代表性,过度或者不足的抽象都可能使得问题更加复杂化.</p>
+<p>面向对象编程过程中,对象就是对类的实例化,或者说创建对象的过程就是对类的实例化过程.</p>
+<h1 id="Fortran-类的结构"><a href="#Fortran-类的结构" class="headerlink" title="Fortran 类的结构"></a>Fortran 类的结构</h1><p>一个 fortran 类的主要组件包含以下几部分:</p>
+<ol>
+<li>数据域(Field)</li>
+</ol>
+<p>简单的理解,就是变量.当然类中的变量本身没有具体的意义,类是抽象的,其变量也是抽象的,没有具体意义的,只是一个变量名称,类中的变量在实例化为对象的过程(创建对象的过程)中,会给这个对象创建具体的变量,对象的变量是具有实际意义的,或者不严格的讲是在内存中进行了定义存储的.</p>
+<ol start="2">
+<li>方法(Method)</li>
+</ol>
+<p>方法定义了类的对象实现行为的过程.有的方法可能在类中进行明确的定义,有的则可能直接从父类中继承而来.</p>
+<ol start="3">
+<li>构造函数(Constructor)</li>
+</ol>
+<p>当对象被创建(类的实例化)后,构造函数用来初始化对象中的变量.</p>
+<ol start="4">
+<li>析构函数(Finalizer)</li>
+</ol>
+<p>在一个对象被销毁前,它将调用该函数,用以完成对象销毁前的所有必须的清楚工作,主要是为了释放资源,例如在对象中创建的动态数组,指针等.类中最多有一个析构函数,很多类也可能根本不需要析构函数.</p>
+<h1 id="CLASS保留字"><a href="#CLASS保留字" class="headerlink" title="CLASS保留字"></a>CLASS保留字</h1><p>所谓的保留字就是被语言本身定义过的,使用者不能再重新定义的变量名或者过程名.</p>
+<p>在 fortran 语言中, <code>CLASS</code> 保留字是对 <code>TYPE</code> 保留字的一种变形.常规 fortran 程序中,<strong>形参</strong>的类型和调用时相应<strong>实参</strong>的类型要完全匹配,而 <code>CLASS</code> 保留字则以一种特殊的方法放松了这种要求.即若形参用 <code>CLASS</code> 声明,<font color=red>那么该形参将与该数据类型及其所有扩展类型相匹配</font></p>
+<p>例如,假设声明了以下两个数据类型:</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> :: point</span><br><span class="line">    <span class="keyword">real</span> :: x</span><br><span class="line">    <span class="keyword">real</span> :: y</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">type</span>, <span class="keyword">extends</span>(point) :: point_3d</span><br><span class="line">    <span class="keyword">real</span> :: z</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span></span><br></pre></td></tr></table></figure>
+
+<p>如果又声明一个指针:</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span>(point), <span class="keyword">pointer</span> :: p</span><br></pre></td></tr></table></figure>
+
+<p>那么它只能接受 <code>point</code> 类型的数据,而如果该指针声明为:</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line">calss(point), <span class="keyword">pointer</span> :: p</span><br></pre></td></tr></table></figure>
+
+<p>这种方式声明的指针,则可以 <code>point</code> 类型,也可以接受其的拓展 <code>point_3d</code>类型.</p>
+<p>以 <code>CLASS</code> 保留字声明的形参,称为形参的 <strong>声明类型</strong>; 而任何时候分配给形参的实际对象的类型被称为形参的动态类型.</p>
+<p>因为 <code>CLASS</code> 声明的形参可以与一种以上的数据类型相匹配,所以被认为是 <strong>多态的</strong>.</p>
+<p>这种多态指针存在限制: 仅能用它访问声明类型的数据项,而扩展中定义的数据项不能用多态形参访问.</p>
+<p>例如,如下的类型:</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">class</span>(point), <span class="keyword">pointer</span> :: p1</span><br><span class="line"><span class="keyword">type</span>(point_3d),<span class="keyword">target</span> :: p2</span><br></pre></td></tr></table></figure>
+
+<p><code>CLASS</code> 定义的 <strong>p1</strong> 只能访问 <strong>point</strong> 类型的数据项, 即 <strong>p1</strong> 可以访问 p1%x 和 p1%y, <font color=red> 但是不能访问 p1%z</font>, 因为 <strong>point</strong>类型没有定义z. </p>
+<h1 id="Fortran-中实现类和对象"><a href="#Fortran-中实现类和对象" class="headerlink" title="Fortran 中实现类和对象"></a>Fortran 中实现类和对象</h1><p>简单的来说,实现类就是<strong>声明变量</strong>和<strong>创建方法</strong>, 而创建对象就是<strong>类的实例化</strong>.</p>
+<ul>
+<li>声明变量</li>
+</ul>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">module</span> complex_class        <span class="comment">! 模块名称</span></span><br><span class="line"><span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line"></span><br><span class="line"><span class="comment">! 类型定义</span></span><br><span class="line"><span class="keyword">type</span>,<span class="keyword">public</span> :: complex_ob   <span class="comment">! 类的名称</span></span><br><span class="line">    <span class="comment">! 类的数据成员</span></span><br><span class="line">    <span class="keyword">real</span> :: re</span><br><span class="line">    <span class="keyword">real</span> :: im</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span> complex_ob</span><br><span class="line"></span><br><span class="line"><span class="comment">! 添加方法的具体实现</span></span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span> <span class="keyword">module</span> complex_class</span><br></pre></td></tr></table></figure>
+
+<p>这里注意,比较特别的是,<font color=red>如果类的数据成员是<code>public</code> 属性,那么这个类的构造函数就可以用来初始化实例变量,该构造函数由数据类型名组成</font>.另外Chapman书中的原来的代码在 <strong>intel19</strong> 编译器下编译出错,可能更 <code>CLASS</code> 保留字还有什么多态指针这些相关吧,具体没有深究. 采用 <code>type</code> 进行声明则没有问题,可以正常运行.</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="comment">! class(complex_ob), pointer :: p</span></span><br><span class="line"><span class="keyword">type</span>(complex_ob) :: p</span><br><span class="line"></span><br><span class="line">p = complex_ob(re=<span class="number">1.0</span>, im=<span class="number">2.0</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>创建方法</li>
+</ul>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">module</span> complex_class        <span class="comment">! 模块名称</span></span><br><span class="line"><span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line"></span><br><span class="line"><span class="comment">! 类型定义</span></span><br><span class="line"><span class="keyword">type</span>,<span class="keyword">public</span> :: complex_ob   <span class="comment">! 类的名称</span></span><br><span class="line">    <span class="comment">! 类的数据成员</span></span><br><span class="line">    <span class="keyword">real</span> :: re</span><br><span class="line">    <span class="keyword">real</span> :: im</span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line">    <span class="comment">! 类的方法成员</span></span><br><span class="line">    <span class="keyword">procedure</span> :: add =&gt; add_complex_to_complex</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span> complex_ob</span><br><span class="line"></span><br><span class="line"><span class="comment">! 声明对模块的访问</span></span><br><span class="line"><span class="keyword">private</span> :: add_complex_to_complex</span><br><span class="line"></span><br><span class="line"><span class="comment">! 添加方法的具体实现</span></span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line">    <span class="function"><span class="keyword">subroutine</span></span> add_complex_to_complex( this, ... )</span><br><span class="line">        <span class="keyword">class</span>(complex_ob) :: this</span><br><span class="line">        ...</span><br><span class="line">    <span class="keyword">end</span> <span class="function"><span class="keyword">subroutine</span></span> add_complex_to_complex</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">module</span> complex_class</span><br></pre></td></tr></table></figure>
+
+<p>创建方法的基本结构就是如上所示,其中 <code>add</code> 过程只是对 <code>add_complex_to_complex</code> 更简短的表示而已,方便对象对该过程的调用. 方法子过程中的第一个变量必须是有类型定义的变量(this). </p>
+<ul>
+<li>类的实例化</li>
+</ul>
+<p>一般是采用 <code>type</code> 保留字直接实例化创建对象, 注意 <code>class</code> 保留字一般在类的定义过程中,常用于实现 <strong>多态</strong>,在实例化过程中不采用.<br>如果类的数据域不是 <code>private</code> 属性, 则可以直接用类的名称创建并初始化.</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="function"><span class="keyword">program</span></span> test</span><br><span class="line">    <span class="keyword">use</span> complex_class</span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line">    <span class="keyword">real</span> a, b, c</span><br><span class="line">    <span class="keyword">type</span>(complex_ob) :: p</span><br><span class="line">    <span class="keyword">type</span>(complex_ob) :: p1 = complex_ob(<span class="number">1.</span>, <span class="number">2.</span>)</span><br><span class="line"></span><br><span class="line">    <span class="built_in">write</span>(*,*) p1%re, p1%im</span><br><span class="line"></span><br><span class="line">    p = complex_ob( re=<span class="number">1.0</span>, im=<span class="number">2.0</span>)</span><br><span class="line">    <span class="built_in">write</span>(*,*) p%re, p%im</span><br><span class="line"></span><br><span class="line">    p = complex_ob( im=<span class="number">1.0</span>, re=<span class="number">2.0</span>)</span><br><span class="line">    <span class="built_in">write</span>(*,*) p%re, p%im</span><br><span class="line"></span><br><span class="line">    p = complex_ob( <span class="number">3.0</span>, <span class="number">4.0</span>)</span><br><span class="line">    <span class="built_in">write</span>(*,*) p%re, p%im</span><br><span class="line"><span class="keyword">end</span> <span class="function"><span class="keyword">program</span></span></span><br></pre></td></tr></table></figure>
+
+<h1 id="timer-类"><a href="#timer-类" class="headerlink" title="timer 类"></a>timer 类</h1><p>主要实现对程序各部分的简单耗时分析,数据就包含时长,方法主要就是 <strong>开始计时</strong>, <strong>结束计时</strong>, <strong>打印时长</strong>.</p>
+<p>主要过程包括:</p>
+<ul>
+<li><p>定义变量</p>
+</li>
+<li><p>创建方法</p>
+</li>
+</ul>
+<p>因为比较简单,这里直接给出Chapman书中最后的实现结果.</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">module</span> timer_class</span><br><span class="line"></span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">! 声明常量(real类型的精度)</span></span><br><span class="line">    <span class="keyword">integer</span>,<span class="keyword">parameter</span>       :: DBL = <span class="built_in">selected_real_kind</span>(p=<span class="number">14</span>)</span><br><span class="line"></span><br><span class="line">    <span class="comment">!类型定义</span></span><br><span class="line">    <span class="keyword">type</span>, <span class="keyword">public</span> :: timer</span><br><span class="line">        <span class="keyword">private</span></span><br><span class="line">        <span class="keyword">real</span>(DBL)           :: saved_time</span><br><span class="line">    <span class="keyword">contains</span></span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: start_timer  =&gt; start_timer_sub</span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: elapsed_time =&gt; elapsed_time_fn</span><br><span class="line">    <span class="keyword">end</span> <span class="keyword">type</span> timer</span><br><span class="line"></span><br><span class="line">    <span class="comment">! 子过程访问限制</span></span><br><span class="line">    <span class="keyword">private</span> :: start_timer_sub</span><br><span class="line">    <span class="keyword">private</span> :: elapsed_time_fn</span><br><span class="line"></span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line"><span class="comment">!-------------------------------------------------------------------------------</span></span><br><span class="line"><span class="function"><span class="keyword">subroutine</span></span> start_timer_sub( this )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line"><span class="comment">! - inout variables(声明调用参数)</span></span><br><span class="line">    <span class="keyword">class</span>(timer),<span class="keyword">intent</span>(inout)  :: this</span><br><span class="line"><span class="comment">! - local variables(声明局部变量)</span></span><br><span class="line">    <span class="keyword">integer</span>,<span class="keyword">dimension</span>(<span class="number">8</span>)        :: <span class="keyword">value</span></span><br><span class="line"></span><br><span class="line"><span class="comment">! - 获取时间</span></span><br><span class="line">    <span class="keyword">call</span> <span class="built_in">date_and_time</span> ( values=<span class="keyword">value</span> )</span><br><span class="line"></span><br><span class="line">    this%saved_time = <span class="number">86400.d0</span> * <span class="keyword">value</span>(<span class="number">3</span>) + <span class="number">3600.d0</span> * <span class="keyword">value</span>(<span class="number">5</span>) &amp;</span><br><span class="line">            + <span class="number">60.d0</span> * <span class="keyword">value</span>(<span class="number">6</span>) + <span class="keyword">value</span>(<span class="number">7</span>) + <span class="number">0.001d0</span> * <span class="keyword">value</span>(<span class="number">8</span>)</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span> <span class="function"><span class="keyword">subroutine</span></span> start_timer_sub</span><br><span class="line"><span class="comment">!-------------------------------------------------------------------------------</span></span><br><span class="line"><span class="keyword">real</span> <span class="function"><span class="keyword">function</span></span> elapsed_time_fn( this )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line"><span class="comment">! - inout variables(声明调用参数)</span></span><br><span class="line">    <span class="keyword">class</span>(timer),<span class="keyword">intent</span>(inout)  :: this</span><br><span class="line"><span class="comment">! - local variables(声明局部变量)</span></span><br><span class="line">    <span class="keyword">integer</span>,<span class="keyword">dimension</span>(<span class="number">8</span>)        :: <span class="keyword">value</span></span><br><span class="line">    <span class="keyword">real</span>(DBL)                   :: current_time</span><br><span class="line"></span><br><span class="line">    <span class="keyword">call</span> <span class="built_in">date_and_time</span> ( values=<span class="keyword">value</span> )</span><br><span class="line"></span><br><span class="line">    current_time = <span class="number">86400.d0</span> * <span class="keyword">value</span>(<span class="number">3</span>) + <span class="number">3600.d0</span> * <span class="keyword">value</span>(<span class="number">5</span>) &amp;</span><br><span class="line">    + <span class="number">60.d0</span> * <span class="keyword">value</span>(<span class="number">6</span>) + <span class="keyword">value</span>(<span class="number">7</span>) + <span class="number">0.001d0</span> * <span class="keyword">value</span>(<span class="number">8</span>)</span><br><span class="line"></span><br><span class="line">    elapsed_time_fn = current_time - this%saved_time</span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span> <span class="function"><span class="keyword">function</span></span> elapsed_time_fn</span><br><span class="line"><span class="comment">!-------------------------------------------------------------------------------</span></span><br><span class="line"><span class="keyword">end</span> <span class="keyword">module</span> timer_class</span><br></pre></td></tr></table></figure>
+
+<h1 id="方法分类"><a href="#方法分类" class="headerlink" title="方法分类"></a>方法分类</h1><ul>
+<li>设置方法(set)</li>
+</ul>
+<p>向类中存储数据的方法,以 <code>set</code> 开头.</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">call</span> d1%set_date(<span class="number">1</span>,<span class="number">3</span>,<span class="number">2018</span>)</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>读取方法(get)</li>
+</ul>
+<p>从类中获取数据的方法, 以 <code>get</code> 开头.</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line">date = d1%get_date()</span><br><span class="line">year = d1%get_year()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>判断方法(is)</li>
+</ul>
+<p>在类中检验方法的真假, 以 <code>is</code> 开头</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">if</span>( d1%is_leap_year ) <span class="keyword">then</span></span><br><span class="line">    <span class="built_in">write</span>(*,*) d1%get_year(), <span class="string">' is a leap year. '</span></span><br><span class="line"><span class="keyword">endif</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="析构函数"><a href="#析构函数" class="headerlink" title="析构函数"></a>析构函数</h1><p>析构函数完成对象销毁前全部必要的清理工作(释放资源,关闭文件)等. <font color=red> 类中可以有一个以上的析构函数</font>,但大多数类也根本不需要析构函数.</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span>,<span class="keyword">public</span> :: vector</span><br><span class="line">    <span class="keyword">private</span></span><br><span class="line">    <span class="keyword">real</span>,<span class="keyword">pointer</span>    :: v(:)</span><br><span class="line">    <span class="keyword">logical</span>         :: <span class="built_in">allocated</span> = .false.</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span></span><br></pre></td></tr></table></figure>
+
+<p>如果该数据类型的对象被删除,指针也将释放,但是已分配的空间却被保留下来了,这样程序中就出现了<strong>内存泄露</strong>.</p>
+<p>而如果在类中声明一个 <code>clean_vector</code> 的析构子过程</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span>,<span class="keyword">public</span> :: vector</span><br><span class="line">    <span class="keyword">private</span></span><br><span class="line">    <span class="keyword">real</span>,<span class="keyword">pointer</span>    :: v(:)</span><br><span class="line">    <span class="keyword">logical</span>         :: <span class="built_in">allocated</span> = .false.</span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line">    <span class="keyword">final</span>           :: clean_vector</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span></span><br></pre></td></tr></table></figure>
+
+<p>这样在销毁这个数据类型的数据项时,它销毁前将自动调用析构子过程clean_vector.</p>
+<h1 id="继承性和多态性"><a href="#继承性和多态性" class="headerlink" title="继承性和多态性"></a>继承性和多态性</h1><h2 id="超类和子类"><a href="#超类和子类" class="headerlink" title="超类和子类"></a>超类和子类</h2><p>继承在面向对象里是很重要也是比较清晰的概念,低层级的类可以继承上层类的变量和方法.继承的概念Fortran与其他语言没有什么区别,下面直接给出 <strong>Fortran</strong> 中子类的定义以及使用方法.</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="comment">! 类型定义</span></span><br><span class="line"><span class="keyword">type</span>,<span class="keyword">public</span> :: employee</span><br><span class="line">    <span class="comment">! 变量</span></span><br><span class="line">    <span class="keyword">character</span>(len=<span class="number">30</span>)   :: first_name</span><br><span class="line">    <span class="keyword">character</span>(len=<span class="number">30</span>)   :: last_name</span><br><span class="line">    <span class="keyword">character</span>(len=<span class="number">11</span>)   :: ssn</span><br><span class="line">    <span class="keyword">real</span>(<span class="keyword">kind</span>=<span class="number">8</span>)        :: pay = <span class="number">0</span></span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line">    <span class="comment">! 方法</span></span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_employee =&gt; set_emplyee_sub</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_name =&gt; set_name_sub</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_ssn =&gt; set_ssn_sub</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: get_first_name =&gt; get_first_name_fn</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: get_last_name =&gt; get_last_name_fn</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: get_ssn =&gt; get_ssn_fn</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: calc_pay =&gt; calc_pay_fn</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span> employee</span><br></pre></td></tr></table></figure>
+
+<p>上面该过程定义了 <strong>employee</strong> 这样一个类型,包含了一定的变量和相应的方法. <strong>fortran</strong>语法中这些变量和方法都要有比较严格的定义过程,可能不像其他语言一样比较灵活.</p>
+<p>基于<strong>employee</strong>这个类,可以进一步定义<strong>salaried_employee</strong>等子类</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="comment">! 类型定义</span></span><br><span class="line"><span class="keyword">type</span>,<span class="keyword">public</span>,<span class="keyword">extends</span>(employee)   :: salaried_employee</span><br><span class="line">    <span class="comment">! 定义其他变量</span></span><br><span class="line">    <span class="keyword">private</span></span><br><span class="line">    <span class="keyword">real</span>    :: salary = <span class="number">0</span></span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line">    <span class="comment">! 绑定的其他方法</span></span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_salary =&gt; set_salary_sub</span><br><span class="line">    <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: calc_pay =&gt; calc_pay_fn</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span> salaried_employee</span><br></pre></td></tr></table></figure>
+
+<p>通过<code>extends</code>,新的子类<strong>salaried_employee</strong>继承了<strong>employee</strong>的所有变量和方法,还添加了新的方法.另外这里有一个<code>calc_pay</code>方法,还是对超类<strong>employee</strong>中方法的<strong>重载</strong>,实际上就是对超类中定义方法的代替.</p>
+<h2 id="超类对象和子类对象"><a href="#超类对象和子类对象" class="headerlink" title="超类对象和子类对象"></a>超类对象和子类对象</h2><p>对象是类的实例化,子类对象继承超类对象的所有变量和方法.任何子类对象都可以看成是它的超类的对象.这里最主要的就是通过指向子类的指针也可以通过指向超类的指针来操作该对象.</p>
+<p>也就是说,一个对象可以通过不同’路径’的指针来操作它.</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line">calss(employee)         :: <span class="keyword">pointer</span>  :: emp1, emp2</span><br><span class="line"><span class="keyword">type</span>(salaried_employee) :: <span class="keyword">pointer</span>  :: sal_emp</span><br><span class="line"><span class="keyword">type</span>(hourly_employee)   :: <span class="keyword">pointer</span>  :: hourly_emp</span><br><span class="line"></span><br><span class="line">emp1 =&gt; sal_emp</span><br><span class="line">emp2 =&gt; hourly_mep</span><br></pre></td></tr></table></figure>
+
+<h2 id="多态性"><a href="#多态性" class="headerlink" title="多态性"></a>多态性</h2><p>多态性可以简单的理解为,不同子类的多个对象,可以被当成一个超类的对象来处理.如前面举例的<code>宠物猫</code>和<code>宠物狗</code>,<code>宠物猫</code>定义了方法:<strong>发出’喵喵喵’的叫声</strong>,<code>宠物狗</code>定义方法:<strong>发出’汪汪汪’的叫声</strong>,这个都可以被<code>宠物</code>这个超类的<strong>发出叫声</strong>来处理.</p>
+<p><font color=red >为了能够使得多态性发挥作用,<strong>必须在超类中定义该方法</strong>,并且在各个子类中重载该方法.</font></p>
+<h2 id="SELECT-TYPE-结构"><a href="#SELECT-TYPE-结构" class="headerlink" title="SELECT TYPE 结构"></a>SELECT TYPE 结构</h2><p>在使用超类指针引用对象时,可以用<code>SELECT TYPE</code> 来分辨出该对象是属于哪一个子类的.</p>
+<p>基本结构如下:</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line">[<span class="keyword">name</span>:] <span class="keyword">select</span> <span class="keyword">type</span> (obj)</span><br><span class="line"><span class="keyword">type</span> is (type_1) </span><br><span class="line">    Block1</span><br><span class="line"><span class="keyword">type</span> is (type2) </span><br><span class="line">    Block2</span><br><span class="line"><span class="keyword">class</span> is (type_3) </span><br><span class="line">    Block3</span><br><span class="line"><span class="keyword">class</span> <span class="keyword">default</span></span><br><span class="line">    Block4</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">select</span> [<span class="keyword">name</span>]</span><br></pre></td></tr></table></figure>
+
+<p>根据 <strong>obj</strong> 对象的不同,执行不同的块,这些块中执行该子类型的实现方法.</p>
+<h1 id="禁止在子类中重载方法"><a href="#禁止在子类中重载方法" class="headerlink" title="禁止在子类中重载方法"></a>禁止在子类中重载方法</h1><p>当需要一个或者多个方法在某个特定超类的子类中不被修改,这可以在绑定时用<code>non_overridable</code>属性标识声明该方法.</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">type</span> :: point</span><br><span class="line">    <span class="keyword">real</span> :: x</span><br><span class="line">    <span class="keyword">real</span> :: y</span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line">    <span class="keyword">procedure</span>, <span class="keyword">non_overridable</span> :: my_proc</span><br><span class="line">    ...</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">type</span> point</span><br></pre></td></tr></table></figure>
+
+<p>在上述类型的定义中,被<code>non_overridable</code>标识的<code>my_proc</code>方法不能被<code>point</code>的任何子类所改写.</p>
+<h1 id="抽象类"><a href="#抽象类" class="headerlink" title="抽象类"></a>抽象类</h1><h2 id="抽象方法和抽象类"><a href="#抽象方法和抽象类" class="headerlink" title="抽象方法和抽象类"></a>抽象方法和抽象类</h2><p>为了实现<strong>多态性</strong>,多态方法必须与父类绑定,这样才能被其子类所继承和重载.</p>
+<p>但是如前<code>employee</code>类,该类的方法<code>calc_pay</code>总是被其子类的方法所重载,如果没有对象从父类中进行实例化,那么这个父类中的方法本身是永远不会被使用.</p>
+<p>因此在Fortran中就允许只声明<strong>方法的绑定</strong>和<strong>方法的接口</strong>,而不具体编写方法. 这种方法被称为<code>抽象方法</code>或者<code>不能引用的方法</code>.而包含抽象方法的类型则称为<code>抽象类型</code>,以区别于一般的<code>具体类型</code>.</p>
+<h2 id="抽象方法的定义"><a href="#抽象方法的定义" class="headerlink" title="抽象方法的定义"></a>抽象方法的定义</h2><p>类型定义中,用<code>deferred</code>属性来声明抽象方法,以及用<code>abstract interface</code>(抽象接口)来定义方法的调用参数的顺序(方法形参的顺序).</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="comment">! 抽象方法的定义</span></span><br><span class="line"><span class="keyword">procedure</span>(calc_payx),<span class="keyword">public</span>,<span class="keyword">deferred</span> :: calc_pay</span><br><span class="line"><span class="comment">! 抽象接口的定义</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="keyword">interface</span></span><br><span class="line">    <span class="keyword">pure</span> <span class="function"><span class="keyword">subroutine</span></span> calc_payx( this )</span><br><span class="line">        <span class="keyword">import</span> :: employee</span><br><span class="line">        <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line">        <span class="keyword">class</span>(employee),<span class="keyword">intent</span>(inout) :: this</span><br><span class="line">    <span class="keyword">end</span> <span class="function"><span class="keyword">subroutine</span></span> destroy_func</span><br><span class="line"><span class="keyword">end</span> <span class="keyword">interface</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p><strong>calc_pay</strong>则是方法实际的名字,也就是要被重载的方法的实际名称.</p>
+</li>
+<li><p><strong>calc_payx</strong>为该方法<code>抽象接口</code>的名字,抽象接口定义了抽象方法形参的顺序</p>
+</li>
+</ul>
+<h2 id="抽象类的定义"><a href="#抽象类的定义" class="headerlink" title="抽象类的定义"></a>抽象类的定义</h2><p>任何包含了抽象方法的类型都必须用<code>abstract</code>属性声明.此外,既然抽象类型的方法中包含了抽象方法,那么从抽象类型实例化对象就是非法的.</p>
+<p>更进一步,只要是被<code>abstract</code>定义的抽象类型,都不能直接实例化对象.抽象类型没有直接的对象,但是继承抽象类型的子类,通过对抽象方法的重载,可以创建对象</p>
+<p>因此创建指向该抽象类型的指针是合法的,可以通过指针来操作抽象类型的不同子类对象.</p>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">module</span> employee_class</span><br><span class="line"></span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line">    <span class="comment">! 抽象类型的定义</span></span><br><span class="line">    <span class="keyword">type</span>,<span class="keyword">abstract</span>,<span class="keyword">public</span> :: employee</span><br><span class="line">        <span class="keyword">character</span>(len=<span class="number">30</span>)   :: <span class="keyword">name</span></span><br><span class="line">        <span class="keyword">character</span>(len=<span class="number">11</span>)   :: ssn</span><br><span class="line">        <span class="keyword">real</span>(<span class="keyword">kind</span>=<span class="number">8</span>)        :: pay</span><br><span class="line">    <span class="keyword">contains</span></span><br><span class="line">        <span class="comment">! 抽象类型绑定的具体过程</span></span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_employee =&gt; set_employee_sub</span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_name =&gt; set_name_sub</span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: set_ssn =&gt; set_ssn_sub</span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: get_name =&gt; get_name_fn</span><br><span class="line">        <span class="keyword">procedure</span>,<span class="keyword">public</span>    :: get_ssn =&gt; get_ssn_fn</span><br><span class="line">        <span class="comment">! 抽象类型绑定的抽象过程</span></span><br><span class="line">        <span class="keyword">procedure</span>(calc_payx),<span class="keyword">public</span>,<span class="keyword">deferred</span> :: calc_pay</span><br><span class="line">    <span class="keyword">end</span> <span class="keyword">type</span> employee</span><br><span class="line"></span><br><span class="line">    <span class="comment">! 抽象接口的定义</span></span><br><span class="line">    <span class="keyword">abstract</span> <span class="keyword">interface</span></span><br><span class="line">        <span class="keyword">real</span> <span class="function"><span class="keyword">function</span></span> calc_payx( this, hours )</span><br><span class="line">            <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line">            <span class="keyword">class</span>(employee) :: this</span><br><span class="line">            <span class="keyword">real</span>(<span class="keyword">kind</span>=<span class="number">8</span>),<span class="keyword">intent</span>(<span class="keyword">in</span>) :: hours</span><br><span class="line">        <span class="keyword">end</span> <span class="function"><span class="keyword">function</span></span> calc_payx</span><br><span class="line">    <span class="keyword">end</span> <span class="keyword">interface</span></span><br><span class="line"></span><br><span class="line">    <span class="comment">! 限制对实际过程名的访问</span></span><br><span class="line">    <span class="keyword">private</span> :: set_employee_sub, set_name_sub, set_ssn_sub</span><br><span class="line">    <span class="keyword">private</span> :: get_name_fn, get_ssn_fn</span><br><span class="line"></span><br><span class="line"><span class="keyword">contains</span></span><br><span class="line"><span class="comment">! 具体方法的实现</span></span><br><span class="line"><span class="comment">!-------------------------------------------------------------</span></span><br><span class="line"><span class="function"><span class="keyword">subroutine</span></span> set_employee_sub( this, <span class="keyword">name</span>, ssn )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line"><span class="comment">! - inout variables</span></span><br><span class="line">    <span class="keyword">class</span>(employee)     :: this</span><br><span class="line">    <span class="keyword">character</span>(len=<span class="number">30</span>)   :: <span class="keyword">name</span></span><br><span class="line">    <span class="keyword">character</span>(len=<span class="number">11</span>)   :: ssn</span><br><span class="line"><span class="comment">! - local variables</span></span><br><span class="line"></span><br><span class="line">    this%<span class="keyword">name</span> = <span class="keyword">name</span></span><br><span class="line">    this%ssn = ssn</span><br><span class="line"></span><br><span class="line"><span class="keyword">end</span> <span class="function"><span class="keyword">subroutine</span></span> set_employee_sub</span><br><span class="line"><span class="comment">!-------------------------------------------------------------</span></span><br><span class="line"><span class="function"><span class="keyword">subroutine</span></span> set_name_sub( this, <span class="keyword">name</span> )</span><br><span class="line"></span><br><span class="line">    <span class="keyword">implicit</span> <span class="keyword">none</span></span><br><span class="line">    </span><br><span class="line"><span class="keyword">end</span> <span class="function"><span class="keyword">subroutine</span></span> set_name_sub</span><br><span class="line"><span class="comment">!-------------------------------------------------------------</span></span><br><span class="line"><span class="keyword">end</span> <span class="keyword">module</span> employee_class</span><br></pre></td></tr></table></figure>
+<h2 id="抽象类和抽象方法的简单总结"><a href="#抽象类和抽象方法的简单总结" class="headerlink" title="抽象类和抽象方法的简单总结"></a>抽象类和抽象方法的简单总结</h2><ol>
+<li><p>抽象类的所有子类都必须重载超类中所有的抽象方法,否则该子类自己也将是抽象类型.</p>
+</li>
+<li><p>不能从抽象类实例化对象. 抽象类就是为具体子类服务的模板,可以从其具体的子类实例化对象.</p>
+</li>
+<li><p>抽象类定义了可以被其子类使用的<strong>多态行为</strong>的类型,但没有这些行为的具体细节.</p>
+</li>
+<li><p>使用抽象类型来定义顶层的主要类型,使用具体类型来完成抽象类的子类的实现细节.</p>
+</li>
+</ol>
+<h2 id="程序实现多态性的简单总结"><a href="#程序实现多态性的简单总结" class="headerlink" title="程序实现多态性的简单总结"></a>程序实现多态性的简单总结</h2><ol>
+<li><strong>定义一个父类,其中需要包含解决问题的所有方法.</strong></li>
+</ol>
+<p>为了实现多态性,超类需要绑定所有方法,超类中可以定义具体方法,也可以定义抽象方法而在子类中实现具体方法.</p>
+<ol start="2">
+<li><strong>为每一类具体问题定义子类,子类包含了解决某一类问题的方法.</strong></li>
+</ol>
+<p>子类可以定义自己的方法,即在超类中没有定义的,这种方法是对该子类自己的过程的实现.另外子类可以重载超类中的方法,这种方法可以通过超类的指针来引用该方法,实现程序的多态性.</p>
+<ol start="3">
+<li><strong>创建不同子类的对象,并用超类的指针引用它们.</strong></li>
+</ol>
+<p>多态性的实现主要就是从这些重载的具体或者抽象方法上体现出来.超类中被重载的方法可以是抽象的,也可以是具体的.</p>
+]]></content>
+      <categories>
+        <category>Programming</category>
+      </categories>
+      <tags>
+        <tag>fortran</tag>
+        <tag>OOP</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Markdown代码块支持的语言</title>
+    <url>/2019/10/Markdown-Code/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>Markdown支持很对语言的代码高亮格式，这里为了方便查询，将常用的几种整理在此，方便离线时查询。</p>
+<a id="more"></a>
+<h1 id="常用语言"><a href="#常用语言" class="headerlink" title="常用语言"></a>常用语言</h1><table>
+<thead>
+<tr>
+<th>语言</th>
+<th>关键字</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Shell</td>
+<td>bash, shell</td>
+</tr>
+<tr>
+<td>C</td>
+<td>cpp, c</td>
+</tr>
+<tr>
+<td>CSS</td>
+<td>css</td>
+</tr>
+<tr>
+<td>Java</td>
+<td>java</td>
+</tr>
+<tr>
+<td>JavaScript</td>
+<td>js, jscript, javascript</td>
+</tr>
+<tr>
+<td>Python</td>
+<td>py, python</td>
+</tr>
+<tr>
+<td>Objective C</td>
+<td>objc, obj-c</td>
+</tr>
+<tr>
+<td>matlab</td>
+<td>matlab</td>
+</tr>
+<tr>
+<td>Fortran</td>
+<td>fortran</td>
+</tr>
+</tbody></table>
+<h1 id="代码高亮效果"><a href="#代码高亮效果" class="headerlink" title="代码高亮效果"></a>代码高亮效果</h1><ul>
+<li>shell</li>
+</ul>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="built_in">cd</span> ~/Blog</span><br><span class="line">ls -a</span><br><span class="line">hexo init</span><br><span class="line">top &gt; TOP.txt</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>python</li>
+</ul>
+<figure class="highlight python"><table><tr><td class="code"><pre><span class="line"><span class="keyword">from</span> abc <span class="keyword">import</span> ABCMeta, abstractclassmethod</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Pet</span><span class="params">(object, metaclass=ABCMeta)</span>:</span></span><br><span class="line">    <span class="string">"""宠物"""</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">__init__</span><span class="params">(self, nickname)</span>:</span></span><br><span class="line">        self._nickname = nickname</span><br><span class="line"></span><br><span class="line"><span class="meta">    @abstractclassmethod</span></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">make_voice</span><span class="params">(self)</span>:</span></span><br><span class="line">        <span class="string">"""发出声音"""</span></span><br><span class="line">        <span class="keyword">pass</span></span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Dog</span><span class="params">(Pet)</span>:</span></span><br><span class="line">    <span class="string">"""狗"""</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">make_voice</span><span class="params">(self)</span>:</span></span><br><span class="line">        print(<span class="string">'%s: WangWangWang...'</span> % self._nickname)</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Cat</span><span class="params">(Pet)</span>:</span></span><br><span class="line">    <span class="string">"""猫"""</span></span><br><span class="line"></span><br><span class="line">    <span class="function"><span class="keyword">def</span> <span class="title">make_voice</span><span class="params">(self)</span>        :</span></span><br><span class="line">        print(<span class="string">'%s: Miao...Miao...'</span> % self._nickname)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">main</span><span class="params">()</span>:</span></span><br><span class="line">    pets = [Dog(<span class="string">'Wangcai'</span>), Cat(<span class="string">'Kitty'</span>), Dog(<span class="string">'Dahuang'</span>)]</span><br><span class="line">    <span class="keyword">for</span> pet <span class="keyword">in</span> pets:</span><br><span class="line">        pet.make_voice()</span><br><span class="line"></span><br><span class="line"><span class="keyword">if</span> __name__ == <span class="string">"__main__"</span>:</span><br><span class="line">    main()</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>fortran</li>
+</ul>
+<figure class="highlight fortran"><table><tr><td class="code"><pre><span class="line"><span class="keyword">do</span> i=<span class="number">1</span>,<span class="number">100</span></span><br><span class="line"><span class="keyword">do</span> j=<span class="number">1</span>,<span class="number">50</span></span><br><span class="line"><span class="keyword">do</span> k=<span class="number">1</span>,<span class="number">20</span></span><br><span class="line">    xp = x(i,j,k)</span><br><span class="line">    yp = y(i,j,k)</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span>((xp**<span class="number">2</span> + yp**<span class="number">2</span>)&gt;<span class="number">2</span>**<span class="number">2</span>) <span class="keyword">then</span></span><br><span class="line">        fpara(<span class="number">2</span>,i,j,k) = parainflow%U1</span><br><span class="line">        fpara(<span class="number">3</span>,i,j,k) = parainflow%V1</span><br><span class="line">        fpara(<span class="number">4</span>,i,j,k) = parainflow%W1</span><br><span class="line">    <span class="keyword">endif</span></span><br><span class="line"><span class="keyword">enddo</span></span><br><span class="line"><span class="keyword">enddo</span></span><br><span class="line"><span class="keyword">enddo</span></span><br></pre></td></tr></table></figure>
+]]></content>
+      <categories>
+        <category>Markdown</category>
+      </categories>
+      <tags>
+        <tag>programming</tag>
+        <tag>markdown</tag>
+      </tags>
+  </entry>
+  <entry>
+    <title>Hexo + GitHub 搭建个人博客记录（基本设置）</title>
+    <url>/2019/10/Hexo-Setup/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>记录搭建个人博客的主要过程。软件和插件的下载、安装等都由脚本按顺序完成，这里主要记录一些具体的细节设置。</p>
+<a id="more"></a>
+
+<h1 id="基本设置的简单脚本文件"><a href="#基本设置的简单脚本文件" class="headerlink" title="基本设置的简单脚本文件"></a>基本设置的简单脚本文件</h1><figure class="highlight bash"><table><tr><td class="code"><pre><span class="line"><span class="meta">#!/bin/bash</span></span><br><span class="line">BLOG=~/Blog</span><br><span class="line">THEM=<span class="variable">$BLOG</span>/themes</span><br><span class="line"></span><br><span class="line"><span class="comment"># 初始化Hexo网站</span></span><br><span class="line">[ $? -eq 0 ] &amp;&amp; hexo init <span class="variable">$BLOG</span></span><br><span class="line">[ $? -eq 0 ] &amp;&amp; <span class="built_in">cd</span> <span class="variable">$BLOG</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"++++++++++++++"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Blog is inited"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"++++++++++++++"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 删除原来的主题，下载next主题</span></span><br><span class="line">[ $? -eq 0 ] &amp;&amp; rm -rf <span class="variable">$THEM</span>/* </span><br><span class="line">[ $? -eq 0 ] &amp;&amp; git <span class="built_in">clone</span> https://github.com/theme-next/hexo-theme-next <span class="variable">$THEM</span>/next</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"++++++++++++++++++++++++++"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Themes is changed to next"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"++++++++++++++++++++++++++"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装相应的插件</span></span><br><span class="line">[ $? -eq 0 ] &amp;&amp; npm install hexo-deployer-git --save           <span class="comment"># 远端部署插件</span></span><br><span class="line">[ $? -eq 0 ] &amp;&amp; npm install hexo-symbols-count-time --save     <span class="comment"># 字数统计插件</span></span><br><span class="line">[ $? -eq 0 ] &amp;&amp; npm install hexo-generator-searchdb --save     <span class="comment"># 内容搜索插件</span></span><br><span class="line">[ $? -eq 0 ] &amp;&amp; npm install hexo-math --save                   <span class="comment"># 数学公式插件</span></span><br><span class="line">[ $? -eq 0 ] &amp;&amp; npm install hexo-asset-image --save            <span class="comment"># 图片引用插件</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"+++++++++++++++++++++"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Plugins are installed"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"+++++++++++++++++++++"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 安装nest特效</span></span><br><span class="line">[ $? -eq 0 ] &amp;&amp; <span class="built_in">cd</span> <span class="variable">$THEM</span>/next</span><br><span class="line">[ $? -eq 0 ] &amp;&amp; git <span class="built_in">clone</span> https://github.com/theme-next/theme-next-canvas-nest <span class="built_in">source</span>/lib/canvas-nest</span><br><span class="line">[ $? -eq 0 ] &amp;&amp; <span class="built_in">cd</span> <span class="variable">$THEM</span>/next/<span class="built_in">source</span>/lib/canvas-nest</span><br><span class="line">[ $? -eq 0 ] &amp;&amp; git pull</span><br><span class="line"><span class="built_in">echo</span> <span class="string">"+++++++++++++++++"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"Nest is installed"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"+++++++++++++++++"</span></span><br><span class="line"></span><br><span class="line"><span class="comment"># 恢复原来保存的设置,覆盖相应文件</span></span><br><span class="line">[ $? -eq 0 ] &amp;&amp; cp -rf ~/Nutstore/03-博客设置/Guanqingdi/* <span class="variable">$BLOG</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"+++++++++++++++++++++++++++++++++++++++++++"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"The original settings have been overwritten"</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"+++++++++++++++++++++++++++++++++++++++++++"</span></span><br><span class="line"></span><br><span class="line"><span class="built_in">echo</span> <span class="string">"-----------------THE END-------------------"</span></span><br></pre></td></tr></table></figure>
+
+<h1 id="个人设置的基本步骤"><a href="#个人设置的基本步骤" class="headerlink" title="个人设置的基本步骤"></a>个人设置的基本步骤</h1><p>记录个人设置的步骤,保证能够复现曾经的设置.</p>
+<ol>
+<li>创建 <code>~/Blog</code> 文件夹以放置博客文件,文件夹的路径本身没有什么特殊要求</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash">mkdir Blog</span></span><br></pre></td></tr></table></figure>
+
+<ol start="2">
+<li>直接执行 <code>Hexo_Setup.sh</code> 脚本文件</li>
+</ol>
+<figure class="highlight shell"><table><tr><td class="code"><pre><span class="line"><span class="meta">$</span><span class="bash">./Hexo_Setup.sh</span></span><br></pre></td></tr></table></figure>
+
+<ol start="3">
+<li>将原来写好的markdown文件复制到 <code>source/_posts</code> 文件夹</li>
+</ol>
+<h1 id="头部顶栏背景图片设置"><a href="#头部顶栏背景图片设置" class="headerlink" title="头部顶栏背景图片设置"></a>头部顶栏背景图片设置</h1><h2 id="图片位置"><a href="#图片位置" class="headerlink" title="图片位置"></a>图片位置</h2><p>目前图片放置在source目录下的images文件夹中，图片命名为header_background.jpg </p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Blog/<span class="built_in">source</span>/images/header_background.jpg</span><br></pre></td></tr></table></figure>
+
+<h2 id="背景设置"><a href="#背景设置" class="headerlink" title="背景设置"></a>背景设置</h2><p>header栏的修改在next主题下的source文件夹，具体的路径为</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">Blog/themes/next/<span class="built_in">source</span>/css/_common/outline/header/_header.styl</span><br></pre></td></tr></table></figure>
+
+<p>将原来默认的背景颜色修改为图片的路径，格式如下：</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">.header &#123; <span class="attr">background</span>: url(<span class="string">'../images/header_background.jpg'</span>); &#125;</span><br></pre></td></tr></table></figure>
+
+<p>保存即可在header栏增加图片背景。</p>
+<h1 id="其他细节配置"><a href="#其他细节配置" class="headerlink" title="其他细节配置"></a>其他细节配置</h1><h2 id="添加文章结束标记"><a href="#添加文章结束标记" class="headerlink" title="添加文章结束标记"></a>添加文章结束标记</h2><p>在主题配置文件中取消相应的注释</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">postBodyEnd: source/_data/post-body-end.swig</span><br></pre></td></tr></table></figure>
+
+<p>在路径 /source/_data 下创建/修改 post-body-end.swig文件，并添加以下内容</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">&lt;div&gt;</span><br><span class="line">    &#123;% <span class="keyword">if</span> not is_index %&#125;</span><br><span class="line">        &lt;div style=<span class="string">"text-align:center;color: #ccc;font-size:14px;"</span>&gt;-------------本文结束&lt;i <span class="class"><span class="keyword">class</span></span>=<span class="string">"fa fa-paw"</span>&gt;<span class="xml"><span class="tag">&lt;/<span class="name">i</span>&gt;</span></span>感谢您的阅读-------------<span class="xml"><span class="tag">&lt;/<span class="name">div</span>&gt;</span></span></span><br><span class="line">    &#123;% endif %&#125;</span><br><span class="line">&lt;<span class="regexp">/div&gt;</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="修改文章页面宽度"><a href="#修改文章页面宽度" class="headerlink" title="修改文章页面宽度"></a>修改文章页面宽度</h2><p>打开 <code>themes/next/source/css/_variables/base.styl</code> , 找到以下字段并修改为合适的宽度:</p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line">content-desktop-large = <span class="number">1000</span>px</span><br></pre></td></tr></table></figure>
+
+<h2 id="更改标签云（tagcloud）颜色"><a href="#更改标签云（tagcloud）颜色" class="headerlink" title="更改标签云（tagcloud）颜色"></a>更改标签云（tagcloud）颜色</h2><p>与以前不同，当前版本标签的设置在主题配置文件 <code>_config.yml</code> 中，具体修改如下：</p>
+<figure class="highlight"><table><tr><td class="code"><pre><span class="line"># TagCloud settings for tags page.</span><br><span class="line">tagcloud:</span><br><span class="line">    # All values below are same as default, change them by yourself</span><br><span class="line">    min: 15 # Minimun font size in px</span><br><span class="line">    max: 30 # Maxium font size in px</span><br><span class="line">    start: "#9733EE" # Start color (hex, rgba, hsla or color keywords)</span><br><span class="line">    end: "#FF512F" # End color (hex, rgba, hsla or color keywords)</span><br><span class="line">    amount: 500 # Amount of tags, change it if you have more than 200 tags</span><br></pre></td></tr></table></figure>
+
+<h2 id="修改文章底部带-号的标签"><a href="#修改文章底部带-号的标签" class="headerlink" title="修改文章底部带#号的标签"></a>修改文章底部带#号的标签</h2><p>当前版本下，只需要将主题配置文件 <code>_config.yml</code> 中 <code>tag_icon</code> 改为 <code>true</code></p>
+<figure class="highlight js"><table><tr><td class="code"><pre><span class="line"># Use icon instead of the symbol # to indicate the tag at the bottom of the post</span><br><span class="line">tag_icon: <span class="literal">true</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="图标的选择"><a href="#图标的选择" class="headerlink" title="图标的选择"></a>图标的选择</h2><p>在主题部分位置可能有图标的选择，例如在侧边栏中设置社交链接时</p>
+<figure class="highlight css"><table><tr><td class="code"><pre><span class="line"><span class="selector-tag">social</span>:</span><br><span class="line">    GitHub: https://github.com/guanqingdi || github</span><br><span class="line">    <span class="selector-tag">E-Mail</span>: <span class="selector-tag">mailto</span><span class="selector-pseudo">:guanqingdi</span>@<span class="keyword">qq</span>.<span class="keyword">com</span> || envelope</span><br><span class="line">    Weibo: https://weibo.com/u/<span class="number">5770863755</span>/home?wvr=<span class="number">5</span> || weibo</span><br></pre></td></tr></table></figure>
+
+<p>其中 <code>||</code> 后面的 <strong>github, envelope, weibo</strong> 等即是图标的名称，图标的选择可以直接到 <a href="https://www.bootcss.com/p/font-awesome/" target="_blank" rel="noopener">Font Awesome</a> 中选择喜欢的图标，复制其名字即可替换现有的图标</p>
+<h1 id="数学公式支持"><a href="#数学公式支持" class="headerlink" title="数学公式支持"></a>数学公式支持</h1><h2 id="基本设置"><a href="#基本设置" class="headerlink" title="基本设置"></a>基本设置</h2><p>数学公式支持也是比较简单,首先要现在安装math插件</p>
+<figure class="highlight bash"><table><tr><td class="code"><pre><span class="line">npm install hexo-math --save</span><br></pre></td></tr></table></figure>
+
+<p>然后在next主题目录下的配置文件_config.yml下按照相应提示设置即可</p>
+<figure class="highlight yaml"><table><tr><td class="code"><pre><span class="line"><span class="comment"># Math Formulas Render Support</span></span><br><span class="line"><span class="attr">math:</span></span><br><span class="line">  <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># Default (true) will load mathjax / katex script on demand.</span></span><br><span class="line">  <span class="comment"># That is it only render those page which has `mathjax: true` in Front-matter.</span></span><br><span class="line">  <span class="comment"># If you set it to false, it will load mathjax / katex srcipt EVERY PAGE.</span></span><br><span class="line">  <span class="attr">per_page:</span> <span class="literal">false</span></span><br><span class="line"></span><br><span class="line">  <span class="comment"># hexo-renderer-pandoc (or hexo-renderer-kramed) required for full MathJax support.</span></span><br><span class="line">  <span class="attr">mathjax:</span></span><br><span class="line">    <span class="attr">enable:</span> <span class="literal">true</span></span><br><span class="line">    <span class="comment"># See: https://mhchem.github.io/MathJax-mhchem/</span></span><br><span class="line">    <span class="attr">mhchem:</span> <span class="literal">false</span></span><br></pre></td></tr></table></figure>
+
+<h2 id="公式简单示意"><a href="#公式简单示意" class="headerlink" title="公式简单示意"></a>公式简单示意</h2><h3 id="行内公式"><a href="#行内公式" class="headerlink" title="行内公式"></a>行内公式</h3><p>行内的公式用单$将公式前后包起来: <code>$公式内容$</code> , 在公式中右键即可查看公式的 TEX 代码.<br>行内公式简单应用,变量 $a$ 和 变量 $b$ 的 函数 $ g(a,b) = a^2 + a / b * exp (a/b) $</p>
+<h3 id="多行公式"><a href="#多行公式" class="headerlink" title="多行公式"></a>多行公式</h3><p>多行公式用双$$将公式前后包起来: <code>$$公式内容$$</code>.</p>
+<ol>
+<li>多行公式</li>
+</ol>
+<p>$$<br>\begin{equation} \sum_{k=1}^{n} \frac{1}{1+8 \sin ^{2} \frac{k \pi}{n}}=\frac{n\left(2^{n}+1\right)}{3\left(2^{n}-1\right)} \end{equation}<br>$$</p>
+<ol start="2">
+<li>平方根与指数</li>
+</ol>
+<p>$$<br>\sqrt{x^{2a}+\sqrt{y}}<br>$$</p>
+<h1 id="致谢"><a href="#致谢" class="headerlink" title="致谢"></a>致谢</h1><p>该博客的设置以及风格,大部分是抄了<a href="https://yangbingdong.com/" target="_blank" rel="noopener">ookamiAntD大神</a> 的Blog,在此感谢大神详细的文档说明.</p>
+]]></content>
+      <categories>
+        <category>Hexo</category>
+      </categories>
+      <tags>
+        <tag>gexo</tag>
+        <tag>gitHub</tag>
+        <tag>bash</tag>
+      </tags>
+  </entry>
+</search>

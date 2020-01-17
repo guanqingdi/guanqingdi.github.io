@@ -1,0 +1,645 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="alternate" href="/atom.xml" title="过河卒" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://guanqingdi.github.io').hostname,
+    root: '/',
+    scheme: 'Muse',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="最小的湍流长度尺度是kolmogorov尺度$\eta$$$ \eta = (\nu^3 &#x2F; \epsilon)^{1&#x2F;4} $$其中$\nu$为动力黏度,$\epsilon$为湍动能耗散率,耗散率由下式进行近似$$\epsilon = u_{rms}^3 &#x2F; L$$其中$u_{rms}$为湍流脉动速度,$L$为湍流积分长度尺度">
+<meta property="og:type" content="article">
+<meta property="og:title" content="空间混合层">
+<meta property="og:url" content="https:&#x2F;&#x2F;guanqingdi.github.io&#x2F;2019&#x2F;12&#x2F;%E7%A9%BA%E9%97%B4%E6%B7%B7%E5%90%88%E5%B1%82&#x2F;index.html">
+<meta property="og:site_name" content="过河卒">
+<meta property="og:description" content="最小的湍流长度尺度是kolmogorov尺度$\eta$$$ \eta = (\nu^3 &#x2F; \epsilon)^{1&#x2F;4} $$其中$\nu$为动力黏度,$\epsilon$为湍动能耗散率,耗散率由下式进行近似$$\epsilon = u_{rms}^3 &#x2F; L$$其中$u_{rms}$为湍流脉动速度,$L$为湍流积分长度尺度">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-01-11T01:39:20.656Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://guanqingdi.github.io/2019/12/%E7%A9%BA%E9%97%B4%E6%B7%B7%E5%90%88%E5%B1%82/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>空间混合层 | 过河卒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">过河卒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">朝廷鹰犬，反贼先锋</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://guanqingdi.github.io/2019/12/%E7%A9%BA%E9%97%B4%E6%B7%B7%E5%90%88%E5%B1%82/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Guan Qingdi">
+      <meta itemprop="description" content="日常 | 湍流 | PDF | 燃烧 | 码渣">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="过河卒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          空间混合层
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-12-07 18:47:54" itemprop="dateCreated datePublished" datetime="2019-12-07T18:47:54+08:00">2019-12-07</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-11 09:39:20" itemprop="dateModified" datetime="2020-01-11T09:39:20+08:00">2020-01-11</time>
+              </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>9.8k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>16 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <a id="more"></a><p>最小的湍流长度尺度是kolmogorov尺度$\eta$</p><p>$$ \eta = (\nu^3 / \epsilon)^{1/4} $$</p><p>其中$\nu$为动力黏度,$\epsilon$为湍动能耗散率,耗散率由下式进行近似</p><p>$$\epsilon = u_{rms}^3 / L$$</p><p>其中$u_{rms}$为湍流脉动速度,$L$为湍流积分长度尺度</p><a id="more"></a>
+
+
+
+
+
+
+<p>最小的标量尺度是Batchelor尺度$$</p>
+<p>$$\lambda_B = (\nu k^2/\epsilon)^{1/4}=\eta/(Sc)^{1/2}$$</p>
+<p>$Sc$为施密特数,一般假设为1?我们的程序里都是假设为0.74.如果假设为1,那么Batchelor尺度约等于湍流耗散尺度.</p>
+<h2 id="Ferrer-反应混合层"><a href="#Ferrer-反应混合层" class="headerlink" title="Ferrer 反应混合层"></a>Ferrer 反应混合层</h2><h3 id="翻译"><a href="#翻译" class="headerlink" title="翻译"></a>翻译</h3><h4 id="文献综述部分"><a href="#文献综述部分" class="headerlink" title="文献综述部分"></a>文献综述部分</h4><p>剪切混合物层是自由剪切流的一个例子，已经成为许多实验，理论以及数值性质研究的一部分。最初的作品致力于不可压缩的混合层。这些研究包括Spencer＆Jones（1971）[156]，Brown＆Roshko（1974）[21]和Dimotakis＆Brown（1976）[39]的著作。这些研究集中于剪切层的结构及其对混合物的影响。 Bell＆Mehta（1990）后来报道了以混合层的线性增长和平均量的归一化轮廓重叠为特征的自相似状态的研究[12]。</p>
+<p><strong>基于线性和非线性不稳定性理论以及直接数值模拟的数值研究表明，不可压缩状态（对流马赫数Mc &lt;0.4）和可压缩状态（Mc &lt;0.6）之间存在重要差异。在第一种情况下，开尔文-亥姆霍兹类型的流中二维不稳定性占主导地位，而在可压缩状态下，倾斜的不稳定性波似乎会产生三维结构[32、33、48、80， 108，134]。</strong>这两种行为已通过不同的研究实验性验证[17，29，45，141]</p>
+<p>惯性和反应性可压缩二维混合物层的大量模拟已经进行。其中大多数是相当古老的模拟，很大程度上受当时计算机的计算能力限制。惰性案件的一些例子是：柏忌[16]和斯坦利和萨卡[157]。这些二维模拟还受到缺乏大规模方向的限制，与实验研究相比，其中一些数量被高估了。反应性二维剪切混合物层的模拟也是许多论文和出版物的主题。<br>[32、113、135、148、159、160、172]。这些研究中的大多数提出了关于反应机理的简化。因此，这些模拟有时仅限于无限快的化学反应[32、113]，或者仅限于仅一步反应的化学反应[148]。</p>
+<p>显着的结果表明，<strong>通过化学反应，混合物层的生长速度大大降低，并且随着温度的升高或温度的降低，诱导长度的减少。氧化剂的流动速度。</strong></p>
+<p>用于描述化学动力学的简化假设与超音速燃烧过程不兼容，超音速燃烧过程的化学特征时间可能与流动的特征时间处于相同数量级。例如，当使用全局化学方法模拟空气-氢分布的超音速火焰，例如Cheng等人的火焰时，就会获得异常的组分浓度[56]。 [28]。<strong>用有限化学方法对二维混合物层进行的模拟突出显示了扩散火焰在由大涡结构形成的位于燃料侧的孤立气穴中的燃烧</strong>[159]。由氮的质量分数计算得出的混合物层生长速率的增加归因于燃烧产生的热膨胀[160]。</p>
+<p>最后，二维近似（不包括涡旋拉伸）已知会高估可变密度湍流火焰中的斜压效应[113]。显然，由化学反应产生的热量的释放导致密度的降低，运动粘度的提高，并因此导致流体动力学与化学动力学之间的耦合。因此，由混合区域中的温度升高引起的流体膨胀可以有助于混合层的生长速率的增长，这似乎是合乎逻辑的。</p>
+<p>在不可压缩饮食中，进行实验研究.为了降低流体动力学对混合物和反应速率的影响，我们以较低的放热速率进行了研究[19，115]。这些结果表明，由于存在三维涡旋结构（纵向涡旋和涡旋涡旋的组合），三维效应促进了反应产物的增加。还进行了其他具有较高放热水平的实验研究[73，107]。这些研究致力于燃烧对生长速率的影响以及该问题的发展，例如安装合适的几何体。这项工作中设想的冲击与混合层之间的相互作用已成为各种数值研究的主题[24、27]，这些研究证实了该方法在实际情况下的良好性能。也已经报道了入射冲击和混合层之间相互作用对燃烧的影响[159]。</p>
+<p>本章专门研究惰性和反应性二维可压缩混合物的层，主要有两个目标。首先，可以将本文框架内开发的计算工具获得的惰性和反应性二维混合物层空间发展的结果与文献中已报道的结果进行比较。但是，三维模拟对于捕获湍流的级联过程至关重要。因此，本节的第二个目的是将与二维混合物层相关的现象学与三维层的现象学联系起来。此<br>本章组织如下。 5.2节回顾了混合层的一般特性。第5.3节介绍了不可压缩空气混合物层的参考案例。 5.4节讨论了具有不同对流马赫数的惰性可压缩混合物层的研究，而5.6节讨论了等效的反应模拟。最后，第5.9节分析了对混合层和最终混合层发展的影响。<br>本节介绍了最重要的结果。</p>
+<h4 id="混合层一般性质"><a href="#混合层一般性质" class="headerlink" title="混合层一般性质"></a>混合层一般性质</h4><p>图5.1示出了示意性的剪切层1的几何形状在空间上开发从两个平行的流动。 在分离板之后，剪切层的纵向速度分布通常由双曲正切[16、123、148、157]模化.</p>
+<p>$$<br>u_{1}=\frac{U_{1}+U_{2}}{2}+\frac{U_{1}-U_{2}}{2} \tanh \left(\frac{2 x_{2}}{\delta_{\omega, 0}}\right)<br>$$</p>
+<p>其中U1和U2分别是快慢两股流动的速度(U1&gt; U2)。 变量$δω0≡δω（x = 0）$是指混合层的初始涡旋厚度。该厚度从该关系式计算</p>
+<p>$$<br>\delta_{\omega}=\frac{U_{1}-U_{2}}{\left|\partial\left\langle u_{1}\right\rangle_{f} / \partial x_{2}\right|_{\max }}<br>$$</p>
+<p>涡的厚度可以具有不同的定义，由于涡量和动量厚度的定义在文献中大量使用</p>
+<p>$$<br>\delta_{\theta}=\frac{1}{\rho_{0} \Delta U^{2}} \int_{-\infty}^{+\infty}\langle\rho\rangle\left(U_{1}-\left\langle u_{1}\right\rangle_{f}\right)\left(\left\langle u_{1}\right\rangle_{f}-U_{2}\right) \mathrm{d} x_{2}<br>$$</p>
+<p>其中 $\rho_0$ 是输入处两个平行流的平均密度。 将定义（5.2）和（5.5）用作剪切层的特征长度，将 $∆U = U1-U2$ 用作参考速度，将 $\rho_0$ 用作参考密度。 在纵向速度分布由关系（5.1）给出的情况下，即双曲正切，初始厚度验证关系</p>
+<p>$$<br>\delta_{\omega_0} = 4\delta_{\theta_0}<br>$$</p>
+<p>空间混合层涡旋厚度的增长率由下式给出：</p>
+<p>$$<br>\delta_{\omega}^{\prime}=\frac{1}{\eta} \frac{\mathrm{d} \delta_{\omega}}{\mathrm{d} x_{1}}<br>$$</p>
+<p>其中 $\eta=(U_1-U_2)/(U_1+U_2)$, 对于基于混合层随时间变化的近似模拟，将该增长率定义为</p>
+<p>$$<br>\delta_{\omega, t}^{\prime}=\frac{1}{\Delta U} \frac{\mathrm{d} \delta_{\omega}}{\mathrm{d} t}=\frac{4}{\delta_{\omega, 0}} \frac{\mathrm{d} \delta_{\omega}}{\mathrm{d} \tau}<br>$$</p>
+<p>$τ= 4∆Ut/δ_{ω_0}$。假定$Uc =(U1 + U2)/2$，这些关系验证</p>
+<p>$$<br>\delta_{\omega}^{\prime}=\frac{1}{\eta} \frac{\mathrm{d} \delta_{\omega}}{\mathrm{d} x_{1}}=\frac{1}{\eta} \frac{\mathrm{d} t}{\mathrm{d} x_{1}} \frac{\mathrm{d} \delta_{\omega}}{\mathrm{d} t}=\frac{2}{\Delta U} \frac{\mathrm{d} \delta_{\omega}}{\mathrm{d} t}=2 \delta_{\omega, t}^{\prime}<br>$$</p>
+<p>可以将相同的推理应用于动量厚度的增长率的定义。</p>
+<p>基于涡度厚度的雷诺数定义为</p>
+<p>$$<br>R e_{\omega}=\frac{\rho_{0} \Delta U \delta_{\omega}}{\mu_{0}}<br>$$</p>
+<p>其中考虑了动力粘度的平均值。 雷诺数和特征厚度的定义用于确定混合层的尺寸。</p>
+<p>Papamoschou＆Roshko [126]在他们的实验研究中定义了一个基准，以测量剪切层的可压缩性。 它是不同于实验室的伽利略参考系，以大型湍流结构Uc的速度移动。 在此坐标系中，每个流的对流马赫数定义为</p>
+<p>$$<br>M_{c_1} = \frac{U_1 - U_c}{c_1}<br>$$</p>
+<p>$$<br>M_{c_2} = \frac{U_c - U_2}{c_2}<br>$$</p>
+<p>其中c1和c2是每个流中的声速。 在Mc1和Mc2的数量不够高并且每种流的比热比保持相同的情况下，即γ1=γ2，Papamoschou和Roshko已经证明了这种关系</p>
+<p>$$<br>U_c = \frac{c_1 U_1 + c_2 U_2}{c_1 + c_2}<br>$$</p>
+<p>可以将公式（5.11）替换为（5.10），以获得剪切层的对流马赫数</p>
+<p>$$ M_c = \frac{\Delta U}{c_1 + c_2}$$</p>
+<p>即使在每个流中的比热γ的比率不同时，关系式（5.12）也将始终用于该工作。 这种选择的原因在参考文献[70]中是合理的，在该文献中表明，由于γ的变化而导致的对流马赫数的变化对于该值的相当宽的范围仍然受到限制。 尤其是，对于Mc∈[0，3]和γ∈[1.1，1.6]，此差异仍小于12％。 此外，方程（5.12）在文献中非常常用于每种流中比热比不同的情况[27、33、110、124、148、154]。</p>
+<p>通过方程（5.12）测得的可压缩性对混合层生长速率的影响可以与每种流动速度之比r = U2 / U1和密度比s =ρ2/ρ1。为此，通过具有相同速度和密度比的不可压缩混合物层的生长率来归一化可压缩混合物层的生长率。归一化之后，当将它们绘制为对流马赫数的函数时，增长率围绕一条曲线聚集。这种行为的一个例子在“有角度的实验曲线”中得到了说明，该曲线是从在几个空气-空气剪切层上进行的实验汇编中获得的。该曲线表明，<strong>随着对流马赫数的增加，增长率降低。因此，可压缩性表现为混合层的稳定机制，可减弱二维Kelvin-Helmholtz结构的不稳定模式，并有利于斜向不稳定模式的发展[48]。因此，可压缩的剪切层比不可压缩的剪切层具有更多的三维无序结构[55]。</strong></p>
+<p>速度和密度比对混合物层生长速率的影响在可压缩和不可压缩状态下实际上相似。 特别是，<strong>当最快的流量中存在最重的气体时，增长率会降低;如果最慢的流量中存在最重的气体，则增长率会提高[21]</strong>。 另外，增长率随着速度比U2 / U1的减小而增加，例如随着速度差U1和U2的增加而增加。</p>
+<h4 id="不可压二维混合层"><a href="#不可压二维混合层" class="headerlink" title="不可压二维混合层"></a>不可压二维混合层</h4><p>本节专门通过不可压缩混合物层的数值模拟研究，以确定其主要空气动力学特性。这些结果的数值验证将可以解决更复杂的情况。<br>这里提出的混合层配置与Bogey [16]提出的非常相似。每个流的速度设置为U1 = 100 m / s和U2 = 50 m / s，初始涡旋厚度设置为δω0= 1.6×10-3 m。初始雷诺数固定为Reω0= 5333，对流马赫数为Mc = 0.074。因此，由于对流马赫数非常低，因此它是不可压缩的混合物层。计算域的尺寸为L1 =320δω0和L2 =198δω0。利用1000个计算点和恒定的网格∆x1 =0.32δω0，该场在纵向上均匀离散。在横向方向上，网格从域的中心开始以1.8％的速率逐渐拉伸，其中网格尺寸固定为∆x2 =0.16δω0。在计算域的入口处，将施加Dirichlet类型条件，并在域的底部和顶部的输出处使用非反射条件。为了初始化计算，在压力p = 1 bar下，由密度为ρ= 1.22 kg / m3的氧气-氮气混合物（21％O2 + 79％N2）定义空气。纵向速度遵循双曲正切轮廓（5.1），而横向速度固定为零。为了激发K-H不稳定性，在$(x_{1,0},x_{2,0}）=(4δ_{ω0}，0)$处的横向速度分量添加如下式的随机扰动</p>
+<p>$$<br>v_{p}=\varepsilon \alpha U_{c} \exp \left(-\frac{\left(x_{1}-x_{1,0}\right)^{2}+\left(x_{2}-x_{2,0}\right)^{2}}{\Delta x_{0}^{2}}\right)<br>$$</p>
+<p>量ε表示-1和+1之间的随机数，α和∆x0分别是扰动的幅度和大小。在此仿真中，α=2×10-3和∆x0 =δθ0。根据Bogey [16]的说法，这种扰动旨在触发混合层的自然发展。 Stanley＆Sarkar [157]研究了不同扰动对混合层发展的影响。某些类型的强迫会导致与随机干扰（即白噪声）有关的不稳定性的早期触发。这些扰动有助于在显影的第一阶段人为地增加混合物层的生长速率，并且在一定距离之后，生长速率的斜率松弛以达到更接近于扰动所获得的值。随机的。本工作中提出的模拟仅使用随机扰动。这种类型的扰动还将用于研究可压缩性效应和热量产生速率对混合物层过渡的影响。使用分子运输的术语的简化描述，0.75的CFL和等于0.1的傅立叶数进行计算。</p>
+<p>图5.2显示了稳态时的涡度等值线和平均纵向速度。旋涡结构的出现在x1 =60δω0附近发生，这与柏忌的结果非常吻合。以随机方式形成的涡流有助于层的扩展，这由平均纵向速度的等值线的规则形状验证</p>
+<p>如图5.3所示，旋涡厚度和动量厚度的空间演变使得可以获得有关该剪切层的定量数量。在几乎为零增长的第一阶段之后，这两个量从x1 =50δω0线性增加。这种增长的线性特征已经在一些实验和数值研究中得到了报道（见表5.1）。在这项研究中，$η^{−1} dδω/dx1$的值等于0.166，这与表5.1中所示的不同参考一致。</p>
+<p>研究的另一个重要方面涉及平均纵向速度横向轮廓的自相似性以及从雷诺应力张量推导出的均方根速度轮廓（均方根）。图5.4（a）证实了在不同横坐标$x1^*≡x1/δω0$处绘制的平均纵向速度曲线的自相似性。从雷诺应力张量推导出的均方根速度曲线的相似性，图5.4（b）–5.4（d),是从x1≈100δω0获得的。<br>均方根速度的最大值已在表5.1中分组，以便将其与其他实验和数值研究进行比较。</p>
+<p>r11 = q | hu0 1u0 1i | / ∆U的最大值比使用其他二维数值模拟获得的值略高。但是，与这些三维模拟相比，r12 = q | hu0 1u0 2i | / ∆U的最大值仍然较低，但大于三维模拟或实验研究确定的最大值，因为<strong>湍动能在二维情况下被高估了</strong>。</p>
+<p>在此给出的结果与其他先前研究得出的结果之间取得了良好的一致性，从而有可能在数值上验证不可压缩混合物层数值模拟的计算代码的良好性能。在下文中，将讨论惰性和反应性可压缩二维混合物层的研究。</p>
+<h4 id="惰性可压缩混合层"><a href="#惰性可压缩混合层" class="headerlink" title="惰性可压缩混合层"></a>惰性可压缩混合层</h4><p>下面将要研究的混合物对应于与高速推进系统[28、110、148]有关的实验和数值研究，例如冲压喷气发动机和超燃冲压发动机。</p>
+<h5 id="混合物的描述"><a href="#混合物的描述" class="headerlink" title="混合物的描述"></a>混合物的描述</h5><p>鉴于其单位质量的能量高，由于氢气的自燃时间短，因此它是此类系统的首选燃料。为了减轻航空结构的重量，超燃冲压发动机的长度保持相当有限，并且燃烧室内的特征混合时间可以与氢-空气混合物的化学反应时间处于相同的数量级，这可以减少大大提高了燃烧效率。这些推进系统的发展为湍流剪切流开辟了一个新的研究领域，其目的是了解可压缩性显着影响混合和燃烧的基本机理。</p>
+<p>米勒等人的实验配置。 [110]用于研究可压缩性在反应性湍流剪切层中的影响，它由四个主要部分组成：陈旧的空气发生器系统，燃料喷射系统，测试室和系统放电。燃料流由用氮气（或氦气）稀释的氢气混合物组成，而废气流是由富氧空气中氢气的预燃烧产生的。在Miller等人的工作中，混合物层的放热率水平不足以改变大规模的结构，因此，在相同的可压缩性水平下，它们仍与惰性层相似。</p>
+<p>由于这项研究的目的之一是研究湍流剪切流的自燃现象，因此我们认为其构型与Miller等人的构型略有不同，总结于表5.2。这种混合配置用于惰性和反应性剪切层。表5.2的最后四列分为两组，以便将使用单个反应步骤的动力学方案（“整体化学”，CG）与使用具有几个基本反应的详细动力学方案的“数值模拟”（“详细化学”，CD）。如[110]中所建议的，氧化剂流（陈旧的空气）中存在的自由基的影响是不可忽略的，对于具有详细化学性质的数值模拟，必须予以考虑。为此，已经使用CHEMKIN库[86]进行了余额计算。这些计算使得可以确定化学平衡时给定混合物的组成，绝热温度以及自燃时间。根据Miller等人测量的实验数据，可以计算化学平衡时自由基的质量分数。表5.2中报告了这些数量的近似值。</p>
+<p>图5.5（a）显示了绝热平衡温度与混合比的关系</p>
+<p>$$<br>z=\frac{1}{1+\phi}\left(\phi \frac{Y_{C}}{Y_{C, c}}-\frac{Y_{O}}{Y_{O, o}}+1\right)<br>$$</p>
+<p>其中YC和YO分别是燃料和氧化剂的质量分数。 量YC，c是燃料侧燃料的质量分数，而Yo，o表示与氧化剂相同的量。 混合物的浓度为定义为</p>
+<p>$$<br>\phi=\frac{\nu_{O} W_{O}}{\nu_{C} W_{C}} \frac{Y_{C, c}}{Y_{O, o}}<br>$$</p>
+<p>将这项工作中使用的混合物结构的绝热平衡温度与文献中使用的各种混合物进行了比较：Miller等。 [110]，Cheng等。 [28]和Sekar＆Mukunda [148]。对应于最大放热速率的该温度用作混合物层中预期的最大温度水平的估计。在Miller等人的配置中，平衡绝热温度仍然低于陈旧空气（z = 0），这解释了作者观察到的结果，如上所述。在Cheng等人的实验配置中，由于燃烧引起的影响相对较大，将温度升高至接近化学计量比的2700 K（zst = 0.41）。</p>
+<p>最后，与Sekar＆Mukunda进行的数值模拟相对应的曲线显示出更大的影响。与这项工作中使用的配置相对应的曲线位于中间区域。使用与Miller等人相同的组成获得这种配置。和相同的陈旧气流温度（z = 0）。在燃料侧（z = 1），545 K的温度对应于Cheng等人测量的温度。与Miller等人的配置相比，氢气的质量分数降低了一半。这种选择可以使混合物的最高绝热温度足够高，从而在一定范围内产生较大的变化成分和温度值与当前的测试台兼容。</p>
+<p>图5.5（b）显示了为上述两种动力学方案选择的混合物构型中的预期自燃时间。全球化学（CG）的计算是根据Marinov等人的全球反应机制进行的。 [102]由一个单一的全球反应和4个物种组成，而详细化学（CD）的计算是根据ÓConaire等人的机制进行的。 [119]由21个基本反应和9个种类组成。总体图显示了最短的周转时间。在详细的图表中，氧化剂流中自由基（陈旧空气）的存在会减少自燃时间，同时会增加易燃区的范围。但是，自燃时间仍大于从整体反应机理获得的时间。根据这些结果，在不考虑自由基（清洁空气）存在的情况下，采用详细的化学方法进行的反应性数值模拟被证明是非常昂贵的，甚至是不切实际的，因为要达到有利于条件的计算域的尺寸混合物的自燃将非常重要。</p>
+<p>下面将使用表5.2中报告的混合物的结构来计算不同对流马赫数下的惰性混合物层。 从战略上选择这些值：根据Langley实验曲线，Mc = 0.35位于不可压缩状态的极限内（情况I-2D-0.35），Mc = 0.70（情况I-2D-0.70） 位于该曲线的过渡区域中，最后，属于可压缩状态的值Mc = 1.10（情况I-2D-1.10）。</p>
+<h5 id="仿真参数"><a href="#仿真参数" class="headerlink" title="仿真参数"></a>仿真参数</h5><p>不同压缩率的惰性混合物层如下所示。表5.3总结了每个剪切层的特性。在所有情况下，这些都是超音速混合层。密度比保持恒定，因为燃料和氧化剂的性质不变。该比率略高于单位，后者可以最初有利于增加增长率。齿轮比随着对流马赫数的增加而降低。为了实现这三种配置，燃料流的速度（图5.1中的上部流）保持恒定且略超音速，而陈旧的空气流的速度（更轻）则增加，以提高马赫数对流。最后，修改初始涡旋厚度δω0的值，以便在三种情况下在输入Reω0=640处获得雷诺数的恒定值。</p>
+<p>对于几乎不可压缩的情况，在尺寸为$L1×L2 =350δω0×80δω0$的笛卡尔计算域中进行数值模拟，而对于其他两种情况，则为$L1×L2 =350δω0×122δω0$。这些域分别离散为N1×N2 = 1739×369点和N1×N2 = 1739×403点。为了减少与模拟相关的计算成本，在两个空间方向上对网格进行拉伸。在横向，网格尺寸保持恒定区域中心和x2=±20δω0之间的$Δx2=0.168δω0$,具有恒定空间离散步骤的该区域涵盖了混合物层的整个显影区域。然后以40％的速率施加恒定的拉伸，直到$x2 =±30δω0$。除此之外，拉伸率设定为500％。在纵向上，如图5.6所示，施加连续拉伸。网格尺寸的最大值Δx1=0.40δω0，与Fu和Li [55]的空间混合层的DNS中保留的最大值相对应。最小网格尺寸∆x1=0.168δω0$，对应于时间混合层的不同DNS中使用的网格尺寸. Dirichlet类型边界条件应用于输入，而完全非反射条件应用于计算域的底部和顶部的输出。 由(5.13）给出的随机干扰，即白噪声，其中ε= 0.01且∆x0 =δθ，0添加到速度的横向分量（x1,0，x2,0 = 4δω，0，0）。 数值仿真的稳定性由固定在0.75的CFL和等于0.1的傅立叶数确保。</p>
+<p>对应于该混合层中的一个的横截面的轮廓的初步数值模拟进行的以分离的分子运输方面的影响。此模拟在长度L1 =80δω0的计算域中进行,一维分布在369个计算点中。初始解对应于物种和温度的双曲正切曲线，纵向速度为零。非反射边界条件在端部施加与上述相同的数值稳定性的标准被使用。图5.7示出了与传输的详细描述和简化方面的结果。 80微秒仿真时间是足够大的，一个粒子通过一个相应于壳体I-2D-0.35计算域。这个时间足够大，可以研究分子层在Mc = 0.35的混合层对流时间特性过程中对该粒子的影响。对于惰性情况下，运输条款的两种描述之间的差异仍然是相当低的。具体的做法是没有，在这些结果中，在该结构必需的光。尽管如此，下面仍将保留对运输条款的详细说明，因为与简化方法相比，此处额外模拟计算的成本仅为10％左右。</p>
+<h5 id="混合层的结构"><a href="#混合层的结构" class="headerlink" title="混合层的结构"></a>混合层的结构</h5><p>图5.8显示了具有涡度等值线的流动的瞬时可视化，对应于不同级别的可压缩性。</p>
+<p>在I-2D-0.35情况下，涡流的配对与不可压缩混合层的模拟（图5.2（a））以及Stanley＆Sarkar提出的结果相似。第一对出现在x1 =100δω0之前。但是，该距离明显大于不可压缩情况下的距离。这些涡流沿流动方向增长。</p>
+<p>情况I-2D-0.70显示出结构的不连贯发展。第一个配对在x1 =150δω0附近形成，从而产生更扭曲的涡旋结构。</p>
+<p>最后，图5.8（c）显示，随机激发未能触发Mc = 1.10时剪切层的不稳定性。这一结果与Fedioun＆Lardjane [48]致力于三维二元混合层时间稳定性线性分析的研究一致。</p>
+<p>随着对流马赫数的增加，剪切层不稳定性的最大放大模式实际上变成了三维。扰动传播的平面与发生二维流动的平面x1-x2偏移了某个角度。如图5.8（c）所示，这阻止了二维混合层的空间扩展。在下文中，仅在三维模拟中解决此可压缩性方案.</p>
+<p>图5.9显示了两种情况下氢的质量分数的瞬时场：I-2D-0.35和I-2D-0.70。 该图使得可以观察到可压缩性对结构以及混合物拓扑的影响。 对于准不可压缩状态（图5.9（a）），这些结构保留了更显着的连贯性，并且可以在横坐标上识别出三卷：x1≈227δω0，x1≈270δω0和x1≈320δω0。 另一方面，情况I-2D-0.70则呈现出更加混乱和拉长的结构</p>
+<h5 id="自相似状态"><a href="#自相似状态" class="headerlink" title="自相似状态"></a>自相似状态</h5><h4 id="能量平衡"><a href="#能量平衡" class="headerlink" title="能量平衡"></a>能量平衡</h4><h4 id="可压缩反应混合层"><a href="#可压缩反应混合层" class="headerlink" title="可压缩反应混合层"></a>可压缩反应混合层</h4>
+    </div>
+
+    
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------------</div>
+    
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Guan Qingdi
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://guanqingdi.github.io/2019/12/%E7%A9%BA%E9%97%B4%E6%B7%B7%E5%90%88%E5%B1%82/" title="空间混合层">https://guanqingdi.github.io/2019/12/%E7%A9%BA%E9%97%B4%E6%B7%B7%E5%90%88%E5%B1%82/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/12/%E5%8C%96%E5%AD%A6%E5%8F%8D%E5%BA%94%E6%9C%BA%E7%90%86/" rel="prev" title="化学反应机理">
+      <i class="fa fa-chevron-left"></i> 化学反应机理
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/12/%E6%B9%8D%E6%B5%81%E7%BB%9F%E8%AE%A1/" rel="next" title="湍流统计">
+      湍流统计 <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Ferrer-反应混合层"><span class="nav-number">1.</span> <span class="nav-text">Ferrer 反应混合层</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#翻译"><span class="nav-number">1.1.</span> <span class="nav-text">翻译</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#文献综述部分"><span class="nav-number">1.1.1.</span> <span class="nav-text">文献综述部分</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#混合层一般性质"><span class="nav-number">1.1.2.</span> <span class="nav-text">混合层一般性质</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#不可压二维混合层"><span class="nav-number">1.1.3.</span> <span class="nav-text">不可压二维混合层</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#惰性可压缩混合层"><span class="nav-number">1.1.4.</span> <span class="nav-text">惰性可压缩混合层</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#混合物的描述"><span class="nav-number">1.1.4.1.</span> <span class="nav-text">混合物的描述</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#仿真参数"><span class="nav-number">1.1.4.2.</span> <span class="nav-text">仿真参数</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#混合层的结构"><span class="nav-number">1.1.4.3.</span> <span class="nav-text">混合层的结构</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#自相似状态"><span class="nav-number">1.1.4.4.</span> <span class="nav-text">自相似状态</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#能量平衡"><span class="nav-number">1.1.5.</span> <span class="nav-text">能量平衡</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#可压缩反应混合层"><span class="nav-number">1.1.6.</span> <span class="nav-text">可压缩反应混合层</span></a></li></ol></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Guan Qingdi"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Guan Qingdi</p>
+  <div class="site-description" itemprop="description">日常 | 湍流 | PDF | 燃烧 | 码渣</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/guanqingdi" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;guanqingdi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5770863755/home?wvr=5" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5770863755&#x2F;home?wvr=5" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guan Qingdi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">65k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">1:48</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='255,0,200' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+</body>
+</html>

@@ -1,0 +1,690 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+<meta name="generator" content="Hexo 4.0.0">
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png">
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png">
+  <link rel="mask-icon" href="/images/logo.svg" color="#222">
+  <link rel="alternate" href="/atom.xml" title="过河卒" type="application/atom+xml">
+
+<link rel="stylesheet" href="/css/main.css">
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css">
+
+
+<script id="hexo-configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    hostname: new URL('https://guanqingdi.github.io').hostname,
+    root: '/',
+    scheme: 'Muse',
+    version: '7.5.0',
+    exturl: false,
+    sidebar: {"position":"right","display":"always","offset":12,"onmobile":false},
+    copycode: {"enable":false,"show_result":false,"style":null},
+    back2top: {"enable":true,"sidebar":false,"scrollpercent":false},
+    bookmark: {"enable":false,"color":"#222","save":"auto"},
+    fancybox: false,
+    mediumzoom: false,
+    lazyload: false,
+    pangu: false,
+    algolia: {
+      appID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    },
+    localsearch: {"enable":true,"trigger":"auto","top_n_per_article":1,"unescape":false,"preload":false},
+    path: 'search.xml',
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    sidebarPadding: 40
+  };
+</script>
+
+  <meta name="description" content="前言关于湍流入口生成方法的一些认识.">
+<meta name="keywords" content="programming,turbulent,CFD">
+<meta property="og:type" content="article">
+<meta property="og:title" content="湍流入口生成方法">
+<meta property="og:url" content="https:&#x2F;&#x2F;guanqingdi.github.io&#x2F;2019&#x2F;11&#x2F;Turbulent-Inlet&#x2F;index.html">
+<meta property="og:site_name" content="过河卒">
+<meta property="og:description" content="前言关于湍流入口生成方法的一些认识.">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2020-01-02T01:48:32.490Z">
+<meta name="twitter:card" content="summary">
+
+<link rel="canonical" href="https://guanqingdi.github.io/2019/11/Turbulent-Inlet/">
+
+
+<script id="page-configurations">
+  // https://hexo.io/docs/variables.html
+  CONFIG.page = {
+    sidebar: "",
+    isHome: false,
+    isPost: true,
+    isPage: false,
+    isArchive: false
+  };
+</script>
+
+  <title>湍流入口生成方法 | 过河卒</title>
+  
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-header { opacity: initial; }
+
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage">
+  <div class="container use-motion">
+    <div class="headband"></div>
+
+    <header class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-container">
+  <div class="site-meta">
+
+    <div>
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">过河卒</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+        <p class="site-subtitle">朝廷鹰犬，反贼先锋</p>
+  </div>
+
+  <div class="site-nav-toggle">
+    <div class="toggle" aria-label="切换导航栏">
+      <span class="toggle-line toggle-line-first"></span>
+      <span class="toggle-line toggle-line-middle"></span>
+      <span class="toggle-line toggle-line-last"></span>
+    </div>
+  </div>
+</div>
+
+
+<nav class="site-nav">
+  
+  <ul id="menu" class="menu">
+        <li class="menu-item menu-item-home">
+
+    <a href="/" rel="section"><i class="fa fa-fw fa-home"></i>首页</a>
+
+  </li>
+        <li class="menu-item menu-item-archives">
+
+    <a href="/archives/" rel="section"><i class="fa fa-fw fa-archive"></i>归档</a>
+
+  </li>
+        <li class="menu-item menu-item-categories">
+
+    <a href="/categories/" rel="section"><i class="fa fa-fw fa-th"></i>分类</a>
+
+  </li>
+        <li class="menu-item menu-item-tags">
+
+    <a href="/tags/" rel="section"><i class="fa fa-fw fa-tags"></i>标签</a>
+
+  </li>
+        <li class="menu-item menu-item-about">
+
+    <a href="/about/" rel="section"><i class="fa fa-fw fa-user"></i>关于</a>
+
+  </li>
+      <li class="menu-item menu-item-search">
+        <a role="button" class="popup-trigger"><i class="fa fa-search fa-fw"></i>搜索
+        </a>
+      </li>
+  </ul>
+
+</nav>
+  <div class="site-search">
+    <div class="popup search-popup">
+    <div class="search-header">
+  <span class="search-icon">
+    <i class="fa fa-search"></i>
+  </span>
+  <div class="search-input-container">
+    <input autocomplete="off" autocorrect="off" autocapitalize="none"
+           placeholder="搜索..." spellcheck="false"
+           type="text" id="search-input">
+  </div>
+  <span class="popup-btn-close">
+    <i class="fa fa-times-circle"></i>
+  </span>
+</div>
+<div id="search-result"></div>
+
+</div>
+<div class="search-pop-overlay"></div>
+
+  </div>
+</div>
+    </header>
+
+    
+  <div class="back-to-top">
+    <i class="fa fa-arrow-up"></i>
+    <span>0%</span>
+  </div>
+  <div class="reading-progress-bar"></div>
+
+
+    <main class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+
+          <div class="content">
+            
+
+  <div class="posts-expand">
+      
+  
+  
+  <article itemscope itemtype="http://schema.org/Article" class="post-block " lang="zh-CN">
+    <link itemprop="mainEntityOfPage" href="https://guanqingdi.github.io/2019/11/Turbulent-Inlet/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="image" content="/images/avatar.jpg">
+      <meta itemprop="name" content="Guan Qingdi">
+      <meta itemprop="description" content="日常 | 湍流 | PDF | 燃烧 | 码渣">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="过河卒">
+    </span>
+      <header class="post-header">
+        <h1 class="post-title" itemprop="name headline">
+          湍流入口生成方法
+        </h1>
+
+        <div class="post-meta">
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              <span class="post-meta-item-text">发表于</span>
+
+              <time title="创建时间：2019-11-24 22:01:32" itemprop="dateCreated datePublished" datetime="2019-11-24T22:01:32+08:00">2019-11-24</time>
+            </span>
+              <span class="post-meta-item">
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                <span class="post-meta-item-text">更新于</span>
+                <time title="修改时间：2020-01-02 09:48:32" itemprop="dateModified" datetime="2020-01-02T09:48:32+08:00">2020-01-02</time>
+              </span>
+            <span class="post-meta-item">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              <span class="post-meta-item-text">分类于</span>
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/Turbulent/" itemprop="url" rel="index">
+                    <span itemprop="name">Turbulent</span>
+                  </a>
+                </span>
+            </span>
+
+          
+            <span class="post-meta-item" title="阅读次数" id="busuanzi_container_page_pv" style="display: none;">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              <span class="post-meta-item-text">阅读次数：</span>
+              <span id="busuanzi_value_page_pv"></span>
+            </span><br>
+            <span class="post-meta-item" title="本文字数">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-file-word-o"></i>
+              </span>
+                <span class="post-meta-item-text">本文字数：</span>
+              <span>3.7k</span>
+            </span>
+            <span class="post-meta-item" title="阅读时长">
+              <span class="post-meta-item-icon">
+                <i class="fa fa-clock-o"></i>
+              </span>
+                <span class="post-meta-item-text">阅读时长 &asymp;</span>
+              <span>6 分钟</span>
+            </span>
+
+        </div>
+      </header>
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+        <h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>关于湍流入口生成方法的一些认识.</p>
+<a id="more"></a>
+
+<h1 id="主流的几种生成方法"><a href="#主流的几种生成方法" class="headerlink" title="主流的几种生成方法"></a>主流的几种生成方法</h1><ul>
+<li>层流自然转捩法</li>
+</ul>
+<p>最直接的湍流边界层生成方法.在远上游给定层流剖面,并增加一定随机扰动,然后让其自然转捩为湍流边界层.</p>
+<p>这种方法最主要用于研究转捩过程本身的模拟,并且在入口处不需要给定湍流脉动信息.</p>
+<p>其缺点也十分明显,自然转捩需要较长的物理距离,只模拟转捩过程的耗费已经很大.</p>
+<p>因此,一般会在入口处给定足够准确的入口条件,以保证流动能在较短的距离内发展出具有正确的摩擦力和积分尺度的真实湍流边界层.</p>
+<ul>
+<li>Fourier变化方法</li>
+</ul>
+<p>such as Batten et al. [1] and Davidson and Billson [3];</p>
+<ul>
+<li>正交分解方法</li>
+</ul>
+<p>采用实验数据,按照Druault等人的方法,通过正交分解重建湍流场.</p>
+<ul>
+<li><p>Di Mare 等人的数字滤波方法</p>
+</li>
+<li><p>合成涡方法</p>
+</li>
+<li><p>回收调节方法, Lund</p>
+</li>
+</ul>
+<h2 id="Klein-2003-JCP-A-digital-filter-based-generation-of-inflow-data-for-spatially-developing-direct-numerical-or-large-eddy-simulations"><a href="#Klein-2003-JCP-A-digital-filter-based-generation-of-inflow-data-for-spatially-developing-direct-numerical-or-large-eddy-simulations" class="headerlink" title="Klein-2003-JCP-A digital filter based generation of inflow data for spatially developing direct numerical or large eddy simulations"></a>Klein-2003-JCP-A digital filter based generation of inflow data for spatially developing direct numerical or large eddy simulations</h2><p><strong>合成湍流最简单的方法是在平均剖面上叠加随机扰动.</strong>由标准程序产生的随机信号,其能量均匀的分布在整个波数范围内(白噪声),也就是说其频谱近似于一条水平线.由于在低波数(大尺度)范围内能量的缺乏,伪湍流被立即阻尼到零,导致其结果与层流入口相似.</p>
+<p><strong>合成湍流的本质就是生成具有某些一定统计特性的速度信号.</strong>这些统计特性可以从实验中得到,例如平均值,脉动值和交叉关系,高阶矩,长度和时间尺度,能谱等等.</p>
+<ol>
+<li><p>首先为每个速度分量建立一个具有指定属性的三维信号Ui，典型的像两点统计(长度尺度,能谱)。如果只需要生成均匀各向同性湍流数据，那么这就是所有需要的.</p>
+</li>
+<li><p>如果所要求的湍流是各向异性的，则至少要考虑提供相应的雷诺应力张量.</p>
+</li>
+</ol>
+<p>数字滤波就是对随机信号进行数字滤波.</p>
+<p>为了建立两点相关函数,设$r_m$为一系列$\overline{r_m} = 0$,$\overline{r_mr_m}=1$的随机信号,定义一个卷积或数字线性非递归滤波器,</p>
+<p>$$ u_m = \sum_{n=-N}^{N} {b_nr_{m+n}} $$</p>
+<p>$b_n$为滤波系数,N与滤波器相关.当$m \neq n$时,${r_mr_n}=0$,因此可以得到$u_m$的相关函数</p>
+<p>$$\frac{\overline{u_mu_{m+k}}}{\overline{u_mu_m}} = \sum_{j=-N+k}^N {b_jb_{j-k}}/ \sum_{j=-N}^N b_j^2$$</p>
+<p>这意味着滤波系数和$u_m$的自相关函数之间存在关系.</p>
+<p>必须回答两个问题:</p>
+<ol>
+<li>如何将这个过程扩展到三维空间，</li>
+</ol>
+<p>通过三个一维滤波器的卷积，可以得到一个三维滤波器</p>
+<p>$b_ijk=b_i\cdot b_j \cdot b_k$</p>
+<ol start="2">
+<li>如何对该公式求逆.</li>
+</ol>
+<p>假设给定了一个自相关函数,如$\overline{u+mu_{m+k}}/\overline{u_mu_m}$.然后就可以利用多维牛顿法求系数$b_n$</p>
+<p>相较于自相关函数,长度尺度更加直观.因此作进一步的简化,即不再试图建立相关函数的详细形式,而是假设其仅仅取决于分开的距离和一个单一的长度尺度.</p>
+<p>可以把相关函数跟概率密度分布函数类比的来看,它同概率密度分布函数一样具有一定的形状.</p>
+<p>这意味着假设了一个特殊的$R_uu$形状。对于后期均匀湍流的情况，自相关函数取固定时间的形式为</p>
+<p>$$R_{uu}(r,0,0)=exp(-\frac{\pi r^2}{4L^2}) (with \ L=L(t)=\sqrt{2 \pi \nu (t-t_0)})$$</p>
+<p>这个相关函数是时间和空间同时存在的相关函数.</p>
+<p>该函数满足一些基本的属性,如$R_{uu}(0)=1,lim_{r\rightarrow\infty}R_{uu}(r)=0$,而且长度尺度$L$可以很容易给定.特别是滤波器系数可以的显式表示,不同迭代求解.</p>
+<p>假设$\Delta x$是网格间距,$L=n\Delta x$是期望的长度尺度，然后我们可以用离散形式写出来</p>
+<p>$$\frac{\overline{u_mu_{m+k}}}{\overline{u_mu_m}} = R_{uu}(k\Delta x) = exp \biggr(-\frac{\pi (k\Delta x)^2}{4(n\Delta x)^2} \biggr) = exp\biggr(-\frac{\pi k^2}{4n^2}\biggr) $$</p>
+<p>其中滤波系数</p>
+<p>$$ b_k \approx \tilde b_k \biggr / \biggr( \sum_{j=-N}^N \tilde b_j^2 \biggr)^{1/2}$$</p>
+<p>$$ \tilde b_k := exp\biggr( -\frac{\pi k^2}{2n^2}\biggr) $$</p>
+<p>上式近似成立,其误差为…,过滤器的支持应该足够大，以捕获长度尺度的两倍</p>
+<p>如果允许$b_k$的空间依赖性，那么通过在网格的不同位置应用不同的过滤系数集,就可以在空间上改变长度尺度。例如，在壁面流动中，当接近壁面时，壁面法向长度必须趋近于零。但必须指出的是，长度尺度的强烈变化导致相关函数偏离高斯形状。原因是公式(10)假设过滤系数为常数。</p>
+<p>动态生成流入数据(用于等距时间步进)的算法可能是这样的(另一种方法是生成大量数据，将其存储，并通过应用泰勒假设让其在入口平面进行对流)</p>
+<ol>
+<li><p>为入口对应的每个坐标方向选择一个长度尺度$L_y=n_y\Delta y,L_z=n_z\Delta z$,和一个时间尺度$L_x$,根据(15)条件选择一个滤波宽度</p>
+</li>
+<li><p>初始化并存储3个随机场</p>
+</li>
+<li><p>计算滤波系数</p>
+</li>
+<li><p>应用如下滤波过程</p>
+</li>
+</ol>
+<p>$$ U_\alpha(j,k) = \sum_{i’=-N_x}^{N_x} \sum_{j’=-N_y}^{N_y} \sum_{k’=-N_z}^{N_z} b(i’,j’,k’)R_i(i’,j+j’,k+k’)$$</p>
+<ol start="6">
+<li><p>进行坐标变化产生$u_\alpha(j,k)$</p>
+</li>
+<li><p>将$u_\alpha$赋给入口</p>
+</li>
+<li><p>舍弃y和z平面的$R_\alpha$,并且shift整个数据$R_\alpha(i,j,k)=R_\alpha(i+1,j,k)$,用新的随机数填满$R_\alpha(N_x,j,k)平面$</p>
+</li>
+<li><p>重复上述过程4-8</p>
+</li>
+</ol>
+<h2 id="Mare-2006-POF-Synthetic-turbulence-inflow-conditions-for-large-eddy-simulation"><a href="#Mare-2006-POF-Synthetic-turbulence-inflow-conditions-for-large-eddy-simulation" class="headerlink" title="Mare-2006-POF-Synthetic turbulence inflow conditions for large eddy simulation"></a>Mare-2006-POF-Synthetic turbulence inflow conditions for large eddy simulation</h2><p>对空间非均匀湍流的直接数值模拟或大涡模拟,都需要提湍流入口边界条件.潜在的含义是，任何计算的结果可能会受到规定的瞬时进口速度剖面的强烈影响。</p>
+<p>通常的做法是,由实验数据或者经验关系式,产生符合某些统计特性的合成湍流.</p>
+<p>本文提出了一种新的基于数字滤波器的湍流涌流数据生成方法，该方法能够再现指定的统计数据。提出了该方法的两种实现方式:一种是通过给定雷诺应力和长度尺度的简单方法，另一种是能够再现完整的雷诺应力张量以及任何给定的、局部定义的空间和时间相关函数的更详细的方法。</p>
+<p>将该方法应用于平面射流和发展中的壁面边界层，验证了该方法的适用性。</p>
+<p><strong>从数学角度看，精确边界和初值条件是偏微分方程组存在唯一解的必要条件.</strong></p>
+<p>RANS中一般给定平均速度剖面就已经足够了,对于LES和DNS,需要在入口提供更加详细的信息,需要速度的时间演化剖面,也就是要同时给定均值和脉动信息.</p>
+<p>该方法基于对已知或估计的统计数据的再现，不包含其他物理信息.在该方法的原始公式中，湍流相关函数是用单湍流长度和时间尺度来描述的。本文对该方法进行了扩展，使多维时空相关关系得以再现.</p>
+<h2 id="数字滤波的问题"><a href="#数字滤波的问题" class="headerlink" title="数字滤波的问题"></a>数字滤波的问题</h2><p>$\Delta x$是网格间距,$L=n\Delta x$是期望的长度尺度，然后我们可以用离散形式写出来</p>
+<p>$$\frac{\overline{u_mu_{m+k}}}{\overline{u_mu_m}} = R_{uu}(k\Delta x) = exp \biggr(-\frac{\pi (k\Delta x)^2}{4(n\Delta x)^2} \biggr) = exp\biggr(-\frac{\pi k^2}{4n^2}\biggr) $$</p>
+<p>其中滤波系数</p>
+<p>$$ b_k \approx \tilde b_k \biggr / \biggr( \sum_{j=-N}^N \tilde b_j^2 \biggr)^{1/2}$$</p>
+<p>$$ \tilde b_k := exp\biggr( -\frac{\pi k^2}{2n^2}\biggr) $$</p>
+<p>最后得到的是</p>
+<p>$$ u_m = \sum_{j=-N}^{N} {b_j r_{m+j}} $$</p>
+<p>这个$u_m$理论上来说是在均匀的$\Delta x$的网格上,$u_1, u_2, … u_k$这个随机序列才具有$L_x$积分长度尺度.因为两点相关函数的具体形式实际上假设了两点的距离是$k \Delta x$.</p>
+<p>如果是壁面加密网格怎么处理???根据给定的$L_y$,再由最小的$\Delta y$,计算出滤波宽度$N_y \geq 2n_y$.然后直接由网格节点$My$,确定$[1-N_y,M_y+N_y]$,根据同样的方法求出滤波系数.</p>
+<p>但是这种计算的结果就是把均匀网格的结果直接映射到了拉伸网格上.</p>
+
+    </div>
+
+    
+    
+    <div>
+    
+        <div style="text-align:center;color: #ccc;font-size:16px;">-------------------本文结束<i class="fa fa-paw"></i>感谢您的阅读-------------------</div>
+    
+</div>
+
+        
+
+<div>
+<ul class="post-copyright">
+  <li class="post-copyright-author">
+    <strong>本文作者： </strong>Guan Qingdi
+  </li>
+  <li class="post-copyright-link">
+    <strong>本文链接：</strong>
+    <a href="https://guanqingdi.github.io/2019/11/Turbulent-Inlet/" title="湍流入口生成方法">https://guanqingdi.github.io/2019/11/Turbulent-Inlet/</a>
+  </li>
+  <li class="post-copyright-license">
+    <strong>版权声明： </strong>本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" rel="noopener" target="_blank"><i class="fa fa-fw fa-creative-commons"></i>BY-NC-SA</a> 许可协议。转载请注明出处！
+  </li>
+</ul>
+</div>
+
+
+      <footer class="post-footer">
+          
+          <div class="post-tags">
+              <a href="/tags/programming/" rel="tag"><i class="fa fa-tag"></i> programming</a>
+              <a href="/tags/turbulent/" rel="tag"><i class="fa fa-tag"></i> turbulent</a>
+              <a href="/tags/CFD/" rel="tag"><i class="fa fa-tag"></i> CFD</a>
+          </div>
+
+        
+
+
+        
+    <div class="post-nav">
+      <div class="post-nav-item">
+    <a href="/2019/11/Turbulent-Combustion/" rel="prev" title="湍流燃烧">
+      <i class="fa fa-chevron-left"></i> 湍流燃烧
+    </a></div>
+      <div class="post-nav-item">
+    <a href="/2019/11/PDFofDiscreteData/" rel="next" title="Python绘制离散数据概率密度函数PDF">
+      Python绘制离散数据概率密度函数PDF <i class="fa fa-chevron-right"></i>
+    </a></div>
+    </div>
+      </footer>
+    
+  </article>
+  
+  
+  
+
+  </div>
+
+
+          </div>
+          
+
+        </div>
+          
+  
+  <div class="toggle sidebar-toggle">
+    <span class="toggle-line toggle-line-first"></span>
+    <span class="toggle-line toggle-line-middle"></span>
+    <span class="toggle-line toggle-line-last"></span>
+  </div>
+
+  <aside class="sidebar">
+    <div class="sidebar-inner">
+
+      <ul class="sidebar-nav motion-element">
+        <li class="sidebar-nav-toc">
+          文章目录
+        </li>
+        <li class="sidebar-nav-overview">
+          站点概览
+        </li>
+      </ul>
+
+      <!--noindex-->
+      <div class="post-toc-wrap sidebar-panel">
+          <div class="post-toc motion-element"><ol class="nav"><li class="nav-item nav-level-1"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-1"><a class="nav-link" href="#主流的几种生成方法"><span class="nav-number">2.</span> <span class="nav-text">主流的几种生成方法</span></a><ol class="nav-child"><li class="nav-item nav-level-2"><a class="nav-link" href="#Klein-2003-JCP-A-digital-filter-based-generation-of-inflow-data-for-spatially-developing-direct-numerical-or-large-eddy-simulations"><span class="nav-number">2.1.</span> <span class="nav-text">Klein-2003-JCP-A digital filter based generation of inflow data for spatially developing direct numerical or large eddy simulations</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Mare-2006-POF-Synthetic-turbulence-inflow-conditions-for-large-eddy-simulation"><span class="nav-number">2.2.</span> <span class="nav-text">Mare-2006-POF-Synthetic turbulence inflow conditions for large eddy simulation</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#数字滤波的问题"><span class="nav-number">2.3.</span> <span class="nav-text">数字滤波的问题</span></a></li></ol></li></ol></div>
+      </div>
+      <!--/noindex-->
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+    <img class="site-author-image" itemprop="image" alt="Guan Qingdi"
+      src="/images/avatar.jpg">
+  <p class="site-author-name" itemprop="name">Guan Qingdi</p>
+  <div class="site-description" itemprop="description">日常 | 湍流 | PDF | 燃烧 | 码渣</div>
+</div>
+<div class="site-state-wrap motion-element">
+  <nav class="site-state">
+      <div class="site-state-item site-state-posts">
+          <a href="/archives/">
+        
+          <span class="site-state-item-count">19</span>
+          <span class="site-state-item-name">日志</span>
+        </a>
+      </div>
+      <div class="site-state-item site-state-categories">
+            <a href="/categories/">
+          
+        <span class="site-state-item-count">12</span>
+        <span class="site-state-item-name">分类</span></a>
+      </div>
+      <div class="site-state-item site-state-tags">
+            <a href="/tags/">
+          
+        <span class="site-state-item-count">23</span>
+        <span class="site-state-item-name">标签</span></a>
+      </div>
+  </nav>
+</div>
+  <div class="feed-link motion-element">
+    <a href="/atom.xml" rel="alternate">
+      <i class="fa fa-rss"></i>RSS
+    </a>
+  </div>
+  <div class="links-of-author motion-element">
+      <span class="links-of-author-item">
+        <a href="https://github.com/guanqingdi" title="GitHub → https:&#x2F;&#x2F;github.com&#x2F;guanqingdi" rel="noopener" target="_blank"><i class="fa fa-fw fa-github"></i>GitHub</a>
+      </span>
+      <span class="links-of-author-item">
+        <a href="https://weibo.com/u/5770863755/home?wvr=5" title="Weibo → https:&#x2F;&#x2F;weibo.com&#x2F;u&#x2F;5770863755&#x2F;home?wvr=5" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+      </span>
+  </div>
+  <div class="cc-license motion-element" itemprop="license">
+    <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/deed.zh" class="cc-opacity" rel="noopener" target="_blank"><img src="/images/cc-by-nc-sa.svg" alt="Creative Commons"></a>
+  </div>
+
+
+
+      </div>
+
+    </div>
+  </aside>
+  <div id="sidebar-dimmer"></div>
+
+
+      </div>
+    </main>
+
+    <footer class="footer">
+      <div class="footer-inner">
+        
+
+<div class="copyright">
+  
+  &copy; 2019 – 
+  <span itemprop="copyrightYear">2020</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">Guan Qingdi</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-area-chart"></i>
+    </span>
+      <span class="post-meta-item-text">站点总字数：</span>
+    <span title="站点总字数">65k</span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item-icon">
+      <i class="fa fa-coffee"></i>
+    </span>
+      <span class="post-meta-item-text">站点阅读时长 &asymp;</span>
+    <span title="站点阅读时长">1:48</span>
+</div>
+
+        
+<div class="busuanzi-count">
+  <script async src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+    <span class="post-meta-item" id="busuanzi_container_site_uv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-user"></i>
+      </span>
+      <span class="site-uv" title="总访客量">
+        <span id="busuanzi_value_site_uv"></span>
+      </span>
+    </span>
+    <span class="post-meta-divider">|</span>
+    <span class="post-meta-item" id="busuanzi_container_site_pv" style="display: none;">
+      <span class="post-meta-item-icon">
+        <i class="fa fa-eye"></i>
+      </span>
+      <span class="site-pv" title="总访问量">
+        <span id="busuanzi_value_site_pv"></span>
+      </span>
+    </span>
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+  </div>
+
+  
+  
+  <script color='255,0,200' opacity='0.5' zIndex='-1' count='99' src="/lib/canvas-nest/canvas-nest.min.js"></script>
+  <script src="/lib/anime.min.js"></script>
+  <script src="/lib/velocity/velocity.min.js"></script>
+  <script src="/lib/velocity/velocity.ui.min.js"></script>
+<script src="/js/utils.js"></script><script src="/js/motion.js"></script>
+<script src="/js/schemes/muse.js"></script>
+<script src="/js/next-boot.js"></script>
+
+
+
+  
+
+
+
+
+  <script src="/js/local-search.js"></script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+  
+      
+<script type="text/x-mathjax-config">
+
+  MathJax.Hub.Config({
+    tex2jax: {
+      inlineMath: [ ['$', '$'], ['\\(', '\\)'] ],
+      processEscapes: true,
+      skipTags: ['script', 'noscript', 'style', 'textarea', 'pre', 'code']
+    },
+    TeX: {
+      equationNumbers: {
+        autoNumber: 'AMS'
+      }
+    }
+  });
+
+  MathJax.Hub.Register.StartupHook('TeX Jax Ready', function() {
+    MathJax.InputJax.TeX.prefilterHooks.Add(function(data) {
+      if (data.display) {
+        var next = data.script.nextSibling;
+        while (next && next.nodeName.toLowerCase() === '#text') {
+          next = next.nextSibling;
+        }
+        if (next && next.nodeName.toLowerCase() === 'br') {
+          next.parentNode.removeChild(next);
+        }
+      }
+    });
+  });
+
+  MathJax.Hub.Queue(function() {
+    var all = MathJax.Hub.getAllJax(), i;
+    for (i = 0; i < all.length; i += 1) {
+      element = document.getElementById(all[i].inputID + '-Frame').parentNode;
+      if (element.nodeName.toLowerCase() == 'li') {
+        element = element.parentNode;
+      }
+      element.classList.add('has-jax');
+    }
+  });
+</script>
+<script>
+  NexT.utils.getScript('//cdn.jsdelivr.net/npm/mathjax@2/MathJax.js?config=TeX-AMS-MML_HTMLorMML', () => {
+    MathJax.Hub.Typeset();
+  }, window.MathJax);
+</script>
+
+    
+
+  
+
+</body>
+</html>
