@@ -1,8 +1,34 @@
 <?xml version="1.0" encoding="utf-8"?>
 <search>
   <entry>
+    <title>Vim基础操作</title>
+    <url>/2020/01/Vim-Basic-Commond/</url>
+    <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>记录Vim的一些基础操作</p>
+<a id="more"></a>
+
+<hr>
+<h1 id="Vim中插入时间方法"><a href="#Vim中插入时间方法" class="headerlink" title="Vim中插入时间方法"></a>Vim中插入时间方法</h1><p>在vim中写文档时,有时需要记录写作时间,每次输入太繁琐,搜索了几种插入时间的方法,这里记录自己感觉最方便的一种.</p>
+<h2 id="参考链接"><a href="#参考链接" class="headerlink" title="参考链接"></a>参考链接</h2><p><a href="https://blog.csdn.net/l_liangkk/article/details/82150895" target="_blank" rel="noopener"><strong>vim中方便插入时间的几种方式</strong></a></p>
+<h2 id="具体实现"><a href="#具体实现" class="headerlink" title="具体实现"></a>具体实现</h2><p>该方法的核心是使用 <code>strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)</code>函数实现插入时间的操作,由于命令太长,所以再用<code>ab</code>来缩写命令.</p>
+<ol>
+<li><p>在<code>~/.vimrc</code>文件中插入<code>iab xdt &lt;c-r&gt;=strftime(&quot;%Y-%m-%d %H:%M:%S&quot;)&lt;cr&gt;</code>. 其中<code>xdt</code>为缩写的命令.</p>
+</li>
+<li><p>直接在<code>insert</code>插入状态下输入<code>xdt</code>,然后<code>Enter</code>回车即完成插入时间</p>
+</li>
+</ol>
+<hr>
+]]></content>
+      <categories>
+        <category>Vim</category>
+      </categories>
+      <tags>
+        <tag>linux</tag>
+        <tag>vim</tag>
+      </tags>
+  </entry>
+  <entry>
     <title>曲线坐标下的合成湍流入口生成方法</title>
-    <url>/2020/01/%E6%9B%B2%E7%BA%BF%E5%9D%90%E6%A0%87%E4%B8%8B%E7%9A%84%E5%90%88%E6%88%90%E6%B9%8D%E6%B5%81%E5%85%A5%E5%8F%A3%E7%94%9F%E6%88%90%E6%96%B9%E6%B3%95/</url>
+    <url>/2020/01/Digtal-Filter/</url>
     <content><![CDATA[<p>主要是总结吸收数字滤波方法,对其进行一定的改进,并将其应用在曲线坐标下湍流入口生成.</p>
 <a id="more"></a>
 
@@ -31,13 +57,13 @@
         <category>Numerical Method</category>
       </categories>
       <tags>
-        <tag>programming</tag>
         <tag>turbulent</tag>
+        <tag>programming</tag>
       </tags>
   </entry>
   <entry>
     <title>湍流统计</title>
-    <url>/2019/12/%E6%B9%8D%E6%B5%81%E7%BB%9F%E8%AE%A1/</url>
+    <url>/2019/12/Turbulent-Statistic/</url>
     <content><![CDATA[<a id="more"></a><h2 id="Pope-Turbulent-Flows-P69"><a href="#Pope-Turbulent-Flows-P69" class="headerlink" title="Pope, Turbulent Flows, P69."></a>Pope, <em>Turbulent Flows</em>, P69.</h2><h3 id="时间相关函数-自相关"><a href="#时间相关函数-自相关" class="headerlink" title="时间相关函数(自相关)"></a>时间相关函数(自相关)</h3><p><strong>自相关函数表征了一定时间内信号的相关性</strong>,其数学形式上就是同一位置不同时刻脉动关联量(乘积)的期望.如果是同一时刻,相关性为1,在其他状态下自相关函数均小于1,也可以为负数,即负相关.</p><p>时间相关函数就是自相关函数.</p><p>$$R(s) = \langle u(t)u(t+s) \rangle$$</p><a id="more"></a>
 
 
@@ -72,7 +98,7 @@
   </entry>
   <entry>
     <title>空间混合层</title>
-    <url>/2019/12/%E7%A9%BA%E9%97%B4%E6%B7%B7%E5%90%88%E5%B1%82/</url>
+    <url>/2019/12/Spatial-Mixing/</url>
     <content><![CDATA[<a id="more"></a><p>最小的湍流长度尺度是kolmogorov尺度$\eta$</p><p>$$ \eta = (\nu^3 / \epsilon)^{1/4} $$</p><p>其中$\nu$为动力黏度,$\epsilon$为湍动能耗散率,耗散率由下式进行近似</p><p>$$\epsilon = u_{rms}^3 / L$$</p><p>其中$u_{rms}$为湍流脉动速度,$L$为湍流积分长度尺度</p><a id="more"></a>
 
 
@@ -152,7 +178,7 @@
   </entry>
   <entry>
     <title>化学反应机理</title>
-    <url>/2019/12/%E5%8C%96%E5%AD%A6%E5%8F%8D%E5%BA%94%E6%9C%BA%E7%90%86/</url>
+    <url>/2019/12/Reaction-Mechanism/</url>
     <content><![CDATA[<h1 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h1><p>对化学反应的相关理解</p>
 <a id="more"></a>
 
@@ -168,7 +194,7 @@
   </entry>
   <entry>
     <title>超声速抬举射流火焰的LES-PDF模拟</title>
-    <url>/2019/11/%E8%B6%85%E5%A3%B0%E9%80%9F%E6%8A%AC%E4%B8%BE%E5%B0%84%E6%B5%81%E7%81%AB%E7%84%B0%E7%9A%84LES-PDF%E6%A8%A1%E6%8B%9F/</url>
+    <url>/2019/11/Supersonic-Lifted-Flame/</url>
     <content><![CDATA[<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p>该篇笔记记录超声速氢气抬举射流火焰模拟的基本情况.</p>
 <a id="more"></a>
 
@@ -382,8 +408,8 @@
         <category>Turbulent</category>
       </categories>
       <tags>
-        <tag>programming</tag>
         <tag>turbulent</tag>
+        <tag>programming</tag>
         <tag>CFD</tag>
       </tags>
   </entry>
@@ -1281,8 +1307,8 @@
         <category>MPI</category>
       </categories>
       <tags>
-        <tag>fortran</tag>
         <tag>programming</tag>
+        <tag>fortran</tag>
         <tag>parallel</tag>
       </tags>
   </entry>
